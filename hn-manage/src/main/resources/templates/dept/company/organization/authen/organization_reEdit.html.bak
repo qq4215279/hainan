@@ -1,0 +1,57 @@
+<body>
+<div class="container">
+    <form class="form-horizontal" id="organizationForm">
+        <div class="row">
+        	<input type="hidden" id="id" th:value="${deptOrganization.id}">
+        	<input type="hidden" id="pId" th:value="${deptOrganization.pId}">
+	        <div class="col-sm-6">
+	        	<form:text id="pName" label="上级工会" name="pName" value="${deptOrganization.pName}" must="true"
+                   onclick="OrganizationDlg.showPNameSelectTree();" disabled="true"></form:text>
+				<form:text id="unionName" label="工会名称" name="unionName" value="${deptOrganization.unionName}" must="true"></form:text>
+				<form:select id="unionType" label="工会类型" name="unionType" value="${deptOrganization.unionType}"  code="lib_base_org_type" must="true"></form:select>
+				<form:figure id="membership" label="会员人数" name="membership" value="${deptOrganization.membership}" min="0" must="true"></form:figure>
+				<form:text id="unionEmail" label="工会邮箱" name="unionEmail" value="${deptOrganization.unionEmail}"></form:text>
+				<form:datetime id="createunionTime" label="建会时间" istime="false" value="${deptOrganization.createunionTime}" must="true" format="yyyy-MM-dd" name="createunionTime"></form:datetime>
+				<form:text id="unionLeader" label="工会负责人" name="unionLeader" value="${deptOrganization.unionLeader}" ></form:text>
+				<form:text id="unionLeaderPhone" label="工会负责人电话" name="unionLeaderPhone" value="${deptOrganization.unionLeaderPhone}" ></form:text>
+
+				<!--<form:text id="unionSimpleName" label="工会简称" name="unionSimpleName" value="${deptOrganization.unionSimpleName}" must="true"></form:text>-->
+                <!--<form:text id="unitZipCode" label="工会邮编" name="unitZipCode" value="${deptOrganization.unitZipCode}"></form:text>-->
+                <!--<form:figure id="cadresNumber" label="专职干部人数" name="cadresNumber" value="${deptOrganization.cadresNumber}" min="0"></form:figure>-->
+				<!--<form:text id="chairmanName" label="主席名称" name="chairmanName" value="${deptOrganization.chairmanName}" must="true"></form:text>-->
+	        </div>
+			<div class="col-sm-6">
+				<form:text id="unitName" label="单位名称" name="unitName" value="${deptOrganization.unitName}" must="true"></form:text>
+				<form:text id="othersOrgCode" label="法人和其他组织统一社会信用代码" name="othersOrgCode" value="${deptOrganization.othersOrgCode}"></form:text>
+				<form:text id="unitOrgCode" label="组织机构代码" name="unitOrgCode" value="${deptOrganization.unitOrgCode}" must="true"></form:text>
+				<form:select id="unitDistrict" label="单位所在行政区" name="unitDistrict"  code="unit_district_code" value="${deptOrganization.unitDistrict}" must="true"></form:select>
+				<form:text id="unitAddress" label="单位地址" name="unitAddress" value="${deptOrganization.unitAddress}" must="true"></form:text>
+				<form:select id="unitNature" label="单位性质类别" name="unitNature" value="${deptOrganization.unitNature}"  code="lib_unit_type" must="true"></form:select>
+				<form:select id="unitIndustry" label="单位所属行业" name="unitIndustry" value=${deptOrganization.unitIndustry}  code="lib_industry_type" must="true"></form:select>
+				<form:select id="unitEconomicType" label="经济类型" name="unitEconomicType" value="${deptOrganization.unitEconomicType}"  code="lib_economic_type" must="true"></form:select>
+				<form:figure id="unitNumber" label="职工人数" name="unitNumber" value="${deptOrganization.unitNumber}" min="0" must="true"></form:figure>
+
+				<!--<form:text id="chairmanSession" label="现任第几届主席" name="chairmanSession" value="${deptOrganization.chairmanSession}"></form:text>-->
+				<!--<form:figure id="chairmanMobile" label="主席手机号" name="chairmanMobile" value="${deptOrganization.chairmanMobile}" min="0"></form:figure>-->
+			</div>
+        </div>
+		<div th:if="${!showCancel}" class="row text-center">
+			<qx:btn id="sure1" class="btn btn-primary" onclick="OrganizationDlg.addSubmit()"
+					fa="fa fa-address-book" label="提交"></qx:btn>
+			<qx:btn id="sure2" class="btn btn-danger" onclick="OrganizationDlg.back()"
+					fa="fa fa-eraser" label="返回"></qx:btn>
+		</div>
+		<div th:if="${showCancel}" class="row text-center">
+			<qx:btn id="sure1" class="btn btn-primary" onclick="OrganizationDlg.addSubmit()"
+					fa="fa fa-address-book" label="提交"></qx:btn>
+			<qx:btn id="sure2" class="btn btn-danger" onclick="OrganizationDlg.close()"
+					fa="fa fa-eraser" label="返回"></qx:btn>
+		</div>
+	    <br/>
+    </form>
+</div>
+</body>
+<js>
+<div th:include="fragment/fargment :: treeJs"></div>
+<script th:src="@{/static/modular/dept/company/organization/authen/organization_reEdit.js}"></script>
+</js>

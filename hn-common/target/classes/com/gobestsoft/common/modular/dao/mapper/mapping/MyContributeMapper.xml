@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dao.mapper.MyContributeMapper">
+    <resultMap id="myContributeMap" type="com.gobestsoft.common.modular.dao.model.MyContributePojo">
+        <id column="id" property="id"/>
+        <result column="auid" property="auid"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="img_path" property="imgPath"/>
+        <result column="create_time" property="createTime"/>
+        <result column="status" property="status"/>
+        <result column="check_desc" property="checkDesc"/>
+        <result column="check_date" property="checkDate"/>
+        <result column="check_user" property="checkUser"/>
+    </resultMap>
+
+    <insert id="addSubmission">
+        INSERT INTO my_contribute
+	    	(auid,
+	    	title,
+	    	content,
+	    	img_path,
+	    	create_time,
+	    	status)
+    	VALUES(
+	    	#{auid},
+	    	#{title},
+	    	#{content},
+	    	#{imgPath},
+	    	#{createTime},
+	    	-1)
+    </insert>
+
+    <select id="mySubmission" resultMap="myContributeMap">
+        SELECT mc.* FROM my_contribute mc WHERE auid=#{auid} and del_flg = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <update id="delSubmission">
+        UPDATE my_contribute SET
+        del_flg = 1
+        where id = ${id}
+    </update>
+</mapper>

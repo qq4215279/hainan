@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="hn-admin:war">
+    <output-path>$PROJECT_DIR$/hn-admin/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>hn-admin</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="hn-admin.war">
+      <element id="artifact" artifact-name="hn-admin:war exploded" />
+    </root>
+  </artifact>
+</component>

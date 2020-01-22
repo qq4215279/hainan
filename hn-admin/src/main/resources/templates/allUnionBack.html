@@ -1,0 +1,267 @@
+<body xmlns:th="http://www.thymeleaf.org">
+<css>
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+    <link th:href="@{/static/assets/css/paper-dashboard.css}" rel="stylesheet"/>
+    <link th:href="@{/static/css/iconfont.css}" rel="stylesheet">
+    <link th:href="@{/static/css/layui.css}" rel="stylesheet">
+    <link th:href="@{/static/css/_fstyle.css}" rel="stylesheet">
+    <style type="text/css">
+        .ztree li span.button.pIcon01_ico_open, .ztree li span.button.pIcon01_ico_close,
+        .ztree li span.button.pIcon01_ico_docu {
+            margin-right: 2px;
+            background: url('../../static/plugin/ztree/img/diy/1_open.png') no-repeat scroll 0 0 transparent;
+            vertical-align: top;
+            *vertical-align: middle
+        }
+
+        .ztree li span.button.pIcon02_ico_open, .ztree li span.button.pIcon02_ico_close,
+        .ztree li span.button.pIcon02_ico_docu {
+            margin-right: 2px;
+            background: url('../../static/plugin/ztree/img/diy/2.png') no-repeat scroll 0 0 transparent;
+            vertical-align: top;
+            *vertical-align: middle
+        }
+
+        .print{
+            float:left;
+            width:75px;
+            height:30px;
+            border-radius: 5px;
+            background: #1E90FF;
+            color: white !important;
+            font-size: 16px;
+            cursor: pointer;
+            text-align:center;
+            line-height:30px
+        }
+
+        .print:hover{
+            color:red
+        }
+
+        table tr td,th{
+
+            color:#000;
+        }
+
+        .nocnt{
+            color:red;
+            font-size:16px;
+            padding-left:6px;
+            padding-top:20px
+        }
+    </style>
+</css>
+<div class="row">
+    <input type="hidden" id="reOutId" value="">
+
+    <div class="col-sm-12"></div>
+    <div class="content">
+        <div class="">
+
+        </div>
+        <div class="container-fluid">
+            <div class="row" style="margin-bottom: 120px">
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label for="pName" class="col-sm-4 control-label">请选择需要查询的工会：</label>
+                        <div class="col-sm-5">
+                            <input id="pName" class="form-control" style="color: black" type="text" name="pName" value="" onclick="showPNameSelectTree();" readonly="true">
+                        </div>
+                    </div>
+                    <div id="pNameContent" class="menuContent" style="display: none; position: absolute; z-index: 200; top: 40px">
+                        <ul id="pNameTree" class="ztree tree-box" style="width: 250px !important; margin-top:-20px; height:150px;"></ul>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card ">
+                        <div class="header">
+                            <h4 class="title" style="margin-bottom: -35px" id="titleName">省总工会直属工会农民工返乡统计表</h4>
+                            <p class="category"></p>
+                        </div>
+                        <div class="content">
+                            <div id="szgzAllRehomeStat" class="ct-chart" style="height:1900px !important;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script th:src="@{/static/assets/js/chartist.min.js}"></script>
+    <script th:src="@{/static/assets/js/bootstrap-notify.js}"></script>
+    <script th:src="@{/static/assets/js/paper-dashboard.js}"></script>
+    <script th:src="@{/static/plugin/echarts/echarts.min.js}"></script>
+    <script th:src="@{/static/js/jquery.jqprint-0.3.js}"></script>
+    <script th:src="@{/static/js/layui.all.js}"></script>
+    <div th:replace="fragment/fargment :: treeJs"></div>
+    <script th:src="@{/static/plugin/ztree/jquery.ztree.core.min.js}"></script>
+    <script th:src="@{/static/plugin/ztree/jquery.ztree.exhide.min.js}"></script>
+    <script type="text/javascript">
+
+        var allPnameTree = null;
+        $(document).ready(function () {
+            var pNameTree = new $ZTree("pNameTree", "dept/treebylevelTwo");
+            pNameTree.bindOnClick(onClickPName);
+            pNameTree.init();
+            allPnameTree = pNameTree;
+            getAllunionStatistics();
+
+        });
+
+        /**
+         * 显示父级菜单下拉框
+         * @returns
+         */
+        function showPNameSelectTree() {
+            App.showInputTree("pName", "pNameContent", 309);
+        }
+
+        /**
+         * 点击父级菜单下拉框input框时
+         * @param e
+         * @param treeId
+         * @param treeNode
+         * @returns
+         */
+        function onClickPName(e, treeId, treeNode) {
+
+            $("#pName").attr("value", allPnameTree.getSelectedVal());
+            $("#reOutId").attr("value", treeNode.id);
+
+            var deptId = $("#reOutId").val();
+            var pName = $("#pName").val();
+            getAllunionStatistics(deptId, pName);
+
+        }
+
+        /**
+         * 获取统计数据
+         */
+        function getAllunionStatistics(deptId, pName) {
+
+            if(deptId != "" && deptId != null && deptId != undefined){
+                $("#titleName").text(pName + "及下级工会返乡统计表")
+            } else {
+                deptId = "";
+            }
+            App.loadingAjax({
+                url: App.ctxPath + "allunionrehome/getAllRehomeStat?deptId=" + deptId,
+                success: function (data) {
+                    var result = data.data;
+                    if(result.allRehomeStat.cntFlg == 0){
+                        $(".card .title").append("<p style='color: red; font-size: 16px; padding-top: 30px; font-weight: 600'>该工会及下属工会暂时没有返乡人数</p>")
+                        var szghEchart = echarts.init(document.getElementById('szgzAllRehomeStat'));
+                        szghEchart.clear();
+                    } else {
+                        szgzAllRehomeStat(result.allRehomeStat);
+                    }
+
+                }
+            })
+
+
+        }
+
+
+        /**
+         * 返乡统计
+         * @param data
+         */
+        function szgzAllRehomeStat(data) {
+            var szgzAllRehomeStat = echarts.init(document.getElementById('szgzAllRehomeStat'));
+            var values=data.fullname;
+            var option = {
+                title: {
+                    text: '',
+                    subtext: ''
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    y:'-7.5',
+                    data: ['省总下级工会返乡统计']
+                },
+                toolbox: {
+                    y:'-7.5',
+                    show: true,
+                    feature: {
+                        mark: {show: true},
+                        dataView: {show: true, readOnly: false},
+                        magicType: {show: true, type: ['line', 'bar']},
+                        restore: {show: true}
+                    }
+                },
+                calculable: true,
+                xAxis: [
+                    {
+                        type: 'value',
+                        boundaryGap: [0, 0.01]
+                    }
+                ],
+                grid:{x:'22%',y:'5%',right:'15%',bottom:'9%',containLable:true},//修改样式
+                yAxis: [
+                    {
+                        type: 'category',
+                        data: values,
+                        axisLabel:{
+                            interval:0,//横轴信息全部显示
+                            // rotate: 30,//30度角倾斜显示
+                            formatter:function(values)
+                            {
+                                var ret = "";//拼接加\n返回的类目项
+                                var formatvalue = "...";
+                                var maxLength = 16;//每项显示文字个数
+                                var valLength = values.length;//X轴类目项的文字个数
+                                if(valLength > maxLength){
+                                    ret = values.substring(0,16) + "...";
+                                    return ret;
+                                }
+                                else {
+                                    return values;
+                                }
+                            }
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '返乡人数',
+                        type: 'bar',
+                        color: ['#ae81ff'],
+                        data: data.count,
+                        itemStyle: {
+                            normal: {
+                                label: {
+                                    show: true, //开启显示
+                                    position: 'right', //在上方显示
+                                    textStyle: { //数值样式
+                                        color: ['#ae81ff'],
+                                        fontSize: 15
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            };
+            szgzAllRehomeStat.setOption(option);
+        }
+
+
+
+        function dateFormat(dateStr){
+            return dateStr.substr(4,2)+'月'+dateStr.substr(6,2)+'日';
+        }
+
+
+    </script>
+    <script th:src="@{http://www.jq22.com/jquery/jquery-migrate-1.2.1.min.js}"></script>
+</js>
+
+</body>

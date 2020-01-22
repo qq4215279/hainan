@@ -1,0 +1,164 @@
+<body>
+<div class="container">
+    <form class="row form-horizontal">
+        <div class="row">
+
+            <div class="col-sm-6">
+                <form:text id="union_name" label="原基层工会名称" name="union_name" must="true"></form:text>
+                <form:text id="residence" label="原住所和邮编" name="residence" must="true"></form:text>
+                <form:text id="representative" label="原法定代表人" name="representative" must="true"></form:text>
+                <form:text id="p_name" label="原隶属工会名称" name="p_name" must="true"></form:text>
+                <form:datetime id="createunion_time" label="工会组织成立时间" istime="false" must="true" format="yyyy-MM-dd" name="createunion_time"></form:datetime>
+             </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <form:text id="re_union_name" label="变更基层工会名称" name="re_union_name" must="true"></form:text>
+                    <form:text id="re_residence" label="变更住所和邮编" name="re_residence" must="true"></form:text>
+                    <form:text id="re_representative" label="变更法定代表人" name="re_representative" must="true"></form:text>
+                    <form:text id="re_p_name" label="变更隶属工会名称" name="re_p_name" must="true"></form:text>
+                    <form:figure id="number" label="职工人数和会员人数" name="number" max="10000" min="10" must="true"></form:figure>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <form:datetime id="time2" label="本届选举日期" istime="false" must="true" format="yyyy-MM-dd" name="time2"></form:datetime>
+                </div>
+
+                <div class="col-sm-6">
+                    <form:figure id="time2" label="任期年限"must="true"  name="time2" max="100" min="0"></form:figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <form:text id="reference_number" label="申请变更文号" name="reference_number" must="true"></form:text>
+                </div>
+                <div class="col-sm-6">
+                    <form:text id="approval_reference_number" label="上级工会批准工号" name="approval_reference_number" must="true"></form:text>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <form:figure id="lastyear_total_income" label="上年结余累计收入（万元）" name="lastyear_total_income" max="10000" min="0" must="true"></form:figure>
+                </div>
+                <div class="col-sm-6">
+                    <form:figure id="member_income" label="年会员缴纳会费收入（万元）" name="member_income" max="10000" min="0" must="true"></form:figure>
+                </div>
+                <div class="col-sm-6">
+                    <form:figure id="deduct_income" label="年2%拨交工会经费本级留成收入（万元）" name="deduct_income" max="10000" min="0" must="true"></form:figure>
+                </div>
+                <div class="col-sm-6">
+                    <form:figure id="other_income" label="其他收入（万元）" name="deduct_income" max="10000" min="0" must="true"></form:figure>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <form:figure id="total_funds" label="合计资金（万元）" name="total_funds" max="10000" min="0" must="true"></form:figure>
+                </div>
+                <div class="col-sm-6">
+                    <form:figure id="fixed_funds" label="固定资金（万元）" name="fixed_funds" max="10000" min="0" must="true"></form:figure>
+                </div>
+
+                <div class="col-sm-6">
+                    <form:figure id="circulating_funds" label="流动资金（万元）" name="circulating_funds" max="10000" min="0" must="true"></form:figure>
+                </div>
+
+                <div class="col-sm-6">
+                    <form:figure id="other_funds" label="其他资金（万元）" name="other_funds" max="10000" min="0" must="true"></form:figure>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <form:figure id="total_space" label="合计场所（平方米）m^2" name="total_area" max="10000" min="0" must="true"></form:figure>
+                    <form:figure id="activity_space" label="活动场所（平方米）m^2" name="activity_area" max="10000" min="0" must="true"></form:figure>
+                </div>
+
+                <div class="col-sm-6">
+                    <form:figure id="office_space" label="办公场所（平方米）m^2" name="office_space" max="10000" min="0" must="true"></form:figure>
+                    <form:figure id="other_space" label="其他场所（平方米）m^2" name="other_area" max="10000" min="0" must="true"></form:figure>
+                </div>
+            </div>
+            <div class="row">
+                <form:text id="certificate_number" label="工会组织机构代码证书号码" name="certificate_number" must="true"></form:text>
+                <form:text id="person_certificate_number" label="工会法人资格证书号码 例（工法证字第xxx号）" name="person_certificate_number" must="true"></form:text>
+                <form:text id="reason" label="申请变更原因" name="reason" must="true"></form:text>
+
+                <div class="col-sm-6">
+                    <form:text id="name" label="姓名" name="name"></form:text>
+                    <form:select id="nationality" label="民族" name="nationality"  code="lib_ethnic_group" must="true"></form:select>
+                    <form:select id="education" label="文化程度" name="education"  code="lib_education_code" must="true"></form:select>
+                    <form:text id="native_place" label="籍贯" name="native_place"></form:text>
+                </div>
+
+                <div class="col-sm-6">
+                    <form:select id="sex" label="性别" name="sex"  code="lib_sex" must="true"></form:select>
+                    <form:datetime id="birth" label="出生年月" istime="false" must="true" format="yyyy-MM-dd" name="birth"></form:datetime>
+                    <form:select id="political_status" label="政治面貌" name="political_status"  code="lib_political_status" must="true"></form:select>
+                    <form:text id="work" label="现任工会职务" name="work"></form:text>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <form:datetime id="start_time" label="本届任职起始时间" istime="false" must="true" format="yyyy-MM-dd" name="start_time"></form:datetime>
+                </div>
+                <div class="col-sm-6">
+                    <form:text id="id_number" label="身份证号码" name="id_number"></form:text>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <form:select id="job_nature" label="属专职/兼职" name="job_nature"  code="lib_job_nature" must="true"></form:select>
+                </div>
+
+                <div class="col-sm-6">
+                    <form:datetime id="join_time" label="何时加入工会组织" istime="false" must="true" format="yyyy-MM-dd" name="join_time"></form:datetime>
+                </div>
+                <div class="col-sm-6">
+                    <form:text id="other_work" label="现任其他职务" name="other_work"></form:text>
+                </div>
+                <div class="col-sm-6">
+                    <form:text id="telephone" label="手机号码" name="telephone"></form:text>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <form:text id="certificate_validity" label="证书有效期" name="certificate_validity"></form:text>
+                </div>
+
+                <div class="col-sm-6">
+                    <form:text id="certificate_number" label="证书编号" name="certificate_number"></form:text>
+                </div>
+            </div>
+        </div>
+
+        <div class="row text-center">
+            <qx:btn id="sure" class="btn btn-default" fa="fa fa-address-book" label="确认"></qx:btn>
+            <qx:btn id="back" class="btn btn-primary" fa="fa fa-address-book" label="返回"></qx:btn>
+        </div>
+
+    </form>
+</div>
+</body>
+
+<!--<form class="form-horizontal">-->
+    <!--<div class="row">-->
+        <!--<div class="col-sm-6">-->
+            <!--<form:figure id="two" label="数字输入框" name="two" max="100" min="10" value=""></form:figure>-->
+            <!--<form:text id="one" label="文本输入框" name="one"></form:text>-->
+            <!--<form:datetime id="three" label="日期输入" istime="false" must="true" format="yyyy-MM-dd" name="three"></form:datetime>-->
+        <!--</div>-->
+        <!--<div class="col-sm-6">-->
+            <!--<form:datetime id="four" label="日期时间输入" istime="true" format="yyyy-MM-dd HH:mm:ss" name="four"></form:datetime>-->
+            <!--<form:select id="account" label="性别" name="account"  code="lib_sex" must="true"></form:select>-->
+            <!--<form:check id="five" label="check选择" name="five"></form:check>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--<div class="row text-center">-->
+        <!--<qx:btn id="sure" class="btn btn-default" fa="fa fa-address-book" label="确认"></qx:btn>-->
+        <!--<qx:btn id="back" class="btn btn-primary" fa="fa fa-address-book" label="返回"></qx:btn>-->
+    <!--</div>-->
+<!--</form>-->
+<!--</div>-->

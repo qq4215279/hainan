@@ -1,0 +1,172 @@
+<css >
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+	<form class="col-sm-12" id="search">
+		<div class="form-horizontal">
+			<div class="row">
+				<div class="col-sm-4">
+					<search:select label="消息类型" name="type"  id="type"
+	                               code="meeting_msg_type"></search:select>
+				</div>
+ 				<div class="col-sm-4">
+ 					<search:select label="状态" name="isOpen" id="isOpen"
+								   code="lib_mail_status"></search:select>
+ 				</div>
+				<div class="col-sm-3">
+					<qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="Message.search()"></qx:btn>
+				</div>
+			</div>
+			<div class="hidden-xs" id="messageTableToolbar" role="group">
+<!-- 				<qx:btn class="btn btn-primary" fa="fa fa-plus" label="发布消息" onclick="Message.send()"></qx:btn> -->
+			</div>
+			<table id="messageTable" data-mobile-responsive="true" data-click-to-select="true">
+			</table>
+		</div>
+	</form>
+</body>
+
+<js>
+<div th:include="fragment/fargment :: bootstrapTableJs"></div>
+<script type="text/javascript">
+
+    /**
+     * 角色管理的单例
+     */
+    var Message = {
+        tableId: "messageTable",	//表格id
+        seItem: null,
+        table: null,
+        layerIndex: -1
+    };
+
+    /**
+     * 初始化表格的列
+     */
+    Message.initColumn = function () {
+        var columns = [
+            {title: 'id', field: 'id', visible: true, align: 'center', valign: 'middle'},
+            {title: '内容', field: 'content', align: 'center', valign: 'middle'},
+            {title: '消息类型', field: 'type', align: 'center', valign: 'middle',
+                formatter: function (value, row, index) {
+					if (value == 0) {
+						value = "建会审批";
+					}else if (value == 1) {
+						value = "入会审批";
+					}else if (value == 2){
+						value = "法律咨询";
+					}else if (value == 3){
+						value = "会员导入结果";
+					}else if (value == 4){
+						value = "组织导入结果";
+					}
+                    return value;
+                }},
+            {title: '创建时间', field: 'createTime', align: 'center', valign: 'middle'},
+            {
+                title: '操作', field: 'isOpen', visible: true, align: 'center', valign: 'middle',
+                formatter: function (isOpen, row, index) {
+                	if(isOpen === '1') {
+                      return '<a href="javascript:void(0);" onclick="Message.watch(\'' + row.id + '\',\'' + row.type + '\')"><i class="fa fa-eye"></i>已读</a>';
+                	}else {
+                      return '<a href="javascript:void(0);" onclick="Message.watch(\'' + row.id + '\',\'' + row.type + '\')" style="color:red;"><i class="fa fa-eye" style="color:red;"></i>未读</a>';
+                	}
+                }
+            }]
+        return columns;
+    };
+
+    /**
+     * 重置查询框
+     */
+    Message.reset = function () {
+        $('#search')[0].reset();
+    }
+
+    /**
+     * 搜索用户
+     */
+    Message.search = function () {
+        var param = {};
+        param.type = $("#type").val();
+        param.isOpen = $("#isOpen").val();
+        Message.table.refresh({query: param});
+    }
+
+    /**
+     * 发布消息
+     */
+     /**
+      * 点击新增
+      */
+      Message.send = function () {
+         var index = layer.open({
+             type: 2,
+             title: '发布消息',
+             area: ['100%', '100%'], //宽高
+             fix: false, //不固定
+             maxmin: true,
+             content: App.ctxPath + '/msg/send'
+         });
+         this.layerIndex = index;
+     };
+
+    /**
+     * 查看消息
+     */
+     Message.watch = function (id, type) {
+		 //
+		 let ctxPath = "/" + location.pathname.split("/")[1]
+
+		 $.get(ctxPath + "/sysMsg/changeIsOpen",{id:id},function (data) {
+			 if (data === 0){
+				 App.alert("更新状态失败！")
+			 }else {
+				 let pagePath = '/sysMsg/page/detail?id=' + id
+				 let title = '查看消息'
+				 switch (type) {
+					 case '0':
+						 break;
+					 case '1':
+						 pagePath = '/transfer/turnIndex?type=2';
+						 title = '入会管理';
+						 break;
+					 case '2':
+						 pagePath = '/law/consultation/1';
+						 title = '法律资讯';
+						 break;
+					 case '3':
+						 pagePath = '/dept/member/member_upload';
+						 title = '会员导入';
+						 break;
+					 case '4':
+						 pagePath = '/dept/organization/organization_upload';
+						 title = '组织导入';
+						 break;
+				 }
+				 var index = layer.open({
+					 type: 2,
+					 title: title,
+					 area: ['100%', '100%'], //宽高
+					 fix: false, //不固定
+					 maxmin: true,
+					 content: App.ctxPath + pagePath
+				 });
+				 this.layerIndex = index;
+			 }
+		 });
+
+
+     };
+
+    $(function () {
+        var defaultColumn = Message.initColumn();
+        var table = new BSTable(Message.tableId, "/sysMsg/list", defaultColumn);
+        table.setPaginationType("server");
+        table.setShowColumns(false);
+        Message.table = table.init();
+    });
+
+
+</script>
+</js>

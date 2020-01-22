@@ -1,0 +1,45 @@
+<css xmlns:form="http://www.w3.org/1999/html" xmlns:form="http://www.w3.org/1999/html">
+</css>
+<body xmlns:th="http://www.thymeleaf.org">
+<div class="form-horizontal" id="deptMemberForm">
+    <div class="panel panel-info text-center">
+        <div class="panel-heading">
+            各市县产业系统工会实名制数据
+            <button type="button" class="btn btn-info download_tag" style="position: fixed;right: 10%;">下载</button>
+        </div>
+        <!-- Table -->
+        <table class="table text-center">
+            <thead>
+            <tr>
+                <th class="text-center">单位名称</th>
+                <th class="text-center">组织数</th>
+                <th class="text-center">会员数</th>
+                <th class="text-center">农名工</th>
+                <th class="text-center">认证会员数</th>
+                <th class="text-center">认证会员占比</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="map : ${list}">
+                <td th:each="k : ${map.keySet()}" th:text="${map.get(k)}"  class="text-center"></td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="panel-footer" th:text="'备注：截止时间为 ' + ${#dates.format(new java.util.Date().getTime(), 'yyyy年MM月dd日')}"></div>
+    </div>
+</div>
+</body>
+
+
+<js>
+    <script type="text/javascript">
+        $(function () {
+            $('.download_tag').click(function(){
+                let paths = window.document.location.pathname.split('/');
+                let pathName = "/";
+                if(paths.length>0){ pathName = pathName + paths[1] }
+                location.href = pathName + "/dept/member/downloadRealData";
+            });
+        })
+    </script>
+</js>

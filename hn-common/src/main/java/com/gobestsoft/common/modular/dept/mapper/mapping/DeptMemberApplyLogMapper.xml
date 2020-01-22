@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dept.mapper.DeptMemberApplyLogMapper">
+
+  <resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.dept.model.DeptMemberApplyLog">
+     <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="apply_id" jdbcType="INTEGER" property="applyId" />
+    <result column="auid" jdbcType="VARCHAR" property="auid" />
+    <result column="apply_status" jdbcType="VARCHAR" property="applyStatus" />
+    <result column="check_flag" jdbcType="INTEGER" property="checkFlag" />
+      <result column="record_flow_info" jdbcType="VARCHAR" property="recordFlowInfo" />
+      <result column="check_reason" jdbcType="VARCHAR" property="checkReason" />
+      <result column="check_time" jdbcType="VARCHAR" property="checkTime" />
+      <result column="check_uid" jdbcType="VARCHAR" property="checkUid" />
+      <result column="check_dept_id" jdbcType="VARCHAR" property="checkDeptId" />
+      <result column="create_time" jdbcType="VARCHAR" property="createTime" />
+
+  </resultMap>
+  
+  <sql id="columns">
+  	dept_member_apply_log.id,
+  	dept_member_apply_log.auid,
+    dept_member_apply_log.apply_id,
+    dept_member_apply_log.apply_status,
+  	dept_member_apply_log.check_flag,
+  	dept_member_apply_log.check_reason,
+  	dept_member_apply_log.record_flow_info,
+  	dept_member_apply_log.check_time,
+  	dept_member_apply_log.check_uid
+  </sql>
+  
+  	<!-- 批量插入 -->
+	<insert id="insertList" parameterType="java.util.List" >
+           insert into dept_member_apply_log  (apply_id, apply_status,content,create_org_id,next_check_org_id,create_uid
+           ,create_time,record_flow_info,check_dept_id)  values
+           <foreach collection ="logs" item="log" index= "index" separator =",">
+               (#{log.applyId}, #{log.applyStatus}, #{log.content}, #{log.createOrgId}, #{log.nextCheckOrgId}, #{log.createUid}
+               , #{log.createTime}, #{log.recordFlowInfo},#{checkDeptId})
+           </foreach >
+	</insert>
+  
+  <!-- 查看流程：根据申请id，查询审核日志 -->
+  <select id="selectMapsByApplyId" resultType="map">
+  	SELECT DISTINCT(dept_member_apply_log.id) log_id,<include refid="columns"></include>,sys_dept.fullname FROM dept_member_apply,
+    sys_dept,dept_member_apply_log
+
+	where
+    dept_member_apply_log.check_dept_id= sys_dept.id
+    AND dept_member_apply.id= #{id}
+    AND dept_member_apply.id= dept_member_apply_log.apply_id
+
+	ORDER BY dept_member_apply_log.check_time
+  </select>
+  <!--查询本工会关于当前会员申请的最新一条记录-->
+    <select id="selectLastLogByDept" resultType="map">
+      SELECT dept_member_apply_log.*
+      from  dept_member_apply_log,dept_member_apply
+      where
+       dept_member_apply.id= #{id}
+      AND dept_member_apply.id= dept_member_apply_log.apply_id
+      AND  dept_member_apply_log.check_dept_id = #{deptId}
+      ORDER BY dept_member_apply_log.check_time desc limit 1
+  </select>
+
+  <!-- 根据申请id，获取第一条log日志；即：app用户申请入会、转会、办卡时添加的数据 -->
+  <select id="selectFirstLogDataByApplyId" resultMap="BaseResultMap">
+  	SELECT <include refid="columns"></include> FROM dept_member_apply_log 
+	where dept_member_apply_log.apply_id= #{id}
+	ORDER BY dept_member_apply_log.check_time
+  </select>
+  
+  <!-- 根据申请id，获取对应的日志条数 -->
+  <select id="selectCountByApplyId" resultType="int">
+  	SELECT count(0) FROM dept_member_apply_log where dept_member_apply_log.apply_id = #{applyId}
+  </select>
+  
+</mapper>

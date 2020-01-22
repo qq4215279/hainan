@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.homepage.mapper.IndexTipsMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.homepage.model.IndexTips">
+		<id column="id" property="id" />
+		<result column="type" property="type" />
+		<result column="tip" property="tip" />
+		<result column="jump_url" property="jumpUrl" />
+		<result column="group_id" property="groupId" />
+	</resultMap>
+
+	<select id ="selectTipList" resultType="map">
+		select m.id as id,
+				m.type as type,
+				m.tip as tip,
+				m.group_id as groupId,
+				m.jump_url as jumpUrl,
+				s.group_name as groupName
+		from app_index_tip m left join smp_group s on m.group_id = s.id
+		where 1=1
+		<if test="tip != null and tip != ''">
+			and m.tip like '%${tip}%'
+		</if>
+	</select>
+
+	<select id ="selectTip" resultType="map">
+		select m.id as id,
+		m.type as type,
+		m.tip as tip,
+		m.group_id as groupId,
+		m.jump_url as jumpUrl,
+		s.group_name as groupName
+		from app_index_tip m left join smp_group s on m.group_id = s.id
+		where m.id =#{id}
+	</select>
+
+</mapper>

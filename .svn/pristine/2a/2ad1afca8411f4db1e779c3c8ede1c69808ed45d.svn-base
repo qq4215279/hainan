@@ -1,0 +1,367 @@
+<css xmlns:form="http://www.w3.org/1999/html" xmlns:form="http://www.w3.org/1999/html">
+</css>
+<body>
+        <div class="form-horizontal" id="SrvStraitenedForm">
+        <input type="hidden" id="id" th:value="${straitened.id}">
+        <input type="hidden" id="straitenedType" th:value="${straitened.straitenedType}">
+        <input type="hidden" id="straitenedLogId" th:value="${straitenedLogId}">
+
+
+			<div class="row">
+					<form:text label="申请人姓名" id="name" name="name" value="${straitened.name}" type="text" disabled="true"></form:text>
+					<form:text label="身份证号" id="certificateNum" name="certificateNum" value="${straitened.certificateNum}" type="text" disabled="true"></form:text>
+					<form:text label="工作单位" id="workUnit" name="workUnit" value="${straitened.workUnit}" type="text" disabled="true"></form:text>
+	        </div>
+	        <div class="row text-center">
+	            <label class="col-sm-4 control-label">
+                                                 身份证人像面
+                 </label>
+                 <div class="col-sm-8">
+                       <div style="margin-left:10px; margin-top: 10px; float:left">
+                           <a th:href="${straitened.identityFace}" target="_blank" title="身份证人像面"><img th:src="${straitened.identityFace}" style="width: 200px;height: 100px;" ></a>
+                       </div>
+                 </div>
+	        </div>
+	        <div class="row text-center">
+	            <label class="col-sm-4 control-label">
+                                                 身份证国徽面
+                 </label>
+                 <div class="col-sm-8">
+                       <div style="margin-left:10px; margin-top: 10px; float:left">
+                            <a th:href="${straitened.cardNationalEmblem}" title="身份证国徽面" target="_blank"><img th:src="${straitened.cardNationalEmblem}" style="width: 200px;height: 100px;" ></a>
+                       </div>
+                 </div>
+	        </div>
+	        <div class="row text-center">
+	            <label class="col-sm-4 control-label">
+                                                 承诺书
+                 </label>
+                 <div class="col-sm-8">
+                       <div style="margin-left:10px; margin-top: 10px; float:left">           
+                           <a th:href="${straitened.commitLetter}" target="_blank" title="承诺书"><img th:src="${straitened.commitLetter}" style="width: 200px;height: 100px;" ></a>
+                       </div>
+                 </div>
+	        </div>
+	        <div class="row text-center">
+	            <label class="col-sm-4 control-label">
+                                                 所在单位证明
+                 </label>
+                 <div class="col-sm-8">
+                       <div style="margin-left:10px; margin-top: 10px; float:left">
+                           <a th:href="${straitened.unitProve}" target="_blank" title=" 所在单位证明"><img th:src="${straitened.unitProve}" style="width: 200px;height: 100px;" ></a>
+                       </div>
+                 </div>
+	        </div>
+	        <div class="row text-center">
+	        	<label class="col-sm-4 control-label">
+                                                 附件材料
+                 </label>
+                 <div class="col-sm-8">
+                 	<div th:each="attach : ${attachments}" style="margin-left:10px; margin-top: 10px; float:left">
+                 		<a th:href="${attach.path}" class="galpop-info" data-galpop-group="info"    th:href="${attach.path}"  th:attr="title=${attach.desc},data-galpop-link=${attach.path},data-galpop-link-title=${attach.desc}" th:title="${attach.desc}"><img th:src="${attach.path}" style="width: 200px;height: 100px;" ></a>
+                 	</div>
+                 </div>
+	        </div>
+            <div th:if="${isExamine==0}" class="row text-center">
+
+                <label class="col-sm-4 control-label">
+                    走访材料
+                </label>
+                <div class="col-sm-8">
+                    <div th:each="attach : ${evidence}" style="margin-left:10px; margin-top: 10px; float:left">
+                        <a th:href="${attach}" class="galpop-info" data-galpop-group="info"   th:href="${attach}"  ><img th:src="${attach}" style="width: 200px;height: 100px;" ></a>
+                    </div>
+                </div>
+            </div>
+            <div th:if="${isExamine==1}" class="row text-center"  style="margin: 10px 0">
+                <label class="col-sm-4  control-label" ><span style="color:red;"> * </span>上传走访材料</label>
+                <div class="col-sm-8">
+                    <div style="display: table">
+                        <div style="display: table-cell; width: 35%">
+                            <input class="form-control" type="text" id="evidence" name="evidence" style="width:10px;display: none;" >
+                        </div>
+                        <div class="jquery-fileupload">
+                            <label for="fileupload" class="btn btn-info" style="display:inline-block;width:100px">
+                                <i class="fa fa-upload">选择上传</i>
+                            </label>
+                            <div class="uploadBtn" style="display:none">
+                                <input id="fileupload" type="file" name="attch" accept="image/*">
+                                <span>+选择文件</span>
+                            </div>
+                            <span class="tips"></span>
+                            <div style="clear: both"></div>
+                            <table>
+                                <tbody class="filesName"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="progress-bar progress-bar-success"></div>
+                </div>
+                <div class="form-group" id="spArea" style="display: none;">
+                    <label class="col-sm-4 control-label">
+                        走访材料
+                    </label>
+                    <div class="col-sm-8" id="spfiles">
+                        <div  th:each="attach : ${evidence}" style="margin-left:10px; margin-top: 10px; float:left">
+                            <a th:href="${attach}" ><img th:src="${attach}"  ></a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row text-center">
+                <label class="col-sm-4 control-label">
+                    困难类型
+                </label>
+                <div class="col-sm-8" style="text-align: left;margin: 5px 0;" >
+                    <div class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-default"><input type="checkbox" name="medicalAss" id="medicalAss" > 医疗救助</label>
+                        <label class="btn btn-default"><input type="checkbox" name="childrenStudy" id="childrenStudy"> 子女助学</label>
+                    </div>
+                </div>
+
+            </div>
+
+
+                <div class="row text-center" th:if="${isExamine==1}" style="margin-bottom: 10px">
+                    <label class="col-sm-4  control-label" ><span style="color:red;"> * </span>审核意见</label>
+                    <div class="col-sm-5">
+			                   <textarea name="comment" id="comment" class="form-control" maxlength="200"
+                                         style="width: 90%;height: 80px;resize: none;"></textarea>
+                    </div>
+                </div>
+                <div class="row text-center" th:if="${isExamine==1}" style="margin-bottom: 10px">
+                    <qx:btn class="btn btn-primary"  fa="fa fa-check" label="通过" permission=""
+                            onclick="checkDlg.agree()" ></qx:btn>
+                    <qx:btn class="btn btn-primary"  fa="fa fa-check" label="转办" permission=""
+                            onclick="checkDlg.transfer()" ></qx:btn>
+                    <qx:btn class="btn btn-danger" fa="fa fa-eraser" label="拒绝" permission=""
+                            onclick="checkDlg.refuse()" ></qx:btn>
+                    <qx:btn class="btn btn-info" fa="fa fa-eraser" label="取消" permission=""
+                            onclick="checkDlg.close()" ></qx:btn>
+                </div>
+
+
+     </div>
+</body>
+<js>
+    <div  th:include="fragment/fargment :: clipJs"></div>
+    <div  th:include="fragment/fargment :: fileUploadJs"></div>
+  <script type="text/javascript" >
+  $(function(){
+
+      if($('#spfiles div').length>0){
+          $('#spArea').show();
+      }
+
+  	  //验证form表单
+      $('.btn-group label').click(function(){
+          $(this).toggleClass('btn-default');
+          $(this).toggleClass('btn-primary');
+      });
+      App.initAlbumNew();
+
+      App.initValidator("SrvStraitenedForm", checkDlg.validateFields);
+      var straitenedType = $("#straitenedType").val();
+      if(straitenedType == 1){
+          $("#medicalAss").attr("checked", true)
+          $("#childrenStudy").attr("checked", false)
+      } else if(straitenedType == 2){
+          $("#medicalAss").attr("checked", false)
+          $("#childrenStudy").attr("checked", true)
+      } else if(straitenedType == 3){
+          $("#medicalAss").attr("checked", true)
+          $("#childrenStudy").attr("checked", true)
+      }
+      if(straitenedType){
+          $('input[type="checkbox"]:checked').each(function(){
+              $(this).parent().toggleClass('btn-default').toggleClass('btn-primary');
+          });
+          $('.btn-group label').unbind('click');
+      }
+  });
+  
+  /* 
+   * 初始对话框
+   */
+   var checkDlg = {
+	    recordData: {},
+	    deptZtree: null,
+	    pNameZtree: null,
+	    validateFields: {}
+   }
+  
+   /**
+    * 设置对话框中的数据
+    * param key 数据的名称
+    */
+    checkDlg.set = function(key) {
+       this.recordData[key] = $("#" + key).val();
+       return this;
+   }
+  $("#fileupload").fileupload({
+      url: App.ctxPath + 'srv/straitened/upload',
+      start: function (e) {
+          uploadStatus=1;
+          $("#evidence").val('');
+          $('#progressText').html('0%');
+          $('#progressText').css('color', 'black');
+          $('#progress .progress-bar').css('width', '0%');
+      },
+      progressall: function (e, data) {
+          var progress = parseInt(data.loaded / data.total * 100, 10);
+          $('#progressText').html(progress + '%')
+          $('#progress .progress-bar').css('width', progress + '%');
+      },
+      done: function (e, data) {
+          uploadStatus=0;
+          $('#progressText').html('complete');
+          $('#progressText').css('color', 'green')
+          /* $('#spArea').css("display","block"); */
+          addsp(data.result);
+      },
+      fail: function (e, data) {
+          $('#progressText').html('error');
+          $('#progressText').css('color', 'red')
+      }
+  });
+  /**
+   * 信息设定
+   */
+   checkDlg.collectData = function () {
+	   this.set('id').set('comment').set('straitenedLogId');
+       var isMedical = $("#medicalAss").is(":checked");
+       var isChildren = $("#childrenStudy").is(":checked");
+       if(isMedical && isChildren){
+           this.recordData["straitenedType"] = 3;
+       } else if(isMedical && !isChildren){
+           this.recordData["straitenedType"] = 1;
+       } else if(!isMedical && isChildren){
+           this.recordData["straitenedType"] = 2;
+       } else {
+           this.recordData["straitenedType"] = 0;
+       }
+
+
+       var evidence = "";
+       $("#spArea img").each(function () {
+           var index = $(this).attr("src").lastIndexOf("straitened");
+           evidence+= $(this).attr("src").substring(index, $(this).attr("src").length) + ",";
+       });
+       evidence=evidence.substring(0,evidence.length)
+       this.recordData["evidence"]=evidence;
+
+   }
+  
+   /**
+    * 清空数据
+    */
+    checkDlg.clearData = function () {
+       this.recordData = {};
+   };
+   
+   /**
+    * 验证数据
+    */
+    checkDlg.validate = function () {
+       $('#SrvStraitenedForm').data("bootstrapValidator").resetForm();
+       $('#SrvStraitenedForm').bootstrapValidator('validate');
+       return $("#SrvStraitenedForm").data('bootstrapValidator').isValid();
+   };
+  
+  /**
+   *审核通过
+   */
+   checkDlg.agree = function(){
+	   debugger;
+	   this.clearData();
+	   this.collectData();
+	   var comment = $("#comment").val();
+       if(!this.recordData['evidence']){
+           App.error("请上传走访材料");
+           return;
+       }
+       if(comment == null || comment == ""){
+    	   App.error("审核意见不能为空!");
+   		   return;
+       }
+       //提交信息
+       var ajax = new $ax(App.ctxPath + "srv/straitened/submit_first/2", function (data) {
+           App.success("审核通过!");
+           window.parent.OptStraitened.table.refresh();
+           checkDlg.close();
+       }, function (data) {
+           App.error("审核提交失败!" + data.responseJSON.message + "!");
+       });
+       ajax.set(checkDlg.recordData);
+       ajax.start();
+	  
+   }
+  
+  /**
+   *拒绝审核
+   */
+   checkDlg.refuse = function(){
+	   this.clearData();
+       this.collectData();
+       var comment = $("#comment").val();
+       if(!this.recordData['evidence']){
+           App.error("请上传走访材料");
+           return;
+       }
+
+       if(comment == null || comment == ""){
+           App.error("审核意见不能为空!");
+           return;
+       }
+
+       //提交信息
+       var ajax = new $ax(App.ctxPath + "srv/straitened/submit_first/3", function (data) {
+           App.success("审核拒绝!");
+           window.parent.OptStraitened.table.refresh();
+           checkDlg.close();
+       }, function (data) {
+           App.error("审核提交失败!" + data.responseJSON.message + "!");
+       });
+       ajax.set(checkDlg.recordData);
+       ajax.start();
+   }
+
+  /**
+   *转办
+   */
+  checkDlg.transfer = function(){
+      var index = layer.open({
+          type: 2,
+          title: '转办页面',
+          area: ['50%', '70%'], //宽高
+          fix: false, //不固定
+          maxmin: true,
+          content: App.ctxPath + '/srv/straitened/transfer?type=0&id=' +$("#id").val(),
+          end:function(){
+              window.parent.OptStraitened.table.refresh();
+              checkDlg.close();
+          }
+      });
+      this.layerIndex = index;
+  }
+
+  /**
+   * 关闭此对话框
+   */
+  checkDlg.close = function() {
+      parent.layer.close(window.parent.OptStraitened.layerIndex);
+  }
+  function addsp(fileName) {
+      var area=$('<div style="margin-left:10px; margin-top: 10px; float:left">' + '<a href= "' + fileName + '" target="_blank"><img src=" ' + fileName + ' " style="width: 200px;height: 100px;"></div>');
+      $("#spfiles").append(area);
+      if($('#spfiles div').length>0){
+          $('#spArea').show();
+      }
+  }
+  $("#spfiles").on("click",".fa-close",function () {
+      $(this).parent().remove();
+  })
+    </script>
+    
+</js>

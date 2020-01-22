@@ -1,0 +1,103 @@
+<body xmlns:th="http://www.thymeleaf.org">
+<css>
+
+    <link th:href="@{/static/assets/css/paper-dashboard.css}" rel="stylesheet"/>
+    <style>
+        .member {
+            background: linear-gradient(rgb(57, 219, 185), rgb(86, 221, 196));
+        }
+
+        .member-card {
+            background: linear-gradient(rgb(84, 180, 233), rgb(120, 199, 239));
+        }
+
+        .org-number {
+            background: linear-gradient(rgb(240, 203, 115), rgb(253, 212, 120));
+        }
+
+        .agency {
+            background: linear-gradient(rgb(209, 187, 239), rgb(215, 187, 255));
+        }
+        div.board{
+            margin-top: 30px;
+        }
+        p{
+            font-size: 13px !important;
+        }
+    </style>
+</css>
+<div class="container">
+
+    <div class="row board">
+        <div class="col-sm-3">
+            <div class="card member">
+                <div class="content">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <i class="fa fa-user fa-3x"></i>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="numbers">
+                                <p>本级工会会员人数</p>
+                                <span th:text="${memberCount}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="card member-card">
+                <div class="content">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <i class="fa fa-user fa-3x"></i>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="numbers">
+                                <p>会员人数（含下级工会）</p>
+                                <span th:text="${memberAndSubordinateCount}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="card org-number">
+                <div class="content">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <i class="fa fa-group fa-3x"></i>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="numbers">
+                                <p>下级工会</p>
+                                <span th:text="${subordinateDeptCount}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="card agency">
+                <div class="content">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <i class="fa fa-book fa-3x"></i>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="numbers">
+                                <p>待办事项</p>
+                                0
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>

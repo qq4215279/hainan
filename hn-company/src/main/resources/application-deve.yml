@@ -1,0 +1,97 @@
+server:
+  port: 10004
+  contextPath: /hn-company
+
+manage:
+  kaptchaOpen: false
+  fileUploadPath: C:\Users\Administrator\AppData\Local\Temp\hn
+  passwordSalt: HN_GH
+  ueditorConfigFile: config-beta.json
+
+company:
+
+
+uploadSite:
+  address: http://localhost:8090/hn/ #图片资源路径
+
+spring:
+  jmx:
+    default-domain: hn-cpmpany
+  datasource:
+    url: jdbc:mysql://localhost:3306/hngh_test2?autoReconnect=true&useUnicode=true&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&characterEncoding=utf8
+    username: root
+    password: root
+#  datasource:
+#    url : jdbc:mysql://39.108.88.223:12306/hngh_test?autoReconnect=true&useUnicode=true&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&characterEncoding=utf8
+#    username : admin
+#    password : gobest_123$%^&
+  aop:
+    proxy-target-class: true
+  http:
+    multipart.maxFileSize: 100Mb #max file size of upload
+    multipart.maxRequestSize: 100Mb #max file size of request
+  redis:
+    database: 0 # Redis database
+    host: 127.0.0.1 # Redis host
+    port: 6379  # Redis port
+    password: #Redis password
+    pool.max-active: 8
+    pool.max-wait: -1
+    timeout: 0
+  resources:
+    static-locations: classpath:/static/
+    chain:
+      cache: false
+  rabbitmq:
+    host: 192.168.128.133  # 149.248.10.6
+    port: 5672
+    username: swt123
+    password: swt123
+  thymeleaf:
+    mode: LEGACYHTML5
+    encoding: UTF-8
+    cache: false
+    check-template-location: true
+    enabled: true
+    prefix: classpath:/templates/
+  mail:
+    protocol: smtp
+    host: smtp.qq.com
+    port: 25
+    username: 353478929@qq.com
+    password: anykvrzsbjxfbiac
+    default-encoding: utf-8
+mybatis-plus:
+  mapper-locations: classpath*:com/gobestsoft/common/**/mapping/*.xml
+  typeAliasesPackage: com.gobestsoft.common.modular.system.model
+  global-config:
+    id-type: 0  #0:数据库ID自增   1:用户输入id  2:全局唯一id(IdWorker)  3:全局唯一ID(uuid)
+    db-column-underline: false
+    refresh-mapper: true
+    key-generator: com.baomidou.mybatisplus.incrementer.PostgreKeyGenerator
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true #配置的缓存的全局开关
+    lazyLoadingEnabled: true #延时加载的开关
+    multipleResultSetsEnabled: true
+    call-setters-on-nulls: true
+#开启的话，延时加载一个属性时会加载该对象全部属性，否则按需加载属性
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #打印sql语句,调试用
+
+
+logging:
+  level.root: info
+  level.com.gobestsoft: debug
+  path: /Users/shenweitao/jianlang/log #Save path of log
+  file: hn-company #File name of save log
+
+jpush:
+  masterSecret: 0aa680cfa87caebfaefed69c
+  appKey: fc511b4b1553e251f7c7d6f3
+
+  #热部署生效
+  spring.devtools.restart.enabled: true
+  #设置重启的目录
+  #spring.devtools.restart.additional-paths: src/main/java
+  #classpath目录下的WEB-INF文件夹内容修改不重启
+  spring.devtools.restart.exclude: WEB-INF/**

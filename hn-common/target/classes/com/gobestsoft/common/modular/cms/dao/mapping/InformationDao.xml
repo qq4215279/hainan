@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.cms.dao.InformationDao">
+
+	<resultMap type="com.gobestsoft.common.modular.cms.model.Channel"
+		id="ownChannelMap">
+		<result column="id" property="id" />
+		<result column="column_name" property="name" />
+	</resultMap>
+
+	<select id="getOwnChannels" resultMap="ownChannelMap">
+		SELECT
+		cms_column.id,cms_column.column_name FROM my_column INNER JOIN
+		cms_column ON my_column.column_id=cms_column.id WHERE
+		my_column.auid=#{userId} AND my_column.column_id NOT IN(101) ORDER BY my_column.sort ASC
+	</select>
+
+	<select id="getRecommendChannels" resultMap="ownChannelMap">
+		SELECT cms_column.id,cms_column.column_name FROM cms_column
+		WHERE id NOT IN (${ids})
+	</select>
+
+	<delete id="deleteAllChannel">
+		DELETE FROM my_column
+		WHERE my_column.auid=#{userId}
+
+	</delete>
+
+	<insert id="addChannel">
+		INSERT INTO my_column(column_id,auid,create_time)
+		VALUES
+		<foreach collection="ids" item="id" separator=",">
+			(#{id},#{userId},#{creatTime})
+		</foreach>
+	</insert>
+
+	<select id="getThumbsUp" resultMap="thumbsUpMap">
+		select thumbup_num,id from
+		cms_comment where id=${commentId}
+	</select>
+
+	<resultMap type="com.gobestsoft.common.modular.cms.model.ThumbsUp"
+		id="thumbsUpMap">
+		<result column="thumbup_num" property="thumbupNum" />
+		<collection property="users" javaType="ArrayList" select="getThumbsUpUsers"
+			column="{commentId=id}" ofType="com.gobestsoft.common.modular.cms.model.Users"></collection>
+	</resultMap>
+
+	<resultMap id="getThumbsUpUserMap" type="com.gobestsoft.common.modular.cms.model.Users">
+		<result column="auid" property="userId" />
+		<result column="nick_name" property="nickname" />
+		<result column="avatar" property="avatar" />
+	</resultMap>
+	<select id="getThumbsUpUsers" resultMap="getThumbsUpUserMap">
+		select
+		cms_comment_thumbup.auid,app_user.nick_name,app_user.avatar from
+		cms_comment_thumbup left join app_user
+		on
+		app_user.auid=cms_comment_thumbup.auid
+		where
+		cms_comment_thumbup.comment_id=${commentId}
+	</select>
+
+	<select id="getCommentThumbsUpUsers" resultMap="getThumbsUpUserMap">
+		select
+		cms_comment_thumbup.auid,app_user.nick_name,app_user.avatar from
+		cms_comment_thumbup left join app_user
+		on
+		app_user.auid=cms_comment_thumbup.auid
+		where
+		cms_comment_thumbup.comment_id=${commentId}
+	</select>
+
+
+	<insert id="reportArticle">
+		INSERT INTO cms_tip_off (auid,
+		description, tip_off_type, target_id, to_content, status,
+		create_user, create_time,
+		update_user, update_time,category) VALUES
+		(#{auId}, #{description}, ${tipType}, #{articleId},
+		#{toContent}, 1,
+		#{auId}, #{createTime}, #{auId}, #{createTime},#{category})
+	</insert>
+
+	<select id="hasArticle" resultType="Integer">
+		SELECT COUNT(0) FROM
+		cms_article WHERE id=${articleId} AND status=1
+	</select>
+
+
+	<delete id="deleteCollectArticle">
+		DELETE FROM my_favorite WHERE auid=#{auId} AND
+		relation_id='${articleId}';
+	</delete>
+
+	<update id="articleShare">
+		UPDATE cms_article SET share_num=share_num+1 WHERE
+		id=${articleId}
+	</update>
+
+	<select id="getExistArticle" parameterType="Long" resultType="Integer">
+		SELECT count(1) FROM cms_article WHERE cms_article.id=#{id}
+	</select>
+
+	<select id="getExistComment" parameterType="Long" resultType="Integer">
+		SELECT count(1) FROM cms_comment WHERE cms_comment.id=#{id}
+	</select>
+
+	<select id="getExistCommentReply" parameterType="Long"
+		resultType="Integer">
+		SELECT count(1) FROM cms_reply WHERE cms_reply.id = #{id}
+	</select>
+
+	<insert id="addShareComment">
+		INSERT INTO cms_comment (article_id, auid, content, status,
+		create_time, update_time, del_flg, comment_type)
+		VALUES (${articleId}, #{auId}, '我转发了这条资讯', '1', #{createTime},
+		#{createTime}, '0', '1')
+	</insert>
+	
+	<resultMap id="userHomePageMap" type="com.gobestsoft.common.modular.cms.model.UserHomePage">
+		<result column="auid" property="userId" />
+		<result column="avatar" property="avatar" />
+		<result column="nick_name" property="nickname" />
+		<result column="dynamic_count" property="dynamic_count" />
+	</resultMap>
+	<!--废弃-->
+	<select id="getUserHomePage" resultMap="userHomePageMap">
+		
+		Select auid,avatar,nick_name,t1.num1+t2.num2 as dynamic_count FROM 
+			(Select count(1) num1 from cms_comment where cms_comment.auid=#{userId} AND cms_comment.comment_type=0)t1,
+			(select count(1) num2 from cms_comment Where cms_comment.auid=#{userId} AND cms_comment.comment_type=1)t2,
+			app_user WHERE app_user.auid= #{userId}
+	</select>
+	
+	<resultMap id="dynamicsMap" type="com.gobestsoft.common.modular.cms.model.Dynamics">
+		<result column="create_time" property="dynamic_time" />
+		<result column="id" property="comment_id" />
+		<result column="content" property="comment_content" />
+		<result column="article_id" property="article_id" />
+		<result column="cover_path" property="article_cover" />
+		<result column="title" property="article_title" />
+		<result column="thumbup_num" property="thumbs_up_total" />
+		<result column="comm_num" property="comment_count" />
+		<result column="is_share" property="can_share" />
+		<result column="comment_type" property="type" />
+	</resultMap>
+
+	<!--废弃-->
+	<select id="getUserDynamics" resultMap="dynamicsMap">
+			SELECT
+				cms_comment. ID,
+				cms_comment. CONTENT,
+				cms_article. ID AS article_id,
+				cover_path,
+				title,
+				cms_comment.thumbup_num,
+				(
+					SELECT
+						COUNT (0)
+					FROM
+						cms_reply
+					WHERE
+						cms_comment. ID = cms_reply.p_id
+				) comm_num,
+				is_share,
+				cms_comment.create_time,
+				cms_comment.comment_type
+			FROM
+				cms_comment
+			INNER JOIN cms_article ON cms_comment.article_id = cms_article. ID
+			WHERE
+				cms_comment.comment_type = 0
+			AND cms_comment.status = 1
+			AND cms_comment.auid =#{ auId }
+			UNION ALL
+				SELECT
+					cms_comment. ID,
+					cms_comment. CONTENT,
+					cms_article. ID AS article_id,
+					cover_path,
+					title,
+					cms_comment.thumbup_num,
+					(
+						SELECT
+							COUNT (0)
+						FROM
+							cms_reply
+						WHERE
+							cms_comment. ID = cms_reply.p_id
+					) comm_num,
+					is_share,
+					cms_comment.create_time,
+					cms_comment.comment_type
+				FROM
+					cms_comment
+				INNER JOIN cms_article ON cms_comment.article_id = cms_article. ID
+				WHERE
+					cms_comment.comment_type = 1
+				AND cms_comment.auid =#{ auId }
+				ORDER BY
+					create_time DESC
+				LIMIT ${ pageSize } OFFSET ${ startIndex }
+	</select>
+	
+	<update id="addHitNum">
+		update cms_article set hit_num=hit_num+1 where id=${articleId}
+	</update>
+</mapper>

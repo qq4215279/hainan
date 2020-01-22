@@ -1,0 +1,141 @@
+<body xmlns:th="http://www.w3.org/1999/xhtml">
+    <div class="ibox float-e-margins">
+        <div class="ibox-content">
+            <div class="form-horizontal" id="moneyForm">
+                <input type="hidden" th:value="${pojo.id}" id="id"/>
+                <div class="row">
+                    <div class="col-sm-7 b-r">
+                        <form:text id="rescuedName" label="姓名" value="${pojo.rescuedName}" />
+                        <label style="color: red; position: inherit;top: 34px;z-index: 999;">*</label>
+                        <search:select id="sex" label="性别" name="sex" code="lib_sex" />
+                        <br />
+                        <form:figure id="age" label="年龄" name="age" min="1" must="true" value="${pojo.age}"/>
+                        <form:text id="certificateNum" label="身份证号" name="certificate-num" value="${pojo.certificateNum}"/>
+                        <search:select id="workStatus" label="工作状态" name="workStatus" code="lib_work_status" />
+                        <br />
+                        <form:figure id="moneyNum" label="发放金额(元)" value="${pojo.moneyNum}" />
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-4 control-label">
+                                <label style="color: red; position: inherit;top: 2px;">*</label>状态
+                            </label>
+                            <div class="col-sm-8" id="status">
+                                <label class="radio-inline">
+                                    <input type="radio" name="status" th:attr ="checked=${pojo.status==0 ? true:false}" value="0">待处理
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="status" th:attr ="checked=${pojo.status==1 ? true:false}" value="1" >通过
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="status" th:attr ="checked=${pojo.status==2 ? true:false}" value="2">拒绝
+                                </label>
+                            </div>
+                        </div>
+                        <form:area id="remark" label="备注信息" value="${pojo.remark}" />
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <qx:btn class="btn btn-primary" fa="fa fa-check" label="提交" onclick="MoneyEdit.addSubmit()" />
+                    <qx:btn class="btn btn-primary" fa="fa fa-eraser" label="取消" onclick="MoneyEdit.close()" />
+                </div>
+            </div>
+        </div>
+    </div>
+<js>
+    <div th:include="fragment/fargment :: clipJs"></div>
+    <script>
+
+        /**
+         * 角色详情对话框（可用于添加和修改对话框）
+         */
+        var MoneyEdit = {
+            articleData: {},
+            baseUrl: App.ctxPath + 'srv/straitened/money',
+            validateFields: {
+                name: {
+                    validators: {
+                        notEmpty: {
+                            message: '姓名不能为空'
+                        }
+                    }
+                },
+                moneyNum: {
+                    validators: {
+                        notEmpty: {
+                            message: '发放金额不能为空'
+                        }
+                    }
+                }
+            }
+        };
+
+        App.initValidator("moneyForm", MoneyEdit.validateFields);
+
+        /**
+         * 清除数据
+         */
+        MoneyEdit.clearData = function () {
+            this.articleData = {};
+        };
+
+        /**
+         * 设置对话框中的数据
+         */
+        MoneyEdit.set = function (key) {
+            this.articleData[key] = (typeof value == "undefined") ? $("#" + key).val() : value;
+            return this;
+        };
+
+        /**
+         * 收集数据
+         */
+        MoneyEdit.collectData = function () {
+            this.set('id').set('rescuedName').set('moneyNum').set('remark');
+        };
+
+        /**
+         * 关闭此对话框
+         */
+        MoneyEdit.close = function () {
+            parent.layer.close(window.parent.Money.layerIndex);
+        };
+
+        /**
+         * 验证数据是否为空
+         */
+        MoneyEdit.validate = function () {
+            $('#moneyForm').data("bootstrapValidator").resetForm();
+            $('#moneyForm').bootstrapValidator('validate');
+            return $("#moneyForm").data('bootstrapValidator').isValid();
+
+        };
+        /**
+         * 提交添加用户
+         */
+        MoneyEdit.addSubmit = function () {
+
+            this.clearData();
+            this.collectData();
+            if (!this.validate()) {
+                errorFocus();
+                return;
+            }
+
+            var status = parseInt($("#status input[name=status]:checked").val());
+            MoneyEdit.articleData['status'] = status;
+
+            //提交信息
+            var ajax = new $ax(MoneyAdd.baseUrl + "/doSave", function (data) {
+                App.success("修改成功!");
+                window.parent.Money.table.refresh();
+                MoneyEdit.close();
+            }, function (data) {
+                App.error("添加失败!");
+            });
+            ajax.set(MoneyEdit.articleData);
+            ajax.start();
+        };
+
+
+    </script>
+</js>
+</body>

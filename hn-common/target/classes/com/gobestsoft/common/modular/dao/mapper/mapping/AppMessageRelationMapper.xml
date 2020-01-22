@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dao.mapper.AppMessageRelationMapper">
+    <resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.dao.model.AppMessageRelationPojo">
+        <id column="id" property="id"/>
+        <result column="message_id" property="messageId"/>
+        <result column="auid" property="auid"/>
+        <result column="is_open" property="isOpen"/>
+        <result column="open_time" property="openTime"/>
+        <result column="appoint" property="appoint"/>
+        <result column="del_flg" property="delFlg"/>
+    </resultMap>
+
+
+    <insert id="insertList" parameterType="java.util.List">
+        INSERT INTO `app_message_relation`(`message_id`,`auid`,`is_open`,`del_flg`)
+        VALUES
+        <foreach collection="pojos" item="pojo" separator=",">
+            (#{pojo.messageId},#{pojo.auid},0,0)
+        </foreach>
+    </insert>
+
+</mapper>

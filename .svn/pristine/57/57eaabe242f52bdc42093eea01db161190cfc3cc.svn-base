@@ -1,0 +1,83 @@
+<div th:fragment="treeCss">
+    <link th:href="@{/static/plugin/ztree/zTreeStyle.css}" rel="stylesheet">
+    <style>
+        .menu {
+            padding-left: 0px !important;
+            background-color: white;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .menu li {
+            height: 30px;
+            line-height: 30px;
+            padding-left: 20px;
+            padding-right: 20px;
+            list-style: none;
+            width: 150px;
+        }
+
+        .menu li:hover {
+            background-color: #f0f0f0;
+            cursor: pointer;
+        }
+
+        .line1 {
+            border-bottom: 1px solid #ddd;
+        }
+
+        .panel-body {
+            overflow-x: scroll;
+        }
+
+        .node_name {
+            font-size: 14px;
+        }
+
+        .ztree li span.button.pIcon01_ico_open, .ztree li span.button.pIcon01_ico_close,
+        .ztree li span.button.pIcon01_ico_docu {
+            margin-right: 2px;
+            background: url('static/plugin/ztree/img/diy/1_open.png') no-repeat scroll 0 0 transparent;
+            vertical-align: top;
+            *vertical-align: middle
+        }
+
+        .ztree li span.button.pIcon02_ico_open, .ztree li span.button.pIcon02_ico_close,
+        .ztree li span.button.pIcon02_ico_docu {
+            margin-right: 2px;
+            background: url('static/plugin/ztree/img/diy/2.png') no-repeat scroll 0 0 transparent;
+            vertical-align: top;
+            *vertical-align: middle
+        }
+    </style>
+</div>
+
+<div th:fragment="treeJs">
+    <script th:src="@{/static/plugin/ztree/jquery.ztree.all.min.js}"></script>
+    <script th:src="@{/static/plugin/ztree/ztree-object.js}"></script>
+</div>
+
+<div th:fragment="bootstrapTableCss">
+    <link th:href="@{/static/plugin/bootstrap-table/bootstrap-table.min.css}" rel="stylesheet">
+</div>
+
+<div th:fragment="bootstrapTableJs">
+    <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table.min.js}"></script>
+    <script th:src="@{/static/plugin/bootstrap-table/locale/bootstrap-table-zh-CN.min.js}"></script>
+    <script th:src="@{/static/js/bootstrap-table-object.js}"></script>
+</div>
+
+
+<div th:fragment="clipJs">
+    <script th:src="@{/static/plugin/photoClip/hammer.min.js}"></script>
+    <script th:src="@{/static/plugin/photoClip/iscroll-zoom-min.js}"></script>
+    <script th:src="@{/static/plugin/photoClip/lrz.all.bundle.js}"></script>
+    <script th:src="@{/static/plugin/photoClip/PhotoClip.js}"></script>
+    <script th:src="@{/static/js/clip.js}"></script>
+</div>
+
+<div th:fragment="fileUploadJs">
+    <script th:src="@{/static/plugin/jqupload/vendor/jquery.ui.widget.js}"></script>
+    <script th:src="@{/static/plugin/jqupload/jquery.iframe-transport.js}"></script>
+    <script th:src="@{/static/plugin/jqupload/jquery.fileupload.js}"></script>
+</div>

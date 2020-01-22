@@ -1,0 +1,41 @@
+package com.gobestsoft.api.sign;
+
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+/**
+ * create by gtw
+ * on 2018/5/31 下午7:57
+ */
+public class AppUserSign extends BaseSign {
+
+
+    public static void login(){
+        SortedMap<String, String> parameters=new TreeMap<>();
+        parameters.put("account","15901847435");
+        parameters.put("password","123456");
+        parameters.put("registerId","asdasd123123");
+        validateSign(parameters);
+    }
+
+
+    public static void getMobileCode(){
+        SortedMap<String, String> parameters=new TreeMap<>();
+        parameters.put("mobile","15901847435");
+        parameters.put("type","2");
+        validateSign(parameters);
+    }
+
+    public  static  void loginByMobile(){
+        SortedMap<String, String> parameters=new TreeMap<>();
+        parameters.put("mobile","15901847435");
+        parameters.put("code","123456");
+        parameters.put("registerId","kj12kl3j21klj3ljsa");
+        validateSign(parameters);
+    }
+
+    public static void main(String[] args) {
+        login();
+    }
+
+}

@@ -1,0 +1,307 @@
+<css xmlns:th="http://www.thymeleaf.org">
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body xmlns:th="http://www.thymeleaf.org">
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-3" style="margin-left: -15px">
+                                <search:input id="title" label="标题" name="title" value=""
+                                              type="text" placeholder="标题／摘要／资讯来源"></search:input>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:datetime id="begDate" label="发布时间" name="begDate"
+                                                 format="yyyy-MM-dd HH:mm:ss"></search:datetime>
+                            </div>
+                            <div class="col-sm-3" style="margin-left: -30px">
+                                <search:datetime id="endDate" label="至" name="endDate"
+                                                 format="yyyy-MM-dd HH:mm:ss"></search:datetime>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 15px">
+                            <div class="col-sm-3" style="margin-left: -15px">
+                                <search:select label="栏目" name="category" categorycode="${categorycode}"></search:select>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:select label="专题" name="seminar" categorycode="${seminar}"></search:select>
+                            </div>
+                            <div class="col-sm-5">
+                            </div>
+                            <div class="col-sm-1">
+                                <qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="OptArticleValid.search()"></qx:btn>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 15px">
+                            <div class="col-sm-3" style="margin-left: -15px">
+                                <qx:btn  class="btn btn-primary" fa="fa fa-arrow-up" label="上架" permission="" onclick="OptArticleValid.onLine()"></qx:btn>
+                                <qx:btn  class="btn btn-primary" fa="fa fa-arrow-down" label="下架" permission="" onclick="OptArticleValid.offLine()"></qx:btn>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#openModal">一键发布</button>
+                            </div>
+                        </div>
+                    </div>
+                    <table id="OptArticleValidTable" data-mobile-responsive="true" data-click-to-select="true">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="openModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title text-center">请选择要发布的终端</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">类型</label>
+                        <div class="col-sm-10">
+                            <label class="radio-inline"><input type="checkbox" name="type" value="0" checked />手机APP</label>
+                            <label class="radio-inline"><input type="checkbox" name="type" value="1" checked/>网站</label>
+                            <label class="radio-inline"><input type="checkbox" name="type" value="2" checked/>微信</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="OptArticleValid.autoSubmit()">确认发布</button>
+            </div>
+        </div>
+    </div>
+</div>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+        /**
+         * 咨询初始化
+         */
+        var OptArticleValid = {
+            id: "OptArticleValidTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            statusList : {},
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        OptArticleValid.initColumn = function () {
+            return [
+                {field: 'selectItem', radio: true},
+                {title: '编号', field: 'id', visible: true, align: 'center', valign: 'middle',sortable: false},
+                {title: '标题', field: 'title', align: 'center', valign: 'middle'},
+                {title: '发布时间', field: 'publishedTime', align: 'center', valign: 'middle',sortable: false,
+                    formatter: function (value, row, index) {
+                        var a = row.publishedTime;
+                        if(typeof a == "undefined" || a == null){
+                            a = "--";
+                        }else{
+                            a = dateDisplay(row.publishedTime);
+                        }
+                        return a;
+                    }
+                },
+                {title: '发布状态', field: 'publishedStatus', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        var b = row.publishedStatus;
+                        if(b == 0){
+                            return "已下架";
+                        } else if(b == 1){
+                            return "已上架";
+                        } else if(b == 2){
+                            return "定时发布";
+                        }
+                    }
+                },
+                {title: '发布人', field: 'pubUser', align: 'center', valign: 'middle'},
+                {title: '操作', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        var a = '<a href="javascript:OptArticleValid.openPub('+ "'" + row.id+ "'" +')">发布状态</a>';
+                        var b = '&nbsp;&nbsp;' + '<a href="javascript:OptArticleValid.del()">'+ "删除" +'</a>';
+                        var c = row.publishedStatus;
+                        if(c== 0){
+                            return a + b;
+                        } else {
+                            return a;
+                        }
+                    }
+                }
+            ]
+        };
+
+        /**
+         * 检查是否选中  xxxxxx
+         */
+        OptArticleValid.check = function () {
+            var selected = $('#'+this.id).bootstrapTable('getSelections');
+
+            if(selected.length == 0){
+                App.info("请先选中表格中的某一记录！");
+                return false;
+            }else{
+                OptArticleValid.seItem = selected[0];
+                return true;
+            }
+
+        };
+
+        /**
+         * 选择资讯发布类型
+         */
+        OptArticleValid.openPub = function(id) {
+            if (this.check()) {
+                var index = layer.open({
+                    type : 2,
+                    title : '资讯发布',
+                    area : [ '100%', '100%' ], //宽高
+                    fix : false, //不固定
+                    maxmin : false,
+                    content : App.ctxPath+'/articlevalid/article_pub?id=' + id
+                });
+                this.layerIndex = index;
+            }
+        };
+
+
+        /**
+         * 资讯下线
+         */
+        OptArticleValid.offLine = function () {
+            if (this.check()) {
+                var thisid = this.seItem.id;
+                var fun = function (){
+                    var ajax = new $ax(App.ctxPath+"/articlevalid/offLine?id=" + thisid, function (data) {
+                        App.success("下架成功！",'');
+                    }, function (data) {
+                        App.error("该条资讯正在被使用，无法下架!");
+                    });
+                    ajax.start();
+                    OptArticleValid.table.refresh({query: OptArticleValid.formParams()});
+                }
+                App.confirm("确定要下架吗？", fun);
+            }
+        };
+
+        /**
+         * 资讯上线
+         */
+        OptArticleValid.onLine = function () {
+            if (this.check()) {
+                var thisid = this.seItem.id;
+                var fun = function (){
+                    var ajax = new $ax(App.ctxPath+"/articlevalid/onLine?id=" + thisid, function (data) {
+                        App.success("发布成功！",'');
+                    }, function (data) {
+                        App.error("该条资讯正在被审核，暂时无法发布!");
+                    });
+                    ajax.start();
+                    OptArticleValid.table.refresh({query: OptArticleValid.formParams()});
+                }
+                App.confirm("确定要发布吗？", fun);
+            }
+        };
+        /**
+         * 一键发布
+         */
+        //todo
+        OptArticleValid.autoSubmit = function () {
+            layer.msg("发布完毕", {icon: 6});
+            $('#openModal').modal('hide');
+            /*var checkboxs = $("input[name=type]:checked");
+            var types = '';
+            App.loadingAjax({
+                url: ctxPath + "xxx",
+                type: "post",
+                data: {type: types},
+                success: function (result) {
+                    if(result.code === 200){
+                        layer.msg("发布完毕", {icon: 6});
+                        $('#openModal').modal('hide');
+                    }
+                }, error: function () {
+                    layer.msg("发布失败,服务器异常");
+                }
+            });*/
+        };
+
+        /**
+         * 删除资讯
+         */
+        OptArticleValid.del = function () {
+            if (this.check()) {
+                var thisid = this.seItem.id;
+                var fun = function (){
+                    var ajax = new $ax(App.ctxPath+"/articlevalid/del?id=" + thisid, function (data) {
+                        App.success("成功删除！", '');
+                    }, function (data) {
+                        App.error("删除失败!");
+                    });
+                    ajax.start();
+                    OptArticleValid.table.refresh({query: OptArticleValid.formParams()});
+                }
+                App.confirm("确定要删除吗？", fun);
+            }
+
+        };
+
+        /**
+         * 预览
+         */
+        OptArticleValid.preview = function (id){
+            var index = layer.open({
+                type: 2,
+                title: '预览',
+                area: ['50%', '100%'], //宽高
+                maxmin: false,
+                fix: false, //不固定
+                content: App.ctxPath+'/articlevalid/article_preview/?id=' + id
+
+            });
+            this.layerIndex = index;
+        }
+
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        OptArticleValid.formParams = function() {
+            var queryData = {};
+
+            queryData['title'] = $("#title").val();
+            queryData['begDate'] = $("#begDate").val();
+            queryData['endDate'] = $("#endDate").val();
+            queryData["category"] = $("#category").val();
+            queryData["seminar"] = $("#seminar").val();
+
+            return queryData;
+        }
+
+        /**
+         * 查询资讯列表
+         */
+        OptArticleValid.search = function () {
+
+            OptArticleValid.table.refresh({query: OptArticleValid.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = OptArticleValid.initColumn();
+            var table = new BSTable(OptArticleValid.id,  "/articlevalid/list", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(OptArticleValid.formParams());
+            OptArticleValid.table = table.init();
+        });
+    </script>
+</js>
+</body>

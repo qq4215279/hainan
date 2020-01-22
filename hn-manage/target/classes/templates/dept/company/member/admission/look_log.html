@@ -1,0 +1,68 @@
+<css>
+	<link th:href="@{/static/css/flowChart.css}" rel="stylesheet">
+</css>
+<body>
+   <div class="form-horizontal">
+       <div class="row">
+           <div class="col-sm-12">
+               <div class="flowChart">
+                   <!--左侧轴-->
+                   <div class="flowChart-left">
+                       <!--虚线-->
+                       <div class="dashed"></div>
+                   </div>
+                   <!--右侧内容-->
+                   <div class="flowChart-right">
+                       <!--节点-->
+                       <div class="oneNode" th:each="log : ${list}">
+                           <!--左侧小球-->
+                           <div class="check check-prime" th:if="${log.apply_status == '-1'}">
+                               待审核
+                           </div>
+                           <div class="check check-success" th:if="${log.apply_status == '0'}">
+                               拒绝
+                           </div>
+                           <div class="check check-danger" th:if="${log.apply_status == '1'}">
+                               同意
+                           </div>
+                           <div class="check check-danger" th:if="${log.apply_status == '2'}">
+                               已转办
+                           </div>
+                           <div class="tag-boder">
+                               <div class="tag">
+                               </div>
+                           </div>
+                           <!--右侧内容-->
+                           <div class="NodeDetail">
+                               <!--上-->
+                               <div class="NodeDetail-title">
+                                   <!--头像-->
+                                   <!--<img src="img/headImg.jpg" />-->
+                                   <!--内容-->
+                                   <div class="details">
+                                   	<span class="orgName" th:text="${log.fullname}"></span>
+                                       <h4 th:text="${log.record_flow_info}"></h4>
+                                   </div>
+                               </div>
+                               <!--中-->
+                               <div class="NodeDetail-content">
+                                   <p th:text="${log.check_reason}"></p>
+                               </div>
+                               <!--下-->
+                               <div class="NodeDetail-footer">
+                                   <span th:text="${log.check_time}"></span>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </div>
+       </div>
+   </div>
+</body>
+<js>
+<script type="text/javascript">
+   var val=$(".flowChart-right").css("height");
+   $(".dashed").css("height",val);
+</script>
+</js>

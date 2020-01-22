@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dept.dao.MemberDao">
+	<!-- 对应selectByCondition方法，条件查询（单位名称，组织机构代码） -->
+	<resultMap type="HashMap" id="selResultMap">
+       <result property="ouid" column="ouid" /> 
+       <result property="member_code" column="member_code" /> 
+       <result property="name" column="name" /> 
+       <result property="unit_name" column="unit_name" /> 
+       <result property="identification_num" column="identification_num" /> 
+       <result property="phone" column="phone" /> 
+       <result property="is_model" column="is_model" /> 
+       <result property="org_id" column="org_id" />
+   </resultMap>
+   
+	<select id="selectByCondition"  resultMap="selResultMap">
+		SELECT 
+			mem.*			
+		FROM org_member mem
+		LEFT JOIN org_dept_ext dept
+		ON dept.dept_id = mem.org_id
+		WHERE (del_flg = 0 or del_flg is null )
+		<if test="unitName != null and unitName != ''">
+			AND mem.unit_name like CONCAT('%',#{unitName},'%')
+		</if>
+		<choose>
+			<when test="orgCode != null and orgCode != ''">
+				and (mem.org_id = #{orgCode} or mem.org_id in ( select id from sys_dept where pids like CONCAT('%[', #{orgCode}, ']%') ))
+			</when>
+			<otherwise>
+				and (mem.org_id = #{orgId} or mem.org_id in ( select id from sys_dept where pids like CONCAT('%[', #{orgId}, ']%') ))
+			</otherwise>
+		</choose>
+		
+		order by mem.member_code ASC
+	</select>
+	
+	<select id="getDetail" resultType="com.gobestsoft.common.modular.dept.model.Member">
+		SELECT * 
+		FROM org_member
+		WHERE ouid =#{ouid}
+	</select>
+	
+	<select id="getOuidbyMemberCode" resultType="com.gobestsoft.common.modular.dept.model.Member">
+		SELECT * 
+		FROM org_member
+		WHERE member_code =#{memberCode}
+	</select>
+
+	<!-- 对应editDept方法，修改工会信息  -->
+	<update id="editMember" parameterType="com.gobestsoft.common.modular.dept.model.Member" >
+		UPDATE org_member
+		<trim prefix="set" suffixOverrides=",">
+		<if test="memberCode!=null"> member_code=#{memberCode},</if>
+		<if test="name!=null">name=#{name},</if>
+		<if test="unitName!=null">unit_name=#{unitName},</if>
+		<if test="phone!=null">phone=#{phone},</if>
+		<if test="isModel!=null">is_model=#{isModel},</if>
+		<if test="identificationNum!=null">identification_num=#{identificationNum},</if>
+		<if test="delFlg!=null">del_flg=#{delFlg},</if>
+		</trim>
+		WHERE ouid=#{ouid}		
+	</update>
+	
+	<!-- 对应addMember方法，新增一条工会信息  -->
+	<insert id="addMember" parameterType="com.gobestsoft.common.modular.dept.model.Member" >
+		INSERT INTO org_member (
+		ouid,
+		member_code,
+		name,
+		unit_name,
+		phone,
+		is_model,
+		org_id,
+		identification_type,
+		identification_num,
+		del_flg
+		)
+		VALUES(
+		#{ouid},
+		#{memberCode},
+		#{name},
+		#{unitName},
+		#{phone},
+		#{isModel},
+		#{orgId},
+		#{identificationType},
+		#{identificationNum},
+		#{delFlg}
+		)
+	</insert>
+
+
+	<update id="updateMemberCountTable1">
+		call generateDeptMemberCount();
+	</update>
+	<update id="updateMemberCountTable2">
+		call generateDeptSonCount();
+
+	</update>
+</mapper>

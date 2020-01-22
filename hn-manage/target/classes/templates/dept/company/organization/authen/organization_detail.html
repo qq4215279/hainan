@@ -1,0 +1,90 @@
+<body>
+<div class="container">
+    <form class="form-horizontal" id="organizationForm">
+        <div class="row">
+            <div class="col-sm-6">
+                <form:text id="unionName" label="工会名称" name="unionName" value="${deptOrganization.unionName}"
+                           disabled="true"></form:text>
+                <form:text id="pName" label="上级工会" name="pName" value="${deptOrganization.pName}"
+                           disabled="true"></form:text>
+                <form:text id="othersOrgCode" label="工会法人和其他组织统一社会信用代码" name="othersOrgCode"
+                           value="${deptOrganization.othersOrgCode}" disabled="true"></form:text>
+                <form:datetime id="createunionTime" label="建会时间" name="createunionTime" istime="false"
+                               format="yyyy-MM-dd"
+                               value="${deptOrganization.createunionTime}" disabled="true"></form:datetime>
+                <form:text id="unionType" label="工会类型" name="unionType" value="${deptOrganization.unionType}"
+                             disabled="true"></form:text>
+                <form:figure id="membership" label="会员人数" name="membership" value="${deptOrganization.membership}"
+                             min="0" disabled="true"></form:figure>
+                <form:text id="unionEmail" label="工会邮箱" name="unionEmail" value="${deptOrganization.unionEmail}"
+                           disabled="true"></form:text>
+                <form:text id="unionLeader" label="工会负责人" name="unionLeader"
+                           value="${deptOrganization.unionLeader}" disabled="true"></form:text>
+                <form:text id="unionLeaderPhone" label="联系电话" name="unionLeaderPhone"
+                           value="${deptOrganization.unionLeaderPhone}" disabled="true"></form:text>
+
+                <!--<form:text id="unionSimpleName" label="工会简称" name="unionSimpleName"-->
+                <!--value="${deptOrganization.unionSimpleName}" disabled="true"></form:text>-->
+                <!--<form:text id="unitZipCode" label="工会邮编" name="unitZipCode" value="${deptOrganization.unitZipCode}"-->
+                <!--disabled="true"></form:text>-->
+                <!--<form:figure id="cadresNumber" label="专职干部人数" name="cadresNumber"-->
+                <!--value="${deptOrganization.cadresNumber}" min="0" disabled="true"></form:figure>-->
+                <!--<form:text id="chairmanName" label="主席名称" name="chairmanName" value="${deptOrganization.chairmanName}"-->
+                <!--disabled="true"></form:text>-->
+            </div>
+            <div class="col-sm-6">
+                <form:text id="unitName" label="单位名称" name="unitName" value="${deptOrganization.unitName}"
+                           disabled="true"></form:text>
+                <form:text id="unitOrgCode" label="单位法人和其他组织统一社会信用代码" name="unitOrgCode"
+                           value="${deptOrganization.unitOrgCode}" disabled="true"></form:text>
+                <form:text id="unitAddress" label="单位地址" name="unitAddress" value="${deptOrganization.unitAddress}"
+                           disabled="true"></form:text>
+                <form:select id="unitDistrict" label="单位所在行政区" name="unitDistrict" code="unit_district_code"
+                             value="${deptOrganization.unitDistrict}" disabled="true"></form:select>
+                <form:text id="unitNature" label="单位性质类别" name="unitNature"
+                             value="${deptOrganization.unitNature}" disabled="true"></form:text>
+                <form:text id="unitEconomicType" label="经济类型" name="unitEconomicType"
+                             value="${deptOrganization.unitEconomicType}" disabled="true"></form:text>
+                <form:text id="unitIndustry" label="单位所属行业" name="unitIndustry"
+                             value="${deptOrganization.unitIndustry}" disabled="true"></form:text>
+                <form:figure id="unitNumber" label="职工人数" name="unitNumber" value="${deptOrganization.unitNumber}"
+                             min="0" disabled="true"></form:figure>
+                <!--<form:text id="chairmanSession" label="现任第几届主席" name="chairmanSession"-->
+                <!--value="${deptOrganization.chairmanSession}" disabled="true"></form:text>-->
+                <!--<form:figure id="chairmanMobile" label="主席手机号" name="chairmanMobile"-->
+                <!--value="${deptOrganization.chairmanMobile}" min="0" disabled="true"></form:figure>-->
+
+            </div>
+        </div>
+        <div th:if="${showCancel}" class="row text-center">
+            <qx:btn id="sure" class="btn btn-danger" onclick="OrganizationDlg.close()"
+                    fa="fa fa-address-book" label="取消"></qx:btn>
+        </div>
+        <div th:if="${!showCancel}" class="row text-center">
+            <qx:btn class="btn btn-primary" onclick="OrganizationDlg.edit()" fa="fa fa-edit" label="修改"></qx:btn>
+            <qx:btn class="btn btn-primary" onclick="" fa="fa" label="转移"></qx:btn>
+        </div>
+        <br/>
+    </form>
+</div>
+</body>
+<js>
+    <script type="text/javascript">
+        var OrganizationDlg = {
+            organizationData: {},
+            validateFields: {}
+        }
+        /**
+         * 关闭此对话框
+         */
+        OrganizationDlg.close = function () {
+            parent.layer.close(window.parent.DeptOrganization.layerIndex);
+        }
+
+
+        OrganizationDlg.edit = function () {
+            window.location.href = App.ctxPath + 'company/organization/reEdit';
+        };
+
+    </script>
+</js>

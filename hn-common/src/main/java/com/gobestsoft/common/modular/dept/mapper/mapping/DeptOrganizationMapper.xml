@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gobestsoft.common.modular.dept.mapper.DeptOrganizationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.dept.model.DeptOrganization">
+        <result property="id" column="id"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="unitName" column="unit_name"/>
+        <result property="unitOrgCode" column="unit_org_code"/>
+        <result property="othersOrgCode" column="others_org_code"/>
+        <result property="unitAddress" column="unit_address"/>
+        <result property="unitDistrict" column="unit_district"/>
+        <result property="unitNature" column="unit_nature"/>
+        <result property="unitEconomicType" column="unit_economic_type"/>
+        <result property="unitIndustry" column="unit_industry"/>
+        <result property="unitNumber" column="unit_number"/>
+        <result property="pId" column="p_id"/>
+        <result property="pName" column="p_name"/>
+        <result property="unionSimpleName" column="union_simple_name"/>
+        <result property="unionName" column="union_name"/>
+        <result property="unionType" column="union_type"/>
+        <result property="unionEmail" column="union_email"/>
+        <result property="createunionTime" column="createunion_time"/>
+        <result property="membership" column="membership"/>
+        <result property="unionLeader" column="union_leader"/>
+        <result property="unionLeaderPhone" column="union_leader_phone"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateUser" column="update_user"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="status" column="status"/>
+        <result property="source" column="source"/>
+        <result property="comment" column="comment"/>
+        <result property="unitZipCode" column="unit_zip_code"/>
+        <result property="cadresNumber" column="cadres_number"/>
+        <result property="chairmanName" column="chairman_name"/>
+        <result property="chairmanSession" column="chairman_session"/>
+        <result property="chairmanMobile" column="chairman_mobile"/>
+        <result property="perfectInformation" column="perfect_information"/>
+    </resultMap>
+
+    <resultMap id="BaseMap" type="HashMap">
+        <result property="deptId" column="dept_id"/>
+        <result property="unionName" column="union_name"/>
+        <result property="unitName" column="unit_name"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <!-- 通用版全部字段-->
+    <sql id="commonColumns">
+		dept_organization.id,
+		dept_organization.dept_id,
+		dept_organization.unit_name,
+		dept_organization.unit_org_code,
+		dept_organization.others_org_code,
+		dept_organization.unit_address,
+		dept_organization.unit_district,
+		dept_organization.unit_nature,
+		dept_organization.unit_economic_type,
+		dept_organization.unit_industry,
+		dept_organization.unit_number,
+		dept_organization.p_id,
+		dept_organization.p_name,
+		dept_organization.union_simple_name,
+		dept_organization.union_name,
+		dept_organization.union_type,
+		dept_organization.union_email,
+		dept_organization.createunion_time,
+		dept_organization.membership,
+		dept_organization.union_leader,
+		dept_organization.union_leader_phone,
+		dept_organization.create_user,
+		dept_organization.create_time,
+		dept_organization.update_user,
+		dept_organization.update_time,
+		dept_organization.status,
+		dept_organization.source,
+		dept_organization.comment,
+		dept_organization.unit_zip_code,
+		dept_organization.cadres_number,
+		dept_organization.chairman_name,
+		dept_organization.chairman_session,
+		dept_organization.chairman_mobile,
+		dept_organization.perfect_information
+	</sql>
+
+    <!-- 对应selectByCondition方法，条件查询（工会名称,编号，上级部门） -->
+    <select id="selectByCondition" resultType="map">
+        SELECT
+        <include refid="commonColumns"></include>,
+        sys_user.name as createUser
+        FROM dept_organization
+        INNER join sys_dept on sys_dept.id=dept_organization.dept_id
+        left join sys_user on sys_user.uid = dept_organization.create_user
+        <where>
+            <if test="unionName != null and unionName != ''">
+                AND dept_organization.union_name like '%${unionName}%'
+            </if>
+            <if test="deptNo != null and deptNo != ''">
+                and sys_dept.dept_no like '%${deptNo}%'
+            </if>
+            <if test="pId != null and pId != ''">
+               and sys_dept.pids like concat('%,', ${pId}, '%')
+            </if>
+        </where>
+        OR sys_dept.id=#{pId}
+        order by sys_dept.level,sys_dept.sort,sys_dept.id
+    </select>
+
+    <!-- 根据deptid数组,查询出对应的工会信息集合-->
+    <select id="getAllParentDeptOrganizationBydeptIds" resultMap="BaseResultMap">
+        SELECT
+        <include refid="commonColumns"></include>
+        FROM dept_organization
+        where dept_organization.dept_id in
+        <foreach item="item" index="index" collection="deptIds"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!-- 根据sys_dept表id,查询直接下级工会List集合-->
+    <select id="getChildMstOrganizationByDeptId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="commonColumns"></include>
+        FROM dept_organization
+        where dept_organization.dept_id in
+        (select id from sys_dept where pid = #{deptId} order by sort,id)
+    </select>
+
+    <!-- 根据sys_dept表id,查询全部下级工会List集合 -->
+    <select id="getAllChildMstOrganizationByDeptId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="commonColumns"></include>
+        FROM dept_organization
+        where dept_organization.dept_id in
+        (select id from sys_dept where
+        pids like '%${deptId}%'
+        order by level,sort,id)
+    </select>
+
+    <select id="isExistByUnitNameOrUnitOrgCode" resultType="com.gobestsoft.common.modular.dept.model.DeptOrganization">
+        SELECT
+        <include refid="commonColumns"></include>
+        FROM dept_organization
+        <where>
+            <if test="unitName != null and unitName != ''">
+                and dept_organization.unit_name =#{unitName}
+            </if>
+            <if test="unitOrgCode != null and unitOrgCode != ''">
+                and dept_organization.unit_org_code =#{unitOrgCode}
+            </if>
+        </where>
+        limit 1
+    </select>
+
+    <!-- 申请建会审核多条件分页查询 -->
+    <select id="selectAuditOrganizationPage" resultMap="BaseResultMap">
+        SELECT <include refid="commonColumns"></include> FROM dept_organization
+        join (select DISTINCT(dept_organization_log.ref_id) as ref_id from dept_organization_log where
+        dept_organization_log.operation_dept_id=#{orgId}
+        )P on dept_organization.id = P.ref_id
+        <if test="status != null and  status != ''">
+            AND dept_organization.status = #{status}
+        </if>
+        <if test="perfectInformations != null and  perfectInformations != ''">
+            AND dept_organization.perfect_information in (
+            <foreach collection="perfectInformations" item="d" separator=",">
+                #{d}
+            </foreach>
+            )
+        </if>
+        <if test="unitName != null and unitName != ''">
+            AND dept_organization.unit_name like CONCAT('%',#{unitName},'%')
+        </if>
+        order by dept_organization.status,dept_organization.perfect_information, dept_organization.create_time
+    </select>
+
+    <!-- 新建临时表（导入组织时先导入至临时表） -->
+    <update id="createTemporaryTable">
+       CREATE TABLE ${tableName} (
+          `id` int(32) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+          `unit_name` varchar(255) DEFAULT NULL COMMENT '单位名称',
+          `index` varchar(255) DEFAULT NULL COMMENT '序号',
+          `unit_org_code` varchar(50) DEFAULT NULL COMMENT '统一社会信用代码（组织机构代码）',
+          `others_org_code` varchar(50) DEFAULT NULL COMMENT '法人和其他组织统一社会信用代码',
+          `unit_address` varchar(255) DEFAULT NULL COMMENT '单位地址',
+          `unit_district` varchar(255) DEFAULT NULL COMMENT '单位所在政区',
+          `unit_nature` varchar(255) DEFAULT NULL COMMENT '单位性质类别',
+          `unit_economic_type` varchar(255) DEFAULT NULL COMMENT '经济类型',
+          `unit_industry` varchar(255) DEFAULT NULL COMMENT '单位所属行业',
+          `unit_number` int(32) DEFAULT NULL COMMENT '职工人数',
+          `p_id` int(32) DEFAULT NULL COMMENT '上级工会id（sys_dept表id）',
+          `p_name` varchar(50) DEFAULT NULL COMMENT '上级工会名称（sys_dept表fullname全称）',
+          `union_simple_name` varchar(255) DEFAULT NULL COMMENT '工会简称',
+          `union_name` varchar(255) DEFAULT NULL COMMENT '工会全称',
+          `createunion_time` varchar(14) DEFAULT NULL COMMENT '建会时间',
+          `union_type` varchar(36) DEFAULT NULL COMMENT '工会类型',
+          `union_leader` varchar(36) DEFAULT NULL COMMENT '工会负责人',
+          `union_leader_phone` varchar(36) DEFAULT NULL COMMENT '工会负责人电话',
+          `membership` int(32) DEFAULT NULL COMMENT '会员人数',
+          `errors_message` varchar(500) DEFAULT NULL COMMENT '错误原因',
+          `if_success` char(4) DEFAULT NULL COMMENT '是否成功',
+          PRIMARY KEY (`id`)
+      ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+   </update>
+
+    <!-- 删除临时表 -->
+    <update id="dropTemporaryTable">
+       DROP TABLE IF EXISTS ${tableName};
+   </update>
+
+    <!-- 临时表插入数据 -->
+    <insert id="insertList" parameterType="java.util.Map">
+        INSERT INTO ${tableName}
+        (`unit_name`,
+        `unit_org_code`,
+        `others_org_code`,
+        `unit_address`,
+        `index`,
+        `unit_district`,
+        `unit_nature`,
+        `unit_economic_type`,
+        `unit_industry`,
+        `unit_number`,
+        `p_id`,
+        `p_name`,
+        `union_simple_name`,
+        `union_name`,
+        `createunion_time`,
+        `union_type`,
+        `union_leader`,
+        `union_leader_phone`,
+        `membership`,
+        `errors_message`,
+        `if_success`)
+        VALUES
+        <foreach collection="pojos" item="pojo" separator=",">
+            (#{pojo.unit_name},
+            #{pojo.unit_org_code},
+            #{pojo.others_org_code},
+            #{pojo.unit_address},
+            #{pojo.index},
+            #{pojo.unit_district},
+            #{pojo.unit_nature},
+            #{pojo.unit_economic_type},
+            #{pojo.unit_industry},
+            #{pojo.unit_number},
+            #{pojo.p_id},
+            #{pojo.p_name},
+            #{pojo.union_simple_name},
+            #{pojo.union_name},
+            #{pojo.createunion_time},
+            #{pojo.union_type},
+            #{pojo.union_leader},
+            #{pojo.union_leader_phone},
+            #{pojo.membership},
+            #{pojo.errors_message},
+            #{pojo.if_success})
+        </foreach>
+    </insert>
+
+    <!-- 创建存储过程  -->
+    <update id="createImportDeptProcedure">
+    CREATE PROCEDURE ${procedureName}()
+    BEGIN
+      DECLARE flag INT DEFAULT FALSE ;
+      DECLARE total INT DEFAULT 0;
+      DECLARE logId INT;
+      DECLARE unitName VARCHAR(255);
+      DECLARE unitOrgCode VARCHAR(50);
+      DECLARE othersOrgCode VARCHAR(50);
+      DECLARE unitAddress VARCHAR(255);
+      DECLARE unitDistrict VARCHAR(255);
+      DECLARE unitDistrictCode VARCHAR(50);
+      DECLARE unitNature VARCHAR(255);
+	  DECLARE unitNatureCode VARCHAR(12);
+      DECLARE unitEconomicType VARCHAR(255);
+	  DECLARE unitEconomicTypeCode VARCHAR(255);
+      DECLARE unitIndustry VARCHAR(255);
+      DECLARE unitIndustryCode VARCHAR(255);
+      DECLARE unitNumber INT(32);
+      DECLARE pIdX INT(32);
+      DECLARE pIdsx VARCHAR(255) ;
+      DECLARE pName VARCHAR(50);
+      DECLARE unionSimpleName VARCHAR(255);
+      DECLARE unionName VARCHAR(255);
+      DECLARE createunionTime VARCHAR(14);
+      DECLARE unionType VARCHAR(36);
+      DECLARE unionTypeCode VARCHAR(255);
+      DECLARE unionLeader VARCHAR(36);
+      DECLARE unionLeaderPhone VARCHAR(36);
+      DECLARE membershipValue INT(32);
+      DECLARE errorsMessage VARCHAR(500);
+      DECLARE ifSuccess CHAR(4) DEFAULT '1';
+      DECLARE deptId INT;
+      DECLARE levelValue INT DEFAULT 0;
+
+       DECLARE depts CURSOR FOR SELECT id,unit_name,unit_org_code,others_org_code,unit_address,unit_district,unit_nature,unit_economic_type,
+       unit_industry,unit_number,p_name,union_simple_name,union_name,createunion_time,union_type,union_leader,union_leader_phone,membership
+       ,errors_message,if_success from ${tableName} WHERE  IFNULL(if_success,1)=1;
+	   declare continue handler for not found set flag = true;
+       OPEN depts;  
+	   REPEAT
+			FETCH  depts INTO logId,unitName,unitOrgCode,othersOrgCode,unitAddress,unitDistrict,unitNature,
+            unitEconomicType,unitIndustry,unitNumber,pName,unionSimpleName,unionName,createunionTime,unionType,
+            unionLeader,unionLeaderPhone,membershipValue,errorsMessage,ifSuccess;
+			IF NOT flag THEN
+                SET levelValue=0;
+
+			    IF errorsMessage IS NULL THEN
+                    SET errorsMessage='错误原因：';
+			    END IF;
+
+                IF unionSimpleName IS NULL THEN
+                   SET errorsMessage=CONCAT(errorsMessage,'-工会组织不能为空');
+                   SET ifSuccess='0';
+                ELSE
+                    IF EXISTS(select 1 from sys_dept where simplename=unionSimpleName OR fullname=unionSimpleName) THEN
+                        SET errorsMessage=CONCAT(errorsMessage,'-当前工会组织已经存在');
+                        SET ifSuccess='0';
+                    END IF;
+                END IF;
+
+                IF EXISTS (SELECT 1 FROM dept_organization WHERE others_org_code=othersOrgCode) THEN
+                    SET errorsMessage=CONCAT(errorsMessage,'-工会法人和其他组织统一社会信用代码已存在');
+                    SET ifSuccess='0';
+                END IF;
+
+                IF pName IS NULL THEN
+                    SET errorsMessage=CONCAT(errorsMessage,'-上级工会名称不能为空');
+				    SET ifSuccess='0';
+                ELSE
+                    IF NOT EXISTS(SELECT 1 FROM sys_dept WHERE simplename=pName OR fullname=pName) THEN
+						SET errorsMessage=CONCAT(errorsMessage,'-上级工会不存在');
+						SET ifSuccess='0';
+					ELSE
+                        SELECT id,pids AS pidsXB,level  INTO pIdX,pIdsX,levelValue  FROM sys_dept WHERE simplename=pName OR fullname=pName;
+                        SET pIdsX=CONCAT(pIdsX,',',pIdX);
+                        SET levelValue=levelValue+1;
+					END IF;
+                END IF;
+
+                IF unitDistrict IS NULL
+                    OR NOT EXISTS(select 1 From sys_dict where name =unitDistrict AND group_code='unit_district_code') THEN
+                    SET errorsMessage=CONCAT(errorsMessage,'-行政区选择错误');
+				    SET ifSuccess='0';
+                ELSE
+                    SELECT code INTO unitDistrictCode From sys_dict where name =unitDistrict AND group_code='unit_district_code';
+                END IF;
+
+					IF ifSuccess='0' THEN 
+							UPDATE ${tableName} SET errors_message=errorsMessage,if_success=ifSuccess WHERE id=logId;
+					ELSE
+					        IF unitNature IS NOT NULL AND  EXISTS(select 1 From sys_dict where name =unitNature AND group_code='lib_unit_type') THEN
+                                 SELECT code INTO unitNatureCode From sys_dict where name =unitNature AND group_code='lib_unit_type';
+                            END IF;
+                            IF unitEconomicType IS NOT NULL AND  EXISTS(select 1 From sys_dict where name =unitEconomicType AND group_code='lib_economic_type') THEN
+                                 SELECT code INTO unitEconomicTypeCode From sys_dict where name =unitEconomicType AND group_code='lib_economic_type';
+                            END IF;
+                            IF unitIndustry IS NOT NULL AND  EXISTS(select 1 From sys_dict where name =unitIndustry AND group_code='lib_industry_type') THEN
+                                 SELECT code INTO unitIndustryCode From sys_dict where name =unitIndustry AND group_code='lib_industry_type';
+                            END IF;
+                            IF unionType IS NOT NULL AND  EXISTS(select 1 From sys_dict where name =unionType AND group_code='lib_base_org_type') THEN
+                                 SELECT code INTO unionTypeCode From sys_dict where name =unionType AND group_code='lib_base_org_type';
+                            END IF;
+
+							INSERT INTO sys_dept(pid,pids,simplename,fullname,addr,p_dept_name,pic_name,establish_date,dept_type,level) VALUES
+                            (pIdX,pIdsX,unionSimpleName,unionName,unitAddress,pName,unionLeader,createunionTime,'0',levelValue);
+
+							select  last_insert_id() INTO deptId;
+
+							INSERT INTO dept_organization(dept_id,unit_name,unit_org_code,others_org_code,unit_address,unit_district,unit_nature,unit_economic_type,
+                            unit_industry,unit_number,p_id,p_name,union_simple_name,union_name,union_type,createunion_time,membership,union_leader,union_leader_phone,create_user,create_time,update_user,update_time)VALUES
+                            (deptId,unitName,unitOrgCode,othersOrgCode,unitAddress,unitDistrictCode,unitNatureCode,
+							unitEconomicTypeCode,unitIndustryCode,unitNumber,pIdX,pName,unionSimpleName,unionName,unionTypeCode,createunionTime,
+                            membershipValue,unionLeader,unionLeaderPhone,#{createUid},#{createTime},#{createUid},#{createTime});
+                          UPDATE ${tableName} SET if_success='1' WHERE id=logId;
+                  END IF;
+			END IF;
+		UNTIL flag END REPEAT;
+		SELECT * FROM ${tableName};
+		CLOSE depts;
+    END;
+	</update>
+
+    <!-- 调用存储过程 -->
+    <select id="callImportDeptProcedure" resultType="java.util.Map">
+	     CALL ${procedureName};
+	</select>
+
+
+    <!-- 删除存储过程  -->
+    <update id="dropImportDeptProcedure">
+	    DROP PROCEDURE IF EXISTS ${procedureName};
+	</update>
+
+
+    <select id="selectByDeptId" resultMap="BaseResultMap">
+        SELECT * FROM dept_organization WHERE  dept_id=${deptId}
+    </select>
+
+    <!--查询所有组织信息，用于导出-->
+    <select id="selectAllByCondition"  resultType="java.util.Map">
+        SELECT
+        <include refid="commonColumns"></include>,
+        D1.name as unit_district_name,
+        D2.name as unit_nature_name,
+        D3.name as unit_economic_type_name,
+        D4.name as unit_industry_name,
+        D5.name as union_type_name
+
+
+        FROM dept_organization
+        left join sys_dict D1 on D1.group_code = 'unit_district_code' and D1.code= dept_organization.unit_district
+        left join sys_dict D2 on D2.group_code = 'lib_unit_type' and D2.code= dept_organization.unit_nature
+        left join sys_dict D3 on D3.group_code = 'lib_economic _type' and D3.code= dept_organization.unit_economic_type
+        left join sys_dict D4 on D4.group_code = 'lib_industry_type' and D4.code= dept_organization.unit_industry
+        left join sys_dict D5 on D5.group_code = 'lib_base_org_type' and D5.code= dept_organization.union_type
+
+
+        INNER join sys_dept on sys_dept.id=dept_organization.dept_id
+        <where>
+            <if test="unionName != null and unionName != ''">
+                AND dept_organization.union_name like '%${unionName}%'
+            </if>
+            <if test="deptNo != null and deptNo != ''">
+                and sys_dept.dept_no like '%${deptNo}%'
+            </if>
+            <if test="pId != null and pId != ''">
+                and dept_organization.p_id = #{pId}
+            </if>
+        </where>
+        OR dept_organization.dept_id=#{pId}
+        order by sys_dept.level,sys_dept.sort,sys_dept.id
+
+    </select>
+
+    <select id="selectByRegRemove" resultMap="BaseMap">
+        SELECT
+          sys_user.account,
+          sys_user.name,
+          sys_user.createtime
+        FROM
+            sys_user
+        <where>
+            <if test="query_deptname != null and query_deptname != ''">
+                account like concat ('%',#{query_deptname},'%')
+            </if>
+
+            <if test="query_deptname == null or query_deptname == ''" >
+                account is null
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByOrgRemove" resultMap="BaseMap">
+        SELECT
+            dept_organization.dept_id,
+            dept_organization.union_name,
+            dept_organization.unit_name,
+            dept_organization.create_time
+        FROM
+            dept_organization
+        <where>
+            <if test="query_orgcode == '' and query_deptname == ''">
+                union_name is null
+            </if>
+
+            <if test="query_orgcode != '' and query_orgcode != null">
+                and others_org_code = #{query_orgcode}
+            </if>
+
+            <if test="query_deptname != '' and query_deptname != null">
+                and union_name like concat ('%',#{query_deptname},'%')
+            </if>
+        </where>
+
+    </select>
+    <update id="updateEmailByUserName" >
+        update dept_organization set union_email = #{unionEmail} where union_name = #{unionName}
+    </update>
+
+
+    <select id="selectMemberCount" resultType="int">
+        select member_count from t_member_count where dept_id = #{deptId}
+    </select>
+
+</mapper>

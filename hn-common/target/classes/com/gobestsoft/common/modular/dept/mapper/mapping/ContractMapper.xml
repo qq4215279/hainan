@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dept.mapper.ContractMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.dept.model.Contract">
+		<id column="contract_id" property="contractId" />
+		<result column="dept_id" property="deptId" />
+		<result column="init_date" property="initDate" />
+		<result column="createtime" property="createTime" />
+		<result column="is_group_constract" property="isGroupConstract" />
+	</resultMap>
+
+</mapper>

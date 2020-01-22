@@ -1,0 +1,71 @@
+<body xmlns:form="http://www.w3.org/1999/html">
+<div class="container">
+
+    <form class="form-horizontal">
+        <form:figure id="two" label="数字输入框" name="two" max="100" min="10" value=""></form:figure>
+        <form:text id="one" label="文本输入框" name="one"></form:text>
+        <form:datetime id="three" label="日期输入" istime="false" must="true" format="yyyy-MM-dd"
+                       name="three"></form:datetime>
+        <form:datetime id="four" label="日期时间输入" istime="true" format="yyyy-MM-dd HH:mm:ss" name="four"></form:datetime>
+        <form:select id="account" label="性别" name="account" code="lib_sex" must="true"></form:select>
+        <form:check id="five" label="check选择" name="five"></form:check>
+        <form:img id="six" label="封面图" width="200" height="100"></form:img>
+        <form:file name="jumpUrl" width="360px"></form:file>
+        <div class="form-group" id="demo">
+            <label class="col-sm-2 control-label">
+                demo文件
+            </label>
+            <div class="col-sm-9" id="demofiles">
+            </div>
+        </div>
+        <form:area id="seven" label="区域输入" name="seven"></form:area>
+        <div class="row text-center">
+            <qx:btn id="sure" class="btn btn-default" fa="fa fa-address-book" label="确认"></qx:btn>
+            <qx:btn id="back" class="btn btn-primary" fa="fa fa-address-book" label="返回"></qx:btn>
+        </div>
+    </form>
+</div>
+
+</body>
+
+<js>
+    <div  th:include="fragment/fargment :: clipJs"></div>
+    <div  th:include="fragment/fargment :: fileUploadJs"></div>
+    <script>
+        /**
+         * demo上传
+         */
+        $("#fileupload").fileupload({
+            url: App.ctxPath + '/upload',
+            start: function (e) {
+                $('#progressText').html('0%');
+                $('#progressText').css('color', 'black')
+                $('#progress .progress-bar').css('width', '0%');
+            },
+            progressall: function (e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $('#progressText').html(progress + '%')
+                $('#progress .progress-bar').css('width', progress + '%');
+            },
+            done: function (e, data) {
+                $('#progressText').html('complete');
+                $('#progressText').css('color', 'green')
+                demo(data.result);
+            },
+            fail: function (e, data) {
+                $('#progressText').html('error');
+                $('#progressText').css('color', 'red')
+            }
+        });
+
+        function demo(fileName) {
+            var index = fileName.lastIndexOf("\/");
+            var showName = fileName.substring(index + 1, fileName.length);
+            var area=$('<div>' + '<span data-filename = "' + fileName + '">'+showName+'</span><i class="fa fa-close" ></i></div>');
+            $("#demofiles").append(area);
+        }
+        $("#demofiles").on("click",".fa-close",function () {
+            $(this).parent().remove();
+        })
+    </script>
+</js>

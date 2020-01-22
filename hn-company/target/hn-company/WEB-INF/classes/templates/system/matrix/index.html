@@ -1,0 +1,190 @@
+@layout("/common/_container.html"){
+<div class="row">
+	<div class="col-sm-12">
+		<div class="ibox float-e-margins">
+			<div class="ibox-title">
+				<h5>媒体矩阵管理表</h5>
+			</div>
+			<div class="ibox-content">
+				<div class="row row-lg">
+					<div class="col-sm-12">
+						<div class="row">
+							<div class="col-sm-3">
+								<#NameCon id="keyword" name="关键字" placeholder="搜索用关键字" />
+							</div>
+							<div class="col-sm-3"></div>
+							<div class="col-sm-3"></div>
+							<div class="col-sm-2"></div>
+							<div class="col-sm-1">
+								<#button name="搜索" icon="fa-search"
+									clickFun="IndexPage.search()" />
+							</div>
+						</div>
+						<div class="hidden-xs" id="CmsMediaMatrixTableToolbar"
+							role="group">
+							<#button name="新增" icon="fa-plus" clickFun="IndexPage.openNew()"
+								btnCss="info" />
+						</div>
+						<#table id="CmsMediaMatrixTable" />
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+    /**
+     * 咨询初始化
+     */
+    var IndexPage = {
+        id: "CmsMediaMatrixTable", //表格id
+        seItem: null, //选中的条目
+        table: null,
+        dlgIndex: -1
+    };
+
+    /**
+     * 初始化表格的列
+     */
+    IndexPage.initColumn = function () {
+        return [{
+            field: 'selectItem',
+            checkbox: true
+        },
+            {
+                title: 'id',
+                field: 'id',
+                visible: true,
+                align: 'center',
+                valign: 'middle',
+                sortable: false
+            },
+            {
+                title: '媒体类型',
+                field: 'mediaType',
+                visible: true,
+                align: 'center',
+                valign: 'middle',
+                sortable: false
+            },
+            {
+                title: '媒体名称',
+                field: 'mediaName',
+                visible: true,
+                align: 'center',
+                valign: 'middle',
+                sortable: false
+            },
+            {
+                title: '操作',
+                field: 'option',
+                visible: true,
+                align: 'center',
+                valign: 'middle',
+                sortable: false,
+                formatter: function (value, row, index) {
+                    return '<a href="#" onclick="IndexPage.openDetail(\'' + row.id + '\')"><i class="fa fa-pencil"></i> 编辑</a>' +
+                        '&nbsp;&nbsp;&nbsp;' +
+                        '<a href="#" onclick="IndexPage.delete(\'' + row.id + '\')" style="color: #d9534f;"><i class="fa fa-trash"></i> 删除</a>';
+                }
+            }
+        ];
+    };
+
+    /**
+     * 检查是否选中
+     */
+    IndexPage.check = function () {
+        var selected = $('#' + this.id).bootstrapTable('getSelections');
+
+        if (selected.length == 0) {
+            Feng.info("请先选中至少一条表格中的记录！");
+            return false;
+        } else {
+            IndexPage.seItem = selected;
+            return true;
+        }
+    };
+
+    /**
+     * 查询表单提交参数对象
+     *
+     */
+    IndexPage.formParams = function () {
+        var queryData = {};
+        queryData['keyword'] = $("#keyword").val();
+        return queryData;
+    }
+
+    /**
+     * 查询列表
+     */
+    IndexPage.search = function () {
+        IndexPage.table.refresh({
+            query: IndexPage.formParams()
+        });
+    };
+
+    /**
+     * 加载列表数据
+     */
+    $(function () {
+        var defaultColunms = IndexPage.initColumn();
+        var table = new BSTable(IndexPage.id, "/system/mediaMatrix/list", defaultColunms);
+        table.setPaginationType("server");
+        table.setQueryParams(IndexPage.formParams());
+        IndexPage.table = table.init();
+    });
+
+    /**
+     * 打开新增画面
+     */
+    IndexPage.openNew = function () {
+        var index = layer.open({
+            type: 2,
+            title: '新增',
+            area: ['60%', '100%'], //宽高
+            fix: false, //不固定
+            maxmin: true,
+            content: Feng.ctxPath + '/system/mediaMatrix/detail/0'
+        });
+        this.dlgIndex = index;
+    };
+
+    /**
+     * 打开修改画面
+     */
+    IndexPage.openDetail = function (id) {
+        if (id != null && id != '') {
+            var index = layer.open({
+                type: 2,
+                title: '详情',
+                area: ['60%', '100%'], //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: Feng.ctxPath + '/system/mediaMatrix/detail/' + id
+            });
+            this.dlgIndex = index;
+        }
+    };
+
+    /**
+     * 执行删除
+     */
+    IndexPage.delete = function(id) {
+        var fun = function (){
+            var ajax = new $ax(Feng.ctxPath + "/system/mediaMatrix/delete/" + id,
+                function (data) {
+                    Feng.success("删除成功！");
+                },
+                function (data) {
+                    Feng.error("删除失败!");
+                });
+            ajax.start();
+            IndexPage.table.refresh({query: IndexPage.formParams()});
+        }
+        Feng.confirm("确定删除？", fun);
+    }
+
+</script>
+@}

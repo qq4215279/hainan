@@ -1,0 +1,158 @@
+<css>
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12" style="margin-left:-15px">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <search:input id="content" label="留言内容" name="content" value=""
+                                              type="text"></search:input>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:datetime label="创建时间" name="begDate"
+                                                 istime="true" format="yyyy-MM-dd HH:mm:ss"></search:datetime>
+                            </div>
+                            <div class="col-sm-3" style="margin-left: -30px">
+                                <search:datetime label="至" name="endDate"
+                                                 istime="true" format="yyyy-MM-dd HH:mm:ss"></search:datetime>
+                            </div>
+                            <div class="col-sm-1">
+                                <qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="OptAppUser.search()"></qx:btn>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hidden-xs" id="OptAppUserTableToolbar" role="group">
+<!--                         <qx:btn class="btn btn-primary" fa="fa fa-plus" label="新增" permission="" onclick="OptAppUser.openAdd()"></qx:btn> -->
+<!--                         <qx:btn class="btn btn-primary" fa="fa fa-edit" label="编辑" permission="" onclick="OptAppUser.detail()"></qx:btn> -->
+                    </div>
+                    <table id="OptAppUserTable" data-mobile-responsive="true" data-click-to-select="true">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+        /**
+         * 咨询初始化
+         */
+        var OptAppUser = {
+            id: "OptAppUserTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        OptAppUser.initColumn = function () {
+            return [
+                {field: 'selectItem', radio: true,visible: false},
+                {title: '序号', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        return index+1;
+                    }},
+                {title: '留言内容', field: 'content', align: 'center', valign: 'middle',formatter: function (value, row, index) {
+                        var a = row.content;
+                        if(typeof a == "undefined"){
+                            a = "--";
+                        }else{
+                            if(a.length>100){
+                                a=a.substring(0,99)+"...";
+                            }
+                        }
+                        return a;
+                    }},
+                {title: '联系方式', field: 'contact', align: 'center', valign: 'middle'},
+                {title: '创建时间', field: 'create_time', align: 'center', valign: 'middle',sortable: false,
+                    formatter: function (value, row, index) {
+                        var a = row.create_time;
+                        if(typeof a == "undefined"){
+                            a = "--";
+                        }else{
+                            a = dateDisplay(row.create_time);
+                        }
+                        return a;
+                    }
+                },
+                {
+                    title: '操作', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        return '<a href="javascript:OptAppUser.detail(' + "'" + row.id + "'" + ')"><i class="fa fa-eye"></i>查看详情</a>';
+                    }
+                }
+            ]
+        };
+
+
+        /**
+         * 检查是否选中  xxxxxx
+         */
+        OptAppUser.check = function () {
+            var selected = $('#'+this.id).bootstrapTable('getSelections');
+
+            if(selected.length == 0){
+                App.info("请先选中表格中的某一记录！");
+                return false;
+            }else{
+                OptAppUser.seItem = selected[0];
+                return true;
+            }
+
+        };
+
+        /**
+         * appuser详情
+         */
+        OptAppUser.detail = function (id) {
+                var index = layer.open({
+                    type: 2,
+                    title: 'app用户留言详情',
+                    area: ['100%', '100%'], //宽高
+                    fix: true, //不固定
+                    maxmin: true,
+                    content:App.ctxPath+ '/appUserLeaveMessage/detail?id=' + id
+                });
+                layer.full(index);
+                this.layerIndex = index;
+        };
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        OptAppUser.formParams = function() {
+            var queryData = {};
+            queryData['content'] = $("#content").val();
+            queryData['begDate'] = frDate2time($("#begDate").val());
+            queryData['endDate'] = toDate2time($("#endDate").val());
+            return queryData;
+        }
+
+        /**
+         * 查询评论列表
+         */
+        OptAppUser.search = function () {
+
+            OptAppUser.table.refresh({query: OptAppUser.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = OptAppUser.initColumn();
+            var table = new BSTable(OptAppUser.id,  "/appUserLeaveMessage/list", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(OptAppUser.formParams());
+            OptAppUser.table = table.init();
+        });
+    </script>
+</js>
+</body>

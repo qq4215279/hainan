@@ -1,0 +1,212 @@
+<css>
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="form-horizontal">
+    <div class="row">
+        <input type="hidden" id="tranfer_id">
+        <div class="col-sm-3">
+            <search:input label="申请用户" name="name" value=""
+                          placeholder="" type="text"></search:input>
+        </div>
+        <div class="col-sm-3">
+            <search:select label="审批状态" name="status"
+                           code="common_approve_status"></search:select>
+        </div>
+        <qx:btn id="btn" class="btn btn-info" fa="fa fa-search" label="搜索"  onclick="MemrehomeCheckPage.search()"
+                permission=""></qx:btn>
+    </div>
+    <div class="hidden-xs" id="MemrehomeCheckTableToolbar" role="group">
+    </div>
+    <table id="MemrehomeCheckTable" data-mobile-responsive="true" data-click-to-select="true">
+    </table>
+</div>
+
+<div id="memCheck">
+    <div class="row" style="margin-top: 15px">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-5">
+            <form:area id="checkOpinion" label="审核意见" name="checkOpinion"  must="true"></form:area>
+        </div>
+    </div>
+
+    <div class="row text-center" style="margin-top: 15px">
+        <qx:btn id="save" class="btn btn-success" onclick="MemrehomeCheckPage.checkeSubmit(1)"
+                fa="fa fa-eraser" label="通过"></qx:btn>
+        <qx:btn id="submit" class="btn btn-danger" onclick="MemrehomeCheckPage.checkeSubmit(0)"
+                fa="fa fa-eraser" label="拒绝"></qx:btn>
+    </div>
+</div>
+
+</body>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script type="text/javascript">
+        /**
+         * 初始化设定
+         */
+        var MemrehomeCheckPage = {
+            id : "MemrehomeCheckTable", //表格id
+            seItem : null, //选中的条目
+            table : null,
+            dlgLayerIndex : -1,
+            layerIndex : -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        MemrehomeCheckPage.initColumn = function() {
+            return [
+                {field: 'selectItem', radio: true},
+                {title: '申请用户', field: 'name', align: 'center', valign: 'middle'},
+                {title: '身份证号码', field: 'num', align: 'center', valign: 'middle'},
+                {title: '当前所在工会', field: 'fullname', align: 'center', valign: 'middle'},
+                {title: '转会申请时间',field: 'createTime' ,align: 'center', valign: 'middle',formatter:initCreateTimeFun},
+                {title: '申请状态', field: 'status', align: 'center', valign: 'middle',formatter:initApplyStatusFun},
+                {title: '操作',align: 'center', valign: 'middle',
+                    formatter:function (value,row,index){
+                        if(row.status == "-1"){
+                            return '<a href="#" onclick="MemrehomeCheckPage.memCheck(\''+ row.id +'\')">审核</a>';
+                        } else if(row.status == "0"){
+                            return '--';
+                        } else {
+                            return '<a href="#" onclick="MemrehomeCheckPage.detail(\''+ row.memId +'\')">查看详情</a>';
+                        }
+                    }
+                }
+            ];
+        };
+
+        //初始化申请时间
+        function initCreateTimeFun(value,row,index){
+            var create_time = row.createTime;
+            return create_time.substring(0,4)+"-"+create_time.substring(4,6)+"-"+create_time.substring(6,8)+" "+create_time.substring(8,10)+":"+create_time.substring(10,12);
+        }
+
+        //初始化申请状态
+        function initApplyStatusFun(value,row,index){
+            var status = row.status;
+            if(status == '-1'){
+                return '待审核';
+            }
+            if(status == 0){
+                return '拒绝';
+            }
+            if(status == 1){
+                return '通过';
+            }
+        }
+
+        /**
+         * 检查是否选中
+         */
+        MemrehomeCheckPage.check = function() {
+            var selected = $('#' + this.id).bootstrapTable('getSelections');
+            if (selected.length == 0) {
+                App.info("请先选中至少一条表格中的记录！");
+                return false;
+            } else {
+                MemrehomeCheckPage.seItem = selected;
+                return true;
+            }
+        };
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        MemrehomeCheckPage.formParams = function() {
+            var queryData = {};
+            queryData['name'] = $("#name").val();
+            queryData['status'] = $("#status").val();
+            return queryData;
+        }
+
+        /**
+         * 查询日志列表
+         */
+        MemrehomeCheckPage.search = function() {
+            MemrehomeCheckPage.table.refresh({
+                query : MemrehomeCheckPage.formParams()
+            });
+        };
+
+        /**
+         * 点击查看会员操作
+         */
+        MemrehomeCheckPage.detail = function (id) {
+            var index = layer.open({
+                type: 2,
+                title: '查看详情',
+                area: ['100%', '100%'], //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: App.ctxPath + 'dept/member/detail?id='+id
+            });
+            this.layerIndex = index;
+        }
+
+        /**
+         * 转会审核
+         */
+        MemrehomeCheckPage.memCheck = function(tranfer_id) {
+
+            $("#tranfer_id").val(tranfer_id);
+            var index = layer.open({
+                type : 1,
+                title : '审核页面',
+                area : [ '750px', '350px' ], //宽高
+                fix : false, //不固定
+                maxmin : true,
+                content : $("#memCheck")
+            });
+
+            this.layerIndex = index;
+        }
+
+        /**
+         * 通过/不通过提交
+         */
+        MemrehomeCheckPage.checkeSubmit = function (status) {
+
+            var tranferId = $("#tranfer_id").val();
+            var checkOpinion = $("#checkOpinion").val();
+            //校验表单是否填写完整
+            if (status == 0) {
+                if(checkOpinion == '' || checkOpinion == null){
+                    layer.msg("请输入审核意见!");
+                    return false;
+                }
+
+            }
+
+            App.loadingAjax({
+                url: App.ctxPath + "/dept/member/memoutcheck",
+                data: {id: tranferId, checkTxt: checkOpinion, status: status},
+                success: function (result) {
+                    if (result.code = 200) {
+                        App.success(result.message);
+                        var index = parent.layer.getFrameIndex(window.name);
+                        layer.close(index);
+
+                        window.location.reload();
+
+                    }
+                }
+            });
+        }
+
+
+        /**
+         * 加载列表数据
+         */
+        $(function() {
+            var defaultColunms = MemrehomeCheckPage.initColumn();
+            var table = new BSTable(MemrehomeCheckPage.id, "/dept/member/rehomeCheckList",defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(MemrehomeCheckPage.formParams());
+            MemrehomeCheckPage.table = table.init();
+        });
+    </script>
+</js>

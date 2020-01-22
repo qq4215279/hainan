@@ -1,0 +1,194 @@
+<body>
+<div class="container">
+    <form class="form-horizontal">
+        <div class="col-sm-6">
+            <form:text id="staffCode" label="职工编号" name="staffCode" disabled="true" value="${pojo.staffCode}" >
+            </form:text>
+        </div>
+        <div class="col-sm-6">
+            <form:select id="srvCategory" label="困难类别" name="srvCategory" code="lib_difficult" disabled="true" value="${pojo.srvCategory}" >
+            </form:select>
+        </div>
+
+
+        <div class="col-sm-6">
+               <form:select id="filingStandard" label="建档标准" name="filingStandard" code="lib_filing_standard"   disabled="true" value="${pojo.filingStandard}" >
+               </form:select> 
+        </div>
+        <div class="col-sm-6">
+                <form:text id=" name" label="姓名" name="name " disabled="true" value="${pojo.name}">
+                </form:text>
+        </div>
+
+
+        <div class="col-sm-6">
+               <form:select  id="nation" label="民族" name="nation" code="lib_ethnic_group" disabled="true" value="${pojo.nation}">
+               </form:select> 
+        </div>
+        <div class="col-sm-6">
+                <form:select  id="sex" label="性别" name="sex" code="lib_sex"  disabled="true" value="${pojo.sex}">
+                </form:select>
+        </div>
+
+        <div class="col-sm-6">
+                <form:select  id="politicalStatus" label="政治面貌" name="politicalStatus" code="lib_political_status" disabled="true" value="${pojo.politicalStatus}">
+                </form:select>
+        </div>
+        <div class="col-sm-6">
+                <form:text id="certificateNum" label="身份证号" name="certificateNum" disabled="true" value="${pojo.certificateNum}">
+                </form:text>
+        </div>
+        <div class="col-sm-6">
+                <form:text id="mobile" label="手机号" name="mobile" disabled="true" value="${pojo.mobile}">
+                </form:text>
+        </div>
+        <div class="col-sm-6">
+                 <form:text id="otherContactTel" label="其他联系方式" name="otherContactTel"  disabled="true" value="${pojo.otherContactTel}">
+                 </form:text>
+        </div>
+        <div class="col-sm-6">
+                 <form:datetime id="birthday" label="出生年月" istime="false" must="true" format="yyyy-MM-dd" name="birthday" disabled="true" value="${pojo.birthday}">
+                 </form:datetime>
+        </div>
+        <div class="col-sm-6">
+               <form:text id="zipCode" label="邮政编码" name="zipCode" disabled="true" value="${pojo.zipCode}">
+               </form:text> 
+        </div>
+        <div class="col-sm-6">
+                <form:select  id="health" label="健康情况" name="health" code="lib_health" disabled="true" value="${pojo.health}">
+                </form:select>
+        </div>
+        <div class="col-sm-6">
+                <form:select  id="disability" label="残疾类别" name="disability" code="lib_disability" disabled="true" value="${pojo.disability}">
+                </form:select>
+        </div>
+        <div class="col-sm-6">
+                <form:select  id="modelWorker" label="劳模类型" name="modelWorker" code="lib_worker" disabled="true" value="${pojo.modelWorker}">
+                </form:select>
+        </div>
+        <div class="col-sm-6">
+                <form:select  id="houseType" label="住房类型" name="houseType" code="lib_house_type" disabled="true" value="${pojo.houseType}">
+                </form:select>
+        </div>
+        <div class="col-sm-6">
+                <form:text id="houseArea" label="住房面积" name="houseArea" disabled="true" value="${pojo.houseArea}">
+                </form:text>
+        </div>
+        <div class="col-sm-6">
+                <form:text id="workTime" label="工作时间" name="workTime" disabled="true" value="${pojo.workTime}">
+                </form:text>
+        </div>
+        <div class="col-sm-6">
+                <form:select  id="industryType" label="所属行业" name="industryType" code="lib_industry_type" disabled="true" value="${pojo.industryType}">
+                </form:select>
+        </div>
+        <div class="col-sm-6">
+                <form:select  id="maritalStatus" label="婚姻状况" name="maritalStatus" code="lib_marital_status" disabled="true" value="${pojo.maritalStatus}">
+                </form:select>
+        </div>
+
+        <div class="col-sm-6">
+                <form:select  id="householdType" label="户口类型" name="householdType" code="lib_household" disabled="true" value="${pojo.householdType}">
+                </form:select>
+        </div>
+        <div class="col-sm-6">
+                <form:text id="address" label="居住地址" name="address" disabled="true" value="${pojo.address}">
+              </form:text>
+        </div>
+        <div class="col-sm-6">
+                <form:text id="address" label="工作单位" name="address" disabled="true" value="${pojo.address}">
+                </form:text>
+        </div>
+        <div class="col-sm-6">
+                <form:select  id="workUnit" label="工作单位性质" name="workUnit" code="lib_unit_type" disabled="true" value="${pojo.workUnit}">
+                </form:select>
+        </div>
+        <div class="col-sm-6">
+                <form:select  id="enterpriseSituation" label="企业状况" name="enterpriseSituation" code="lib_enterprise_situation" disabled="true" value="${pojo.enterpriseSituation}">
+                </form:select>
+        </div>
+        <div class="col-sm-6">
+               <form:select  id="isSingleParent" label="是否单亲" name="isSingleParent" code="lib_is_not" disabled="true" value="${pojo.isSingleParent}">
+               </form:select> 
+        </div>
+        <div class="col-sm-6">
+                <form:text id="monthlyIncome" label="月收入" name="monthlyIncome" disabled="true" value="${pojo.monthlyIncome}">
+                </form:text>
+
+        </div>
+        <div class="col-sm-6">
+                <form:text id="familyYearIncomeOther" label="家庭其他年收入" name="familyYearIncomeOther" disabled="true" value="${pojo.familyYearIncomeOther}">
+                </form:text>
+        </div>
+     <div class="row">  
+        <div class="col-sm-6">
+               <form:text id="familyYearIncome" label=" 家庭年度总收入" name="familyYearIncome" disabled="true" value="${pojo.familyYearIncome}">
+              </form:text> 
+        </div>
+
+                
+        <div class="col-sm-6">
+            <form:text id="familyPopulation" label="家庭人口" name="familyPopulation" disabled="true" value="${pojo.familyPopulation}">
+            </form:text>
+        </div>
+      </div>
+     <div class="row">   
+        <div class="col-sm-6">
+                <form:text id="familyMonthIncomeAvg" label="家庭月人均收入" name="familyMonthIncomeAvg" disabled="true" value="${pojo.familyMonthIncomeAvg}">
+                </form:text>
+        </div>
+        <div class="col-sm-6">
+              <form:text id="householeAddress" label="户口所在地行政区划" name="householeAddress" disabled="true" value="${pojo.householeAddress}">
+              </form:text> 
+         </div>    
+      </div>   
+     <div class="row">     
+        <div class="col-sm-6">
+                <form:text id="medicalInsurance" label="医保状况" name="medicalInsurance" disabled="true" value="${pojo.medicalInsurance}">
+                </form:text>
+        </div>
+        <div class="col-sm-6">
+              <form:select  id="hasSaveOneself" label="是否具有自救能力" name="hasSaveOneself" code="lib_is_not" disabled="true" value="${pojo.hasSaveOneself}">
+              </form:select> 
+        </div>
+    </div>
+        <div class="col-sm-6">
+                <form:datetime id="laborContractStart" label="劳动合同开始日期" istime="false" must="true" format="yyyy-MM-dd" name="birth" disabled="true" value="${pojo.laborContractStart}">
+                </form:datetime>
+        </div>
+        <div class="col-sm-6">
+               <form:datetime id="laborContractEnd" label="劳动合同结束日期" istime="false" must="true" format="yyyy-MM-dd" name="birth" disabled="true" value="${pojo.laborContractEnd}">
+        </div>
+
+
+
+   <div class="row">
+        <div class="col-sm-6">
+               <form:text id="memberCardNo" label="工会会员服务卡（大海惠工卡）卡号" name="memberCardNo" disabled="true" value="${pojo.memberCardNo}">
+               </form:text>
+        </div>
+        <div class="col-sm-6">
+                <form:select  id="familyNoWorker" label="是否家庭零就业" name="familyNoWorker" code="lib_is_not" disabled="true" value="${pojo.familyNoWorker}">
+               </form:select>      
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+                <form:text id="reason" label="致困原因" name="reason" disabled="true" value="${pojo.reason}">
+                </form:text>  
+        </div>
+        <div class="col-sm-6">
+                <form:datetime id="createTime" label=" 申报日期" istime="false" must="true" format="yyyy-MM-dd" name="createTime" disabled="true" value="${pojo.createTime}">
+                </form:datetime>
+        </div>
+  
+   </div>
+
+       
+    </form>
+
+
+</div>
+</body>
+
+

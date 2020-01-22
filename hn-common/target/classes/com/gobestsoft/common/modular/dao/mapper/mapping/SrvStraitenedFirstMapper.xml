@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dao.mapper.SrvStraitenedFirstMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="HashMap">
+        <id column="id" property="id" />
+        <result column="auid" property="auid" />
+        <result column="name" property="name" />
+        <result column="certificate_num"   property="certificateNum" />
+        <result column="work_unit" property="workUnit" />
+        <result column="identity_face" property="identityFace" />
+        <result column="card_national_emblem" property="cardNationalEmblem" />
+        <result column="commit_letter" property="commitLetter" />
+        <result column="unit_prove" property="unitProve" />
+        <result column="attachments" property="attachments" />
+        <result column="status"   property="status" />
+        <result column="create_time"   property="createTime" />
+        <result column="straitened_type"   property="straitenedType" />
+        <result column="evidence"   property="evidence" />
+        <result column="straitened_type_name"   property="straitenedTypeName" />
+
+    </resultMap>
+
+    <resultMap id="straitFirstMap" type="com.gobestsoft.common.modular.srv.StraitenedEntity">
+        <result column="id" property="id" />
+        <result column="status" property="status" />
+        <result column="reason" property="reason" />
+        <result column="create_time" property="createTime" />
+        <result column="straitened_type" property="straitenedType" />
+        <result column="commit_flag" property="commitFlag" />
+        <result column="straitened_first_id" property="firstStraitenedId" />
+    </resultMap>
+    
+    <!-- 通用版全部字段-->
+    <sql id="commonColumns">
+        srv_straitened_first.id,
+        srv_straitened_first.auid,
+        srv_straitened_first.name,
+        srv_straitened_first.certificate_num,
+        srv_straitened_first.work_unit,
+        srv_straitened_first.identity_face,
+        srv_straitened_first.card_national_emblem,
+        srv_straitened_first.commit_letter,
+        srv_straitened_first.unit_prove,
+        srv_straitened_first.attachments,
+        srv_straitened_first.status,
+        srv_straitened_first.create_time,
+        srv_straitened_first.evidence
+    </sql>
+    
+    <!-- 对应selectByCondition方法，条件查询（姓名,状态,工作单位） -->
+    <select id="selectByCondition" resultMap="BaseResultMap">
+        select temp.* from(
+        SELECT
+        distinct(srv_straitened_log.straitened_id)straitened_id,
+        srv_straitened_log.status AS logStatus,
+        srv_straitened_log.id AS straitenedLogId,
+        <include refid="commonColumns"></include>
+        FROM srv_straitened_first
+        INNER JOIN srv_straitened_log ON srv_straitened_log.straitened_id=srv_straitened_first.id and srv_straitened_log.type=0
+        <where>
+            <if test="name != null and name != ''">
+                AND srv_straitened_first.name like '%${name}%'
+            </if>
+            <if test="status != null and status != ''">
+                and srv_straitened_first.status = #{status}
+            </if>
+            <if test="workUnit != null and workUnit != ''">
+                AND srv_straitened_first.work_unit like '%${workUnit}%'
+            </if>
+            <if test="deptId!=null and deptId!=''">
+                and srv_straitened_log.check_dept_id = #{deptId}
+            </if>
+        </where>
+        order by srv_straitened_log.create_time desc
+
+        )temp group by temp.straitened_id
+
+        order by temp.create_time desc
+    </select>
+
+    <select id="getStraitenedFirst" resultMap="straitFirstMap">
+        select ssf.id,
+        ssf.status,
+        ssf.create_time,
+        ssf.straitened_type,
+        (select ssr.`comment` from srv_straitened_log ssr where ssr.type=0 and ssr.straitened_id =ssf.id and ssr.status=3 limit 1) as reason from
+        srv_straitened_first ssf
+        where
+        ssf.auid=#{auid}
+        ORDER BY ssf.create_time desc
+    </select>
+
+    <!--查询当前用户所有的初审和终审-->
+    <select id="getStraitenedAll" resultMap="straitFirstMap">
+        select temp.* from
+        (
+          select ssf.id,
+            null straitened_first_id,
+            ssf.status,
+            0 type,
+            ssf.commit_flag,
+            ssf.create_time,
+            ssf.straitened_type,
+            (select ssr.`comment` from srv_straitened_log ssr where ssr.type=0 and ssr.straitened_id =ssf.id and ssr.status in(2,3)
+             order by  ssr.check_date DESC,ssr.status  desc limit 1) as reason from
+            srv_straitened_first ssf
+            where
+            ssf.auid=#{auid}
+            and not EXISTS(
+              select srvFinal.id from srv_straitened srvFinal where srvFinal.straitened_first_id=ssf.id
+            )
+
+            union all
+
+            select ss.id,
+            ss.straitened_first_id,
+            ss.status,
+            1 type,
+            ss.commit_flag,
+            ss.create_time,
+            first.straitened_type,
+            (select ssr.`comment` from srv_straitened_log ssr where ssr.type=1 and ssr.straitened_id = ss.id and ssr.status in(2,3)
+             order by ssr.check_date  desc ,ssr.status  desc limit 1) as reason from
+            srv_straitened ss ,srv_straitened_first first
+            where
+            ss.auid=#{auid}
+            and ss.straitened_first_id= first.id
+
+        ) temp order by temp.create_time desc
+    </select>
+
+
+    <select id="selectOneById" resultMap="BaseResultMap">
+        select
+        srv_straitened_first.id,
+        srv_straitened_first.auid,
+        srv_straitened_first.name,
+        srv_straitened_first.certificate_num,
+        srv_straitened_first.work_unit,
+        srv_straitened_first.identity_face,
+        srv_straitened_first.card_national_emblem,
+        srv_straitened_first.commit_letter,
+        srv_straitened_first.unit_prove,
+        srv_straitened_first.attachments,
+        srv_straitened_first.status,
+        srv_straitened_first.create_time,
+        srv_straitened_first.evidence,
+        d.name as straitened_type_name,
+        srv_straitened_first.straitened_type
+
+        from srv_straitened_first
+        left join sys_dict d on d.group_code='lib_srv_straitened_type' and d.code=srv_straitened_first.straitened_type
+        where srv_straitened_first.id=#{id}
+    </select>
+
+
+        <update id="updateAuditDeptId" >
+
+		update srv_straitened_log
+		set comment =#{transfer_reason},
+		status=4,
+		transfer_dept_id=#{transfer_dept_id},
+		transfer_time= date_format(now(),'%Y%m%d')
+		where exists (
+			select id from srv_straitened_first where id=#{straitened_id} and status =1
+		)
+		and straitened_id=#{straitened_id}
+		and type=#{type}
+
+	</update>
+
+
+
+    <!--查询所有已经过期的申请-->
+    <select id="selectExpireAudit" resultType="java.util.Map">
+
+		select temp.id,temp.auid
+		from (
+			select t.id,count(log.id)log_count,t.auid from srv_straitened_first t left join srv_straitened_log log
+				on log.straitened_id = t.id and log.status in(2,3)
+				and log.type=0
+
+				where t.status=1
+				and t.create_time <![CDATA[<]]> date_format(date_sub(now(),INTERVAL #{day} day),'%Y%m%d%H%i%s')
+				group by t.id
+
+		)temp where temp.log_count=0
+
+
+	</select>
+
+    <update id="updateExpireAudit" parameterType="list">
+        update srv_straitened_first set status=3
+        where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and status=1
+    </update>
+
+    <update id="updateExpireLog" parameterType="list">
+        update srv_straitened_log set status=3,comment='审核超时，申请被退回，请重新提交申请',
+        check_date =date_format(now(),'%Y%m%d%H%i%s')
+        where straitened_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and status=1 and type=0
+
+    </update>
+
+    <select id="selectTotalCount" resultType="map">
+      select count(1) as value,
+      (case when status=1 then '待审核' when status = 2 then '审核通过' else  '审核拒绝' end) name,
+      status
+
+      from srv_straitened_first
+			where status in (1,2,3)
+      group by status
+      order by status
+    </select>
+
+
+</mapper>

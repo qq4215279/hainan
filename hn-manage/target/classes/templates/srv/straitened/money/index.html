@@ -1,0 +1,223 @@
+<css xmlns:th="http://www.w3.org/1999/xhtml">
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body xmlns:th="http://www.w3.org/1999/xhtml">
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <div class="col-sm-5" style="margin-left: -15px">
+                            <search:input id="name" label="被救助人" name="name" value="" type="text"></search:input>
+                        </div>
+                        <!--<div class="col-sm-5">
+                            <form:figure id="big" label="资金范围" min="0"></form:figure>
+                            <form:figure id="small" label="至" min="0"></form:figure>
+                        </div>-->
+                        <div class="col-sm-2">
+                            <qx:btn class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="Money.search()"></qx:btn>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="btn-group">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" style="width: 160px;">
+                                        <span id="type">所有状态</span>
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu" id="select">
+                                        <li><a href="#" style="text-align: center;" alt="">所有状态</a></li>
+                                        <li><a href="#" style="text-align: center;" alt="0">待处理</a></li>
+                                        <li><a href="#" style="text-align: center;" alt="1">通过</a></li>
+                                        <li><a href="#" style="text-align: center;" alt="2">拒绝</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12" role="group">
+                        <qx:btn class="btn btn-primary" fa="fa fa-plus" label="新增" permission="" onclick="Money.add()"></qx:btn>
+                        <qx:btn class="btn btn-primary" fa="fa fa-edit" label="修改" permission="" onclick="Money.edit()"></qx:btn>
+                    </div>
+                    <table id="MoneyTable" data-mobile-responsive="true" data-click-to-select="true">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<js>
+<div th:include="fragment/fargment :: bootstrapTableJs"></div>
+<script>
+    let area = ['40%', '80%'];
+
+    $(function () {
+        $("#select li a").click(function () {
+            $("#type").text($(this).text());
+
+            let status = $(this).attr("alt");
+            if(status !== ''){
+                Money.queryData['status'] = parseInt(status);
+            }else{
+                delete Money.queryData['status']
+            }
+            Money.search();
+        })
+    });
+
+    /**
+     * 初始化表格对象
+     */
+    var Money = {
+        id: "MoneyTable",	//表格id
+        seItem: null,		//选中的条目
+        table: null,
+        layerIndex: -1,
+        baseUrl: App.ctxPath + 'srv/straitened/money',
+        queryData:{}
+    };
+
+    /**
+     * 初始化表格的列
+     */
+     Money.initColumn = function () {
+        return [
+            {field: 'selectItem', radio: true},
+            {title: 'id', field: 'id', visible: false, align: 'center', valign: 'middle'},
+            {title: '被救助人', field: 'rescued_name', visible: true, align: 'center', valign: 'middle'},
+            {title: '性别', field: 'sexName', visible: true, align: 'center', valign: 'middle'},
+            {title: '金额(元)', field: 'money_num', visible: true, align: 'center', valign: 'middle'},
+            {title: '状态', field: 'statusName', align: 'center', valign: 'middle'},
+            {title: '创建时间', field: 'create_time', align: 'center', valign: 'middle',formatter: initCreateTimeField},
+            {title: '操作', align: 'center', valign: 'middle',
+                formatter: function (value, row, index) {
+                    return '<a href="javascript:Money.detail(' + row.id +  ')">查看</a> || <a href="javascript:Money.delete(' + row.id +  ')">删除</a> ';
+                }
+            }
+        ];
+    };
+
+
+     /**
+      * 初始化列表的创建时间类型的字段
+      */
+      function initCreateTimeField(value, row, index){
+      	if(row.create_time){
+      		return returnTimeStr(row.create_time);
+      	}
+      }
+
+      /**
+       * 返回组装好的日期字符串
+       */
+      function returnTimeStr(time) {
+     	 return time.substring(0,4)+"-"+time.substring(4,6)+"-"+time.substring(6,8);
+      }
+
+    /**
+     * 检查是否选中
+     */
+     Money.check = function () {
+        let selected = $('#' + this.id).bootstrapTable('getSelections');
+        if (selected.length === 0) {
+            App.info("请先选中表格中的某一记录！");
+            return false;
+        } else {
+        	Money.seItem = selected[0];
+            return true;
+        }
+    };
+
+    /**
+     * 添加
+     */
+     Money.add = function () {
+        let index = layer.open({
+            type: 2,
+            title: '添加',
+            area: area, //宽高
+            fix: false, //不固定
+            maxmin: true,
+            content: Money.baseUrl + '/add'
+        });
+        this.layerIndex = index;
+    };
+
+    /**
+     * 编辑
+     */
+     Money.edit = function () {
+         if(this.check()){
+             let index = layer.open({
+                 type: 2,
+                 title: '编辑',
+                 area: area, //宽高
+                 fix: false, //不固定
+                 maxmin: true,
+                 content: Money.baseUrl + '/edit?id='+Money.seItem.id
+             });
+             this.layerIndex = index;
+         }
+     };
+
+    /**
+     * 详情
+     */
+     Money.detail = function (id) {
+    	 let index = layer.open({
+             type: 2,
+             title: '详情',
+             area: area, //宽高
+             fix: false, //不固定
+             maxmin: true,
+             content: Money.baseUrl + '/detail?id='+id
+         });
+         this.layerIndex = index;
+     };
+
+     /**
+      * 删除
+      */
+     Money.delete = function (id) {
+         let fun = function () {
+             let ajax = new $ax(Money.baseUrl + "/delete", function (data) {
+                 App.success("操作成功!");
+                 Money.table.refresh();
+             }, function (data) {
+                 App.error("操作成功!" + data.responseJSON.message + "!");
+             });
+
+             ajax.set('id', id);
+             ajax.start();
+         };
+         App.confirm("确定要删除吗？", fun);
+     };
+
+    /**
+     * 查询表单提交参数对象
+     *
+     */
+     Money.formParams = function () {
+         Money.queryData['name'] = $("#name").val();
+         /*Money.queryData['big'] = parseInt($("#status").val());
+         Money.queryData['small'] = parseInt($("#workUnit").val());*/
+        return Money.queryData;
+    };
+
+    /**
+     * 查询列表
+     */
+     Money.search = function () {
+    	 Money.table.refresh({query: Money.formParams()});
+    };
+
+    $(function () {
+        let defaultColunms = Money.initColumn();
+        let table = new BSTable(Money.id, "srv/straitened/money/list", defaultColunms);
+        table.setPaginationType("server");
+        table.setQueryParams(Money.formParams());
+        Money.table = table.init();
+    });
+</script>
+</js>
+</body>

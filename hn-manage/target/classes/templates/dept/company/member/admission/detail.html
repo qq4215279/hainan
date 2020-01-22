@@ -1,0 +1,217 @@
+<body>
+<div class="container">
+   <div class="form-horizontal" id="infoForm">
+    	<input id="id" th:value="${apply.id}" type="hidden"/>
+    	<div class="row" >
+    		<div class="col-sm-4">
+    			<form:text id="name" label="姓名" name="name" value="${personInfo.name}" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="sex" label="性别" name="sex" value="${personInfo.sex}" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="nation" label="民族" name="nation" value="${personInfo.nation}" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="education" label="学历" name="education" value="${personInfo.education}" disabled="true"></form:text>
+			</div>
+    		<div class="col-sm-4">
+    			<form:text id="workSituation" label="就业情况" name="workSituation" value="${personInfo.workSituation}" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="certificateType" label="证件类型" name="certificateType" value="${personInfo.certificateType}" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="certificateNum" label="证件号" name="certificateNum" value="${personInfo.certificateNum}" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="isFarmer" label="是否农民工" name="isFarmer" value="${personInfo.isFarmer}" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="politicalStatus" label="政治面貌" name="politicalStatus" value="${personInfo.politicalStatus}" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="mobile" label="手机号码" name="mobile" value="${personInfo.mobile}" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="household" label="户籍类型" name="household" value="${personInfo.household}" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="domicile" label="户籍所在地" name="domicile" value="${personInfo.domicile}" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="technologyLevel" label="技能等级" name="technologyLevel" value="${personInfo.technologyLevel}" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="workUnit" label="工作单位" name="workUnit" value="${personInfo.workUnit}" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="memberChange" label="会籍变化类型" name="memberChange" value="${personInfo.memberChange}" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="memberChangeDate" label="会籍变化时间" name="memberChangeDate" value="${personInfo.memberChangeDate}" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="memberChangeReason" label="会籍变化原因" name="memberChangeReason" value="${personInfo.memberChangeReason}" disabled="true"></form:text>
+    		</div>
+    	</div>
+    	<div class="row text-center" th:if="${apply.applyStatus == '-1'}">
+   			<label class="col-sm-2 col-sm-offset-2 control-label">审核意见</label>
+   			<div class="col-sm-4">
+           	 	<textarea name="checkDesc" id="checkDesc" class="form-control" maxlength="200"
+				 style="width: 90%;height: 80px;resize: none;"></textarea>
+			</div>
+    	</div>
+    	<div class="row text-center" th:if="${apply.applyStatus == '-1'}">
+    		<qx:btn id="accepted" class="btn btn-primary" onclick="InfoDlg.approval(1)"
+					fa="fa fa-check" label="通过"></qx:btn>
+    		<qx:btn id="accepted" class="btn btn-primary" onclick="InfoDlg.transfer()"
+					fa="fa fa-check" label="转办"></qx:btn>
+			<qx:btn id="rejected" class="btn btn-danger" onclick="InfoDlg.approval(0)"
+					fa="fa fa-eraser" label="拒绝"></qx:btn>
+			<qx:btn id="close1" class="btn btn-info" onclick="InfoDlg.close()"
+					fa="fa fa-eraser" label="取消"></qx:btn>
+    	</div>
+    	<div class="row text-center" th:if="${apply.applyStatus != '-1'}">
+			<qx:btn id="close2" class="btn btn-danger" onclick="InfoDlg.close()"
+					fa="fa fa-eraser" label="取消"></qx:btn>
+    	</div>
+    </div>
+</div>
+<div th:include="fragment/fargment :: bootstrapTableJs"></div>
+</body>
+<js>
+	<script type="text/javascript">
+
+        /**
+         * 画面初期处理
+         */
+        $(function () {
+            App.initValidator("infoForm", InfoDlg.validateFields);
+            //初始化日期类型的字典
+            var memberChangeDate = $("#memberChangeDate").val();
+            if(memberChangeDate){
+                memberChangeDate = memberChangeDate.substring(0,4)+"-"+memberChangeDate.substring(4,6)+"-"+memberChangeDate.substring(6,8);
+                $("#memberChangeDate").val(memberChangeDate)
+            }
+        });
+
+        /**
+         * 初始化详情对话框
+         */
+        var InfoDlg = {
+            infoData: {},
+            zTreeInstance: null,
+            validateFields: {
+                checkDesc: {
+                    validators: {
+                        notEmpty: {
+                            message: '审核意见不能为空'
+                        },
+                        stringLength: {
+                            max: 200
+                        }
+                    }
+                }
+            }
+        };
+
+        /**
+         * 清除数据
+         */
+        InfoDlg.clearData = function () {
+            this.infoData = {};
+        }
+
+        /**
+         * 设置对话框中的数据
+         */
+        InfoDlg.set = function (key, val) {
+            this.infoData[key] = (typeof value == "undefined") ? $("#" + key).val() : value;
+            return this;
+        }
+
+        /**
+         * 设置对话框中的数据
+         *
+         */
+        InfoDlg.get = function (key) {
+            return $("#" + key).val();
+        }
+
+        /**
+         * 关闭此对话框
+         */
+        InfoDlg.close = function () {
+            parent.layer.close(window.parent.IndexPage.layerIndex);
+        }
+
+        /**
+         * 收集数据
+         */
+        InfoDlg.collectData = function () {
+            this.set('id').set('checkDesc');
+        }
+
+        /**
+         * 验证数据是否为空
+         */
+        InfoDlg.validate = function () {
+            $('#infoForm').data("bootstrapValidator").resetForm();
+            $('#infoForm').bootstrapValidator('validate');
+            return $("#infoForm").data('bootstrapValidator').isValid();
+        }
+        InfoDlg.transfer = function(){
+            var index = layer.open({
+                type: 2,
+                title: '转办页面',
+                area: ['50%', '70%'], //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: App.ctxPath + '/admission/apply/transfer_audit?id=' +$("#id").val(),
+                end:function(){
+                    window.parent.IndexPage.table.refresh();
+                    InfoDlg.close();
+                }
+            });
+            this.layerIndex = index;
+        }
+
+        /**
+         * 通过与不通过
+         */
+        InfoDlg.approval = function (status) {
+            this.clearData();
+            this.collectData();
+            if (!this.validate()) {
+                errorFocus();
+                return;
+            }
+            var showMessage = getShowMessage(status);
+            //提交信息
+            var ajax = new $ax(App.ctxPath + "admission/apply/approval", function (data) {
+                    App.success(showMessage+"成功!");
+                    window.parent.IndexPage.table.refresh();
+                    InfoDlg.close();
+                },
+                function (data) {
+                    App.error(showMessage+"失败!");
+                });
+            ajax.set(this.infoData);
+            ajax.set("status",status);
+            ajax.start();
+        }
+
+        //根据传入的审核状态，返回提示信息
+        function getShowMessage(status){
+            if(status == '1'){
+                return '通过';
+            }
+            return '拒绝';
+        }
+
+
+	</script>
+</js>
+
+

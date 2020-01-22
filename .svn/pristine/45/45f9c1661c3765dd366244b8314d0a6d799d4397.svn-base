@@ -1,0 +1,18 @@
+package com.gobestsoft.common.modular.system.mapper;
+
+import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.gobestsoft.common.modular.system.model.Dept;
+import org.springframework.stereotype.Repository;
+
+/**
+ * <p>
+  * 部门表 Mapper 接口
+ * </p>
+ *
+ * @author gobestsoft
+ * @since 2017-07-11
+ */
+@Repository
+public interface DeptMapper extends BaseMapper<Dept> {
+
+}

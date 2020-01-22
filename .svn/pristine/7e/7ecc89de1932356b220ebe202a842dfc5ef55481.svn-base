@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dao.mapper.SrvStraitenedMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="HashMap">
+        <id column="id" property="id" />
+        <result column="auid" property="auid" />
+        <result column="straitened_first_id"   property="straitenedFirstId"    />
+        <result column="status"   property="status"    />
+        <result column="srv_category" property="srvCategory" />
+        <result column="filing_standard"   property="filingStandard"/>
+        <result column="name" property="name" />
+        <result column="nation"   property="nation"    />
+        <result column="sex" property="sex" />
+        <result column="age" property="age" />
+        <result column="political_status" property="politicalStatus" />
+        <result column="certificate_num"   property="certificateNum"    />
+        <result column="birthday" property="birthday" />
+        <result column="mobile"   property="mobile"    />
+        <result column="other_contact_tel" property="otherContactTel" />
+        <result column="zip_code"   property="zipCode"    />
+        <result column="health" property="health" />
+        <result column="disability"   property="disability"    />
+        <result column="model_worker" property="modelWorker" />
+        <result column="house_type"   property="houseType"    />
+        <result column="house_area" property="houseArea" />
+        <result column="work_time"   property="workTime"    />
+        <result column="work_status"   property="workStatus"    />
+        <result column="industry_type" property="industryType" />
+        <result column="marital_status"   property="maritalStatus"    />
+        <result column="household_type" property="householdType" />
+        <result column="address"   property="address"    />
+        <result column="work_unit" property="workUnit" />
+        <result column="unit_type"   property="unitType"    />
+        <result column="enterprise_situation" property="enterpriseSituation" />
+        <result column="is_single_parent"   property="isSingleParent"    />
+        <result column="monthly_income"   property="monthly_income"    />
+        <result column="family_year_income_other" property="familyYearIncomeOther" />
+        <result column="family_year_income"   property="familyYearIncome"    />
+        <result column="family_population" property="familyPopulation" />
+        <result column="family_month_income_avg"   property="familyMonthIncomeAvg"    />
+        <result column="househole_address"   property="householeAddress"    />
+        <result column="medical_insurance" property="medicalInsurance" />
+        <result column="has_save_oneself"   property="hasSaveOneself"    />
+        <result column="labor_contract_start" property="laborContractStart" />
+        <result column="labor_contract_end"   property="laborContractEnd"    />
+        <result column="family_no_worker" property="familyNoWorker" />
+        <result column="member_card_no"   property="memberCardNo"    />
+        <result column="reason" property="reason" />
+        <result column="create_time"   property="createTime"    />
+        <result column="sys_attachments" property="sysAttachments"/>
+
+    </resultMap>
+
+    <resultMap id="straitMap" type="com.gobestsoft.common.modular.srv.StraitenedEntity">
+        <result column="id" property="id" />
+        <result column="straitened_first_id" property="firstStraitenedId"/>
+        <result column="status" property="status" />
+        <result column="reason" property="reason" />
+        <result column="create_time" property="createTime" />
+        <result column="straitened_type" property="straitenedType" />
+    </resultMap>
+
+    <resultMap id="memberMap" type="HashMap">
+        <id column="id" property="id" />
+        <result column="dept_id" property="deptId" />
+        <result column="person_id" property="personId" />
+        <result column="station_card" property="stationCard" />
+        <result column="member_card" property="memberCard" />
+        <result column="name" property="name" />
+        <result column="sex" property="sex" />
+        <result column="birthday" property="birthday" />
+        <result column="nation" property="nation" />
+        <result column="work_situation" property="workSituation" />
+        <result column="certificate_type" property="certificateType" />
+        <result column="certificate_num" property="certificateNum" />
+        <result column="education" property="education" />
+        <result column="technology_level" property="technologyLevel" />
+        <result column="mobile" property="mobile" />
+        <result column="household" property="household" />
+        <result column="domicile" property="domicile" />
+        <result column="member_change" property="memberChange" />
+        <result column="member_change_date" property="memberChangeDate" />
+        <result column="member_change_reason" property="memberChangeReason" />
+        <result column="political_status" property="politicalStatus" />
+        <result column="work_unit" property="workUnit" />
+        <result column="native_place" property="nativePlace" />
+        <result column="homeplace" property="homeplace" />
+        <result column="is_farmer" property="isFarmer" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+        <result column="update_user" property="updateUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="type" property="type" />
+    </resultMap>
+    
+    <!-- 通用版全部字段-->
+    <sql id="commonColumns">
+        srv_straitened.id,
+        srv_straitened.auid,
+        srv_straitened.straitened_first_id,
+        srv_straitened.status,
+        srv_straitened.srv_category,
+        srv_straitened.filing_standard,
+        srv_straitened.name,
+        srv_straitened.nation,
+        srv_straitened.sex,
+        srv_straitened.age,
+        srv_straitened.political_status,
+        srv_straitened.certificate_num,
+        srv_straitened.birthday,
+        srv_straitened.mobile,
+        srv_straitened.other_contact_tel,
+        srv_straitened.zip_code,
+        srv_straitened.health,
+        srv_straitened.disability,
+        srv_straitened.model_worker,
+        srv_straitened.house_type,
+        srv_straitened.house_area,
+        srv_straitened.work_time,
+        srv_straitened.work_status,
+        srv_straitened.industry_type,
+        srv_straitened.marital_status,
+        srv_straitened.household_type,
+        srv_straitened.address,
+        srv_straitened.work_unit,
+        srv_straitened.unit_type,
+        srv_straitened.enterprise_situation,
+        srv_straitened.is_single_parent,
+        srv_straitened.monthly_income,
+        srv_straitened.family_year_income_other,
+        srv_straitened.family_year_income,
+        srv_straitened.family_population,
+        srv_straitened.family_month_income_avg,
+        srv_straitened.househole_address,
+        srv_straitened.medical_insurance,
+        srv_straitened.has_save_oneself,
+        srv_straitened.labor_contract_start,
+        srv_straitened.labor_contract_end,
+        srv_straitened.family_no_worker,
+        srv_straitened.member_card_no,
+        srv_straitened.reason,
+        srv_straitened.create_time,
+        srv_straitened.sys_attachments
+    </sql>
+    
+    <!-- 对应selectByCondition方法，条件查询（姓名,状态,工作单位） -->
+    <select id="selectByCondition" resultMap="BaseResultMap">
+         select temp.*
+         from (
+        SELECT
+        distinct(srv_straitened_log.straitened_id)straitened_id,
+        srv_straitened_log.id AS straitenedLogId,
+        srv_straitened_log.status AS logStatus,
+        <include refid="commonColumns"></include>
+        FROM srv_straitened
+        INNER JOIN srv_straitened_log ON srv_straitened_log.straitened_id=srv_straitened.id
+        and srv_straitened_log.type=1
+        <where>
+            <if test="name != null and name != ''">
+                AND srv_straitened.name like '%${name}%'
+            </if>
+            <if test="status != null and status != ''">
+                and srv_straitened.status = #{status}
+            </if>
+            <if test="workUnit != null and workUnit != ''">
+                AND srv_straitened.work_unit like '%${workUnit}%'
+            </if>
+            <if test="deptId!=null and deptId!=''">
+                and srv_straitened_log.check_dept_id = #{deptId}
+            </if>
+
+        </where>
+        order by srv_straitened_log.create_time desc
+
+         )temp
+		GROUP BY temp.straitened_id
+		ORDER BY temp.create_time DESC
+    </select>
+    
+    <select id="straitenedDetail" resultType="java.util.Map" >
+          SELECT
+          srv_straitened.*
+          FROM srv_straitened 
+          WHERE srv_straitened.id = #{id}
+    </select>
+
+    <select id="getStraitened" resultMap="straitMap">
+        select ss.id,
+        ss.straitened_first_id,
+        ss.status,
+        ss.create_time,
+        first.straitened_type,
+        (select ssr.`comment` from srv_straitened_log ssr where ssr.type=1 and ssr.straitened_id = ss.id and ssr.status in(2,3) order by ssr.status asc,ssr.check_date desc limit 1) as reason from
+        srv_straitened ss ,srv_straitened_first first
+        where
+        ss.auid=#{auid}
+        and ss.straitened_first_id= first.id
+        ORDER BY ss.create_time desc
+
+
+
+
+
+    </select>
+
+    <!--查询终审详情-->
+    <select id="selectInfoById" resultMap="BaseResultMap">
+        select
+        t.id,
+        t.auid,
+        t.straitened_first_id,
+        t.name,
+        t.certificate_num,
+        t.nation,
+        t.birthday,
+        t.age,
+        t.mobile,
+        t.other_contact_tel,
+        t.zip_code,
+        t.work_status,
+        t.household_type,
+        t.marital_status,
+        d16.name as work_status_name,
+        t.house_area,
+        t.work_time,
+        t.status,
+        t.live_address,
+        d0.name sexName,
+        t.sex,
+        d1.name politicalStatusName,
+        t.political_status,
+        d2.name healthName,
+        t.health,
+        d3.name disabilityName,
+        t.disability,
+        d4.name model_workerName,
+        t.model_worker,
+        d5.name house_typeName,
+        t.house_type,
+        d6.name industryTypeName,
+        t.industry_type,
+        d7.name maritalStatusName,
+        t.industry_type,
+        d8.name householdTypeName,
+        t.household_type,
+        d9.name unitTypeName,
+        t.unit_type,
+        d10.name enterpriseSituationName,
+        t.enterprise_situation,
+        d11.name isSingleParentName,
+        t.is_single_parent,
+        d12.name has_saveOneselfName,
+        t.has_save_oneself,
+        d13.name familyNoWorkerName,
+        t.family_no_worker,
+        t.disease,
+        d14.name as disease_name,
+        t.address,
+        t.work_unit,
+        t.monthly_income,
+        t.family_year_income_other,
+        t.family_year_income,
+        t.family_population,
+        t.family_month_income_avg,
+        t.househole_address,
+        t.medical_insurance,
+        d17.name as medical_insurance_name,
+        t.labor_contract_start,
+        t.labor_contract_end,
+        t.member_card_no,
+        t.reason,
+        t.create_time,
+        d15.name as nation_name,
+        t.filing_standard,
+        d18.name as filing_standard_name,
+        t.srv_category,
+        d19.name as srv_category_name,
+        m.station_card
+        from srv_straitened t
+        left join  sys_dict d0 on d0.group_code='lib_sex' and d0.code=t.sex
+        left join  sys_dict d1 on d1.group_code='lib_political_status' and d1.code=t.political_status
+        left join  sys_dict d2 on d2.group_code='lib_health' and d2.code=t.health
+        left join  sys_dict d3 on d3.group_code='lib_disability' and d3.code=t.disability
+        left join  sys_dict d4 on d4.group_code='lib_worker' and d4.code=t.model_worker
+        left join  sys_dict d5 on d5.group_code='lib_house_type' and d5.code=t.house_type
+        left join  sys_dict d6 on d6.group_code='lib_industry_type' and d6.code=t.industry_type
+        left join  sys_dict d7 on d7.group_code='lib_marital_status' and d7.code=t.marital_status
+        left join  sys_dict d8 on d8.group_code='lib_household' and d8.code=t.household_type
+        left join  sys_dict d9 on d9.group_code='lib_unit_type' and d9.code=t.unit_type
+        left join  sys_dict d10 on d10.group_code='lib_enterprise_situation' and d10.code=t.enterprise_situation
+        left join  sys_dict d11 on d11.group_code='lib_is_not' and d11.code=t.is_single_parent
+        left join  sys_dict d12 on d12.group_code='lib_is_not' and d12.code=t.has_save_oneself
+        left join  sys_dict d13 on d13.group_code='lib_is_not' and d13.code=t.family_no_worker
+        left join  sys_dict d14 on d14.group_code='lib_disease' and d14.code=t.disease
+        left join  sys_dict d15 on d15.group_code='lib_ethnic_group' and d15.code=t.nation
+        left join  sys_dict d16 on d16.group_code='lib_work_status' and d16.code=t.work_status
+        left join  sys_dict d17 on d17.group_code='lib_medical_insurance' and d17.code=t.medical_insurance
+        left join  sys_dict d18 on d18.group_code='lib_filing_standard' and d18.code=t.filing_standard
+        left join  sys_dict d19 on d19.group_code='lib_difficult' and d19.code=t.srv_category,
+        dept_member m,app_user u
+        where t.id=#{id}
+        and
+        u.member_id= m.id
+        and
+        u.auid=t.auid
+
+    </select>
+    <!--查询建档人员的会员信息-->
+    <select id="selectMemberByAuId" resultMap="memberMap">
+        SELECT
+        dept_member.id,
+		dept_member.dept_id,
+		dept_member.person_id,
+		dept_member.station_card,
+		dept_member.member_card,
+		person_info.name,
+		person_info.sex,
+		person_info.birthday,
+		person_info.certificate_num,
+		person_info.mobile,
+		person_info.domicile,
+		person_info.member_change_date,
+		person_info.work_unit,
+		person_info.native_place,
+		person_info.homeplace,
+		person_info.is_farmer,
+		dept_member.create_time,
+		dept_member.update_user,
+		dept_member.update_time,
+		dept_member.type
+        FROM dept_member
+        left join person_info on person_info.id=dept_member.person_id
+        INNER JOIN app_user ON app_user.member_id=dept_member.id and
+        app_user.auid=#{id}
+    </select>
+    <!--查询困难帮扶联系人-->
+    <select id="selectContacts" resultType="java.util.Map">
+        select
+        t.name,
+        t.tel,
+        t.sex,
+        d0.name sexName,
+        t.political_status,
+        d1.name politicalStatusName,
+        d2.name educationName,
+        t.education,
+        d3.name healthName,
+        t.health,
+        d4.name relationName,
+        t.relation,
+        t.certificate_num,
+        t.age,
+        t.medical_insurance,
+        t.monthly_income,
+        t.identity,
+        d5.name as identity_name,
+        t.unit,
+        d6.name as medical_insurance_name,
+        t.school_type,
+        d7.name as school_type_name
+        from srv_contacts t
+        left join  sys_dict d0 on d0.group_code='lib_sex' and d0.code=t.sex
+        left join  sys_dict d1 on d1.group_code='lib_political_status' and d1.code=t.political_status
+        left join  sys_dict d2 on d2.group_code='lib_education_code' and d2.code=t.education
+        left join  sys_dict d3 on d3.group_code='lib_health' and d3.code=t.health
+        left join  sys_dict d4 on d4.group_code='lib_family_relationship' and d4.code=t.relation
+        left join  sys_dict d5 on d5.group_code='lib_identity' and d5.code=t.identity
+        left join  sys_dict d6 on d6.group_code='lib_medical_insurance' and d6.code=t.medical_insurance
+        left join  sys_dict d7 on d7.group_code='lib_school_type' and d7.code=t.school_type
+        where t.target_id=#{target_id}
+        and t.type=#{type}
+
+    </select>
+
+    <!--查询病例-->
+    <select id="selectMedicalList" resultType="java.util.Map">
+        select
+        t.id,
+        t.name,
+        t.relation,
+        d1.name as relationName,
+        t.certificate_num,t.age,
+        d2.name sexName,
+        t.sex,
+        t.work_unit,
+        t.mobile,
+        d3.name diseaseName,
+        t.disease,
+        t.hospitalization_num,
+        t.unit_donation_money,
+        t.sociology_donation_money,
+        t.remark
+        from srv_straitened_exe_medical t
+        left join sys_dict d1 on d1.group_code='lib_family_relationship' and d1.code= t.relation
+        left join sys_dict d2 on d2.group_code='lib_sex' and d2.code= t.sex
+        left join sys_dict d3 on d3.group_code='lib_disease' and d3.code= t.disease
+        where
+        t.srv_straitened_id =#{id}
+    </select>
+    <!--困难帮扶子女助学情况-->
+    <select id="selectStudyList" resultType="java.util.Map">
+      select
+      t.id,
+      t.name,t.certificate_num,t.age,
+      d1.name sexName,
+      t.sex,
+      t.is_current,
+      d2.name isCurrentName,
+      t.political_status,
+      d3.name politicalStatusName,
+      t.mobile,
+      t.education,
+      d4.name educationName,
+      t.college_score,
+      t.enroll_school,
+      t.enroll_major,
+      t.school_year,
+      t.enroll_batch,
+      d6.name as enroll_batch_name,
+      t.enroll_time,
+      t.graduation_time,
+      t.learn_money,
+      d5.name hasLoanName,
+      t.has_loan,
+      t.loan_money,
+      t.live_address,
+      t.address,
+      d7.name as schoolYearName,
+      t.nation,
+      d8.name as nationName
+
+      from
+      srv_straitened_exe_study t
+      left join sys_dict d1 on d1.group_code='lib_sex' and d1.code= t.sex
+      left join sys_dict d2 on d2.group_code='lib_is_not' and d2.code= t.is_current
+      left join sys_dict d3 on d3.group_code='lib_political_status' and d3.code= t.political_status
+      left join sys_dict d4 on d4.group_code='lib_straitened_student_edu' and d4.code= t.education
+      left join sys_dict d5 on d5.group_code='lib_is_not' and d5.code= t.has_loan
+      left join sys_dict d6 on d6.group_code='lib_enroll_batch' and d6.code= t.enroll_batch
+      left join sys_dict d7 on d7.group_code='lib_study_year' and d7.code= t.school_year
+      left join sys_dict d8 on d8.group_code='lib_ethnic_group' and d8.code= t.nation
+      where srv_straitened_id=#{id}
+
+    </select>
+
+    <update id="updateAuditDeptId" >
+
+		update srv_straitened_log
+		set comment =#{transfer_reason},
+		status=4,
+		transfer_dept_id=#{transfer_dept_id},
+		transfer_time= date_format(now(),'%Y%m%d')
+		where exists (
+			select id from srv_straitened where id=#{straitened_id} and status =1
+		)
+		and straitened_id=#{straitened_id}
+		and type=#{type}
+
+	</update>
+
+
+
+
+    <!--查询所有已经过期的申请-->
+    <select id="selectExpireAudit" resultType="java.util.Map">
+
+		select temp.id,temp.auid
+		from (
+			select t.id,count(log.id)log_count,t.auid from srv_straitened t left join srv_straitened_log log
+				on log.straitened_id = t.id and log.status in(2,3)
+                and log.type=1
+				where t.status=1
+				and t.create_time <![CDATA[<]]> date_format(date_sub(now(),INTERVAL #{day} day),'%Y%m%d%H%i%s')
+				group by t.id
+
+		)temp where temp.log_count=0
+
+
+	</select>
+
+    <update id="updateExpireAudit" parameterType="list">
+        update srv_straitened set status=3
+        where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and status=1
+    </update>
+
+    <update id="updateExpireLog" parameterType="list">
+        update srv_straitened_log set status=3,comment='审核超时，申请被退回，请重新提交申请',
+        check_date =date_format(now(),'%Y%m%d%H%i%s')
+        where straitened_id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and status=1 and type=1
+
+    </update>
+
+    <select id="getStraitenedAll" resultType="map">
+        select temp.* from
+        (
+          select ssf.id,
+            ssf.name,
+            ssf.status,
+            null straitenedFirstId,
+            null sex,
+            null age,
+            null birthday,
+            0 type,
+            ssf.certificate_num certificateNum,
+            ssf.create_time createTime,
+            ssf.work_unit workUnit,
+            ssf.straitened_type,
+            ifnull(dict.name,'职工救助') as straitenedTypeName,
+            (select ssr.status from srv_straitened_log ssr where ssr.type=0 and ssr.straitened_id =ssf.id and ssr.status in(2,3)
+             order by  ssr.check_date DESC,ssr.status  desc limit 1) as logStatus from
+            srv_straitened_first ssf
+            left join sys_dict dict on dict.group_code = 'lib_srv_straitened_type'
+            and dict.code =  ssf.straitened_type
+            where
+            1=1
+            and not EXISTS(
+              select srvFinal.id from srv_straitened srvFinal where srvFinal.straitened_first_id=ssf.id
+            )
+            <if test="name != null and name != ''">
+                AND ssf.name like '%${name}%'
+            </if>
+            <if test="status != null and status != ''">
+                and ssf.status = #{status}
+            </if>
+            <if test="workUnit != null and workUnit != ''">
+                AND ssf.work_unit like '%${workUnit}%'
+            </if>
+            <if test="cert != null and cert != ''">
+                AND ssf.certificate_num like '%${cert}%'
+            </if>
+            union all
+
+            select ssf.id,
+            ssf.name,
+            ssf.status,
+            ssf.straitened_first_id straitenedFirstId,
+            ssf.sex,
+            ssf.age,
+            ssf.birthday,
+            1 type,
+            ssf.certificate_num certificateNum,
+            ssf.create_time createTime,
+            ssf.work_unit workUnit,
+            sf.straitened_type,
+            ifnull(dict.name,'职工救助') as straitenedTypeName,
+            (select ssr.status from srv_straitened_log ssr where ssr.type=0 and ssr.straitened_id =ssf.id and ssr.status in(2,3)
+             order by  ssr.check_date DESC,ssr.status  desc limit 1) as logStatus from
+            srv_straitened ssf inner join srv_straitened_first sf on
+            sf.id = ssf.straitened_first_id
+            left join sys_dict dict on dict.group_code = 'lib_srv_straitened_type'
+            and dict.code =  sf.straitened_type
+            where
+            1=1
+            <if test="name != null and name != ''">
+                AND ssf.name like '%${name}%'
+            </if>
+            <if test="status != null and status != ''">
+                and ssf.status = #{status}
+            </if>
+            <if test="workUnit != null and workUnit != ''">
+                AND ssf.work_unit like '%${workUnit}%'
+            </if>
+            <if test="cert != null and cert != ''">
+                AND ssf.certificate_num like '%${cert}%'
+            </if>
+
+        ) temp
+        where 1=1
+        <if test="type!=null and type!=''">
+           and temp.type=#{type}
+        </if>
+        <if test="straitenedType!=null and straitenedType!=''">
+            and temp.straitened_type=#{straitenedType}
+        </if>
+        order by temp.createTime desc
+    </select>
+
+    <select id="selectLogIdList" resultType="map">
+
+        select temp.* from (
+
+        select id straitenedLogId,straitened_id
+        from srv_straitened_log
+        where straitened_id in
+            <foreach collection="list" separator="," open="(" close=")" item="id">
+                #{id}
+            </foreach>
+        order by create_time desc
+        ) temp
+        group by straitened_id
+
+
+    </select>
+
+    <select id="selectStraitenedIdByStudyId" resultType="int">
+
+        select srv_straitened_id from srv_straitened_exe_study where id=#{id}
+
+    </select>
+
+    <select id="selectStraitenedIdByMedicalId" resultType="int">
+
+        select srv_straitened_id from srv_straitened_exe_medical where id=#{id}
+
+    </select>
+</mapper>

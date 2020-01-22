@@ -1,0 +1,256 @@
+<css>
+    <div th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="container">
+    <div class="form-horizontal">
+        <input type="hidden" id="category" th:value="${category}">
+        <div class="row">
+            <div class="col-sm-4">
+                <search:input label="标题" name="keyword" value=""
+                              placeholder="标题" type="text"></search:input>
+            </div>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <div class="input-group-btn">
+                        <button data-toggle="dropdown" class="btn btn-white dropdown-toggle" type="button">
+                                                   状态
+                        </button>
+                    </div>
+                    <select class="form-control" id="status" name="status">
+                        <option value="" selected>全部</option>
+                        <option value="0" >启用</option>
+                        <option value="1" >禁用</option>
+                    </select>
+                </div>
+            </div> 
+
+            <div class="col-sm-2">
+                <qx:btn id="sure" class="btn btn-primary" fa="fa fa-search" label="搜索"
+                        onclick="ObjBanner.search()"></qx:btn>
+            </div>
+        </div>
+    </div>
+
+    <div id="ObjBannerTableToolbar">
+        <qx:btn class="btn btn-primary" fa="fa fa-plus" label="新增" onclick="ObjBanner.openAdd()"></qx:btn>
+        <qx:btn class="btn btn-primary" fa="fa fa-pencil" label="编辑" onclick="ObjBanner.openEdit()"></qx:btn>
+        <qx:btn class="btn btn-primary" fa="fa fa-trash" label="删除" onclick="ObjBanner.del()"></qx:btn>
+        <qx:btn class="btn btn-primary" fa="fa fa-arrow-up" label="启用" onclick="ObjBanner.setEnable()"></qx:btn>
+        <qx:btn class="btn btn-primary" fa="fa fa-arrow-down" label="禁用" onclick="ObjBanner.setNotEnable()"></qx:btn>
+    </div>
+    <table id="ObjBannerTable" data-mobile-responsive="true" data-click-to-select="true">
+    </table>
+
+</div>
+
+</body>
+
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script type="text/javascript">
+        /**
+         * Banner初始化
+         */
+        var ObjBanner = {
+            id: "ObjBannerTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            category: function () {
+                return $('#category').val();
+            },
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        ObjBanner.initColumn = function () {
+            return [
+                {field: 'selectItem', checkbox: true},
+                {title: '栏目', field: 'type', visible: false, align: 'center', valign: 'middle', sortable: false},
+                {title: '目标ID', field: 'targetId', visible: false, align: 'center', valign: 'middle', sortable: false},
+                {title: '标题', field: 'title', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {title: '跳转地址', field: 'jumpUrl', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {
+                    title: '状态', field: 'status', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        return value;
+                    }
+                }
+            ]
+        };
+
+        /**
+         * 删除功能
+         */
+        ObjBanner.del = function () {
+            if (this.check()) {
+                var selected = $('#' + this.id).bootstrapTable('getSelections');
+                var ids = "";
+
+                // 循环取得已选中的ID 并已',' 连接
+                for (var i = 0; i < selected.length; i++) {
+                    ids += selected[i].id + ",";
+                }
+                // 删除最后以为的','
+                ids = ids.left(ids.length - 1);
+
+                var fun = function () {
+                    //提交信息
+                    var ajax = new $ax(App.ctxPath + "banner/delete", function (data) {
+                        App.success("操作成功!");
+                        ObjBanner.table.refresh();
+                    }, function (data) {
+                        App.error("操作成功!" + data.responseJSON.message + "!");
+                    });
+
+                    ajax.set('bannerIds', ids);
+                    ajax.start();
+                }
+                App.confirm("确定要删除吗？", fun);
+            }
+        };
+
+        /**
+         * 启用功能
+         */
+        ObjBanner.setEnable = function () {
+            if (this.check()) {
+                var selected = $('#' + this.id).bootstrapTable('getSelections');
+                var ids = "";
+
+                // 循环取得已选中的ID 并已',' 连接
+                for (var i = 0; i < selected.length; i++) {
+                    ids += selected[i].id + ",";
+                }
+                // 删除最后以为的','
+                ids = ids.left(ids.length - 1);
+
+                var fun = function () {
+                    //提交信息
+                    var ajax = new $ax(App.ctxPath + "banner/online", function (data) {
+                        App.success("操作成功!");
+                        ObjBanner.table.refresh();
+                    }, function (data) {
+                        App.error("操作成功!" + data.responseJSON.message + "!");
+                    });
+
+                    ajax.set('bannerIds', ids);
+                    ajax.start();
+                }
+                App.confirm("确定要启用吗？", fun);
+            }
+        };
+
+        /**
+         * 禁用功能
+         */
+        ObjBanner.setNotEnable = function () {
+            if (this.check()) {
+                var selected = $('#' + this.id).bootstrapTable('getSelections');
+                var ids = "";
+
+                // 循环取得已选中的ID 并已',' 连接
+                for (var i = 0; i < selected.length; i++) {
+                    ids += selected[i].id + ",";
+                }
+                // 删除最后以为的','
+                ids = ids.left(ids.length - 1);
+
+                var fun = function () {
+                    //提交信息
+                    var ajax = new $ax(App.ctxPath + "banner/offline", function (data) {
+                        App.success("操作成功!");
+                        ObjBanner.table.refresh();
+                    }, function (data) {
+                        App.error("操作成功!" + data.responseJSON.message + "!");
+                    });
+
+                    ajax.set('bannerIds', ids);
+                    ajax.start();
+                }
+                App.confirm("确定要禁用吗？", fun);
+            }
+        };
+
+
+        /**
+         * 打开添加的窗口
+         */
+        ObjBanner.openAdd = function () {
+            var index = layer.open({
+                type: 2,
+                title: '新增Banner',
+                area: ['100%', '100%'], //宽高
+                fix: true, //固定
+                maxmin: true,
+                content: App.ctxPath + 'banner/add?category=' + ObjBanner.category()
+            });
+            layer.full(index);
+            this.layerIndex = index;
+        };
+
+        /**
+         * 打开修改的窗口
+         */
+        ObjBanner.openEdit = function () {
+            if (this.check()) {
+                var index = layer.open({
+                    type: 2,
+                    title: '编辑Banner',
+                    area: ['100%', '100%'], //宽高
+                    fix: true, //固定
+                    maxmin: true,
+                    content: App.ctxPath + 'banner/edit?category=' + ObjBanner.category() + '&bannerId=' + ObjBanner.seItem.id
+                });
+                layer.full(index);
+                this.layerIndex = index;
+            }
+        };
+
+        /**
+         * 检查是否选中
+         */
+        ObjBanner.check = function () {
+            var selected = $('#' + this.id).bootstrapTable('getSelections');
+            if (selected.length == 0) {
+                App.info("请先选中表格中的某一记录！");
+                return false;
+            } else {
+                ObjBanner.seItem = selected[0];
+                return true;
+            }
+
+        };
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        ObjBanner.formParams = function () {
+            var queryData = {};
+            queryData['category'] = $("#category").val();
+            queryData['keyword'] = $("#keyword").val();
+            queryData['status'] = $("#status").val();
+            return queryData;
+        }
+
+        /**
+         * 查询资讯列表
+         */
+        ObjBanner.search = function () {
+
+            ObjBanner.table.refresh({query: ObjBanner.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = ObjBanner.initColumn();
+            var table = new BSTable(ObjBanner.id, "banner/list", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(ObjBanner.formParams());
+            ObjBanner.table = table.init();
+        });
+    </script>
+
+</js>

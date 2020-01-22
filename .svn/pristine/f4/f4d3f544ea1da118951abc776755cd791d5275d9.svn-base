@@ -1,0 +1,177 @@
+<css>
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-3" style="margin-left: -15px">
+                                <search:input id="title" label="专题名称" name="title" value=""
+                                              type="text"></search:input>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:datetime id="begDate" label="创建时间" name="begDate"
+                                                 istime="true" format="yyyy-MM-dd HH:mm:ss"></search:datetime>
+                            </div>
+                            <div class="col-sm-3" style="margin-left: -30px">
+                                <search:datetime id="endDate" label="至" name="endDate"
+                                                 istime="true" format="yyyy-MM-dd HH:mm:ss"></search:datetime>
+                            </div>
+                            <div class="col-sm-1">
+                                <qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="OptTopic.search()"></qx:btn>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hidden-xs" id="OptTopicTableToolbar" role="group">
+                        <qx:btn class="btn btn-primary" fa="fa fa-plus" label="新增" permission="" onclick="OptTopic.openAdd()"></qx:btn>
+                        <qx:btn class="btn btn-primary" fa="fa fa-edit" label="编辑" permission="" onclick="OptTopic.detail()"></qx:btn>
+                        <qx:btn class="btn btn-primary" fa="fa fa-trash" label="删除" permission="" onclick="OptTopic.del()"></qx:btn>
+                    </div>
+                    <table id="OptTopicTable" data-mobile-responsive="true" data-click-to-select="true">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+        /**
+         * 咨询初始化
+         */
+        var OptTopic = {
+            id: "OptTopicTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        OptTopic.initColumn = function () {
+            return [
+                {field: 'selectItem', radio: true},
+                {title: '编号', field: 'id', visible: true, align: 'center', valign: 'middle',sortable: false},
+                {title: '专题名称', field: 'name', align: 'center', valign: 'middle'},
+                {title: '创建时间', field: 'createTime', align: 'center', valign: 'middle',sortable: false,
+                    formatter: function (value, row, index) {
+                        var a = row.createTime;
+                        if(typeof a == "undefined"){
+                            a = "--";
+                        }else{
+                            a = dateDisplay(row.createTime);
+                        }
+                        return a;
+                    }
+                },
+                {title: '创建人', field: 'account', align: 'center', valign: 'middle'}
+            ]
+        };
+
+        /**
+         * 专题新增
+         */
+        OptTopic.openAdd = function () {
+
+            var index = layer.open({
+                type: 2,
+                title: '专题发布',
+                area: ['100%', '100%'], //宽高
+                fix: true, //不固定
+                maxmin: true,
+                content: App.ctxPath+'/topic/topic_add'
+            });
+            layer.full(index);
+            this.layerIndex = index;
+        };
+
+        /**
+         * 检查是否选中  xxxxxx
+         */
+        OptTopic.check = function () {
+            var selected = $('#'+this.id).bootstrapTable('getSelections');
+
+            if(selected.length == 0){
+                App.info("请先选中表格中的某一记录！");
+                return false;
+            }else{
+                OptTopic.seItem = selected[0];
+                return true;
+            }
+
+        };
+
+        /**
+         * 专题编辑
+         */
+        OptTopic.detail = function () {
+            if (this.check()) {
+                var index = layer.open({
+                    type: 2,
+                    title: '专题编辑',
+                    area: ['100%', '100%'], //宽高
+                    fix: true, //不固定
+                    maxmin: true,
+                    content:App.ctxPath+ '/topic/topic_edit?id=' + this.seItem.id
+                });
+                layer.full(index);
+                this.layerIndex = index;
+            }
+        };
+
+        /**
+         * 点击删除
+         */
+        OptTopic.del = function () {
+            if (this.check()) {
+                var id =  this.seItem.id;
+                var fun = function (){
+                    var ajax = new $ax(App.ctxPath+"/topic/delete?id=" + id, function (data) {
+                        App.success("删除成功！", '');
+                    }, function (data) {
+                        App.error("删除失败!");
+                    });
+                    ajax.start();
+                    OptTopic.table.refresh({query: OptTopic.formParams()});
+                }
+                App.confirm("确定要删除吗？", fun);
+            }
+        };
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        OptTopic.formParams = function() {
+            var queryData = {};
+            queryData['name'] = $("#title").val();
+            queryData['begDate'] = $("#begDate").val();
+            queryData['endDate'] = $("#endDate").val();
+
+            return queryData;
+        }
+
+        /**
+         * 查询资讯列表
+         */
+        OptTopic.search = function () {
+
+            OptTopic.table.refresh({query: OptTopic.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = OptTopic.initColumn();
+            var table = new BSTable(OptTopic.id,  "/topic/list", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(OptTopic.formParams());
+            OptTopic.table = table.init();
+        });
+    </script>
+</js>
+</body>

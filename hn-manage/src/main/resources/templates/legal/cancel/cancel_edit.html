@@ -1,0 +1,70 @@
+<body>
+<div class="container">
+   <div class="form-horizontal" id="CancelForm">
+   		<input id="id" type="hidden" th:value="${deptLegalApply.id}"/>
+    	<div class="row" >
+    		<div class="col-sm-2"></div>
+    		<div class="col-sm-4">
+    			<form:text id="deptName" label="工会名称" name="deptName" value="${deptLegalApply.deptName}" must="true" readonly="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="name" label="法定代表人" name="name" must="true" value="${deptLegalApply.name}"></form:text>
+    		</div>
+    	</div>
+    	<div class="row" >
+    		<div class="col-sm-2"></div>
+    		<div class="col-sm-4">
+    			<form:text id="cerNo" label="证书证号" name="cerNo" must="true" value="${deptLegalApply.cerNo}"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="agentName" label="经办人" name="agentName" must="true" value="${deptLegalApply.agentName}"></form:text>
+			</div>
+		</div>
+		
+    	<div class="row" >
+    		<div class="col-sm-2"></div>
+    		<div class="col-sm-8">
+    			<form:area id="cancellationReason" label="注销原因" name="cancellationReason" must="true" value="${deptLegalApply.cancellationReason}"></form:text>
+    		</div>
+    	</div>
+    	<div class="row" >
+    		<div class="col-sm-2"></div>
+    		<div class="col-sm-8">
+    			<form:area id="cacellationBasis" label="注销依据" name="cacellationBasis" must="true" value="${deptLegalApply.cacellationBasis}"></form:text>
+    		</div>
+    	</div>
+    	<div class="row" >
+    		<div class="col-sm-2"></div>
+    		<div class="col-sm-8">
+    			<form:area id="pDeptFullname" label="隶属工会名称" name="pDeptFullname" must="true"  value="${deptLegalApply.pDeptFullname}"></form:text>
+    		</div>
+    	</div>
+		
+		<div class="row" >
+    		<div class="col-sm-2"></div>
+    		<div class="col-sm-8">
+    			<form:area id="assetsHanding" label="资产处理情况" name="assetsHanding" must="true" value="${deptLegalApply.assetsHanding}"></form:text>
+    		</div>
+    	</div>
+    	<div class="row" >
+    		<div class="col-sm-2"></div>
+    		<div class="col-sm-8">
+    			<form:area id="debtHanding" label="债权债务处理情况" name="debtHanding" must="true" value="${deptLegalApply.debtHanding}"></form:text>
+    		</div>
+    	</div>
+    	<div class="row text-center">
+    		<qx:btn id="save" class="btn btn-success" onclick="CancelDlg.addSubmit(1)" 
+					fa="fa fa-eraser" label="保存"></qx:btn>
+			<qx:btn id="submit" class="btn btn-danger" onclick="CancelDlg.addSubmit(2)" 
+					fa="fa fa-eraser" label="提交"></qx:btn>
+			<qx:btn id="close" class="btn btn-warning" onclick="CancelDlg.close()" 
+					fa="fa fa-eraser" label="取消"></qx:btn>
+    	</div>
+    	<br/>
+    </div>
+</div>
+</body>
+<js>
+<script th:src="@{/static/modular/legal/cancel/cancel_edit.js}"></script>
+</js>
+

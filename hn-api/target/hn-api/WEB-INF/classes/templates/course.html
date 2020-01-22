@@ -1,0 +1,17 @@
+<title th:text="${course.title}" xmlns:th="http://www.springframework.org/schema/mvc">课程</title>
+<body xmlns:th="http://www.springframework.org/schema/mvc">
+<link rel="stylesheet" th:href="@{/static/css/course.css}"/>
+<section class="source">
+    <header>
+        <h1 th:text="${course.title}"></h1>
+        <p><span class="gray-text"><span th:text="${course.createTime}"></span>&nbsp;&nbsp;&nbsp;<span
+                th:text="${course.createUserName}"></span></span></p>
+    </header>
+    <article class="content" th:utext="${course.content}">
+    </article>
+
+    <article th:if=" ${course.infoType==1 }" th:include="fragment/course :: mp3" class="attachment"></article>
+    <article th:if=" ${course.infoType==2 }" th:include="fragment/course :: mp4" class="attachment"></article>
+</section>
+
+</body>

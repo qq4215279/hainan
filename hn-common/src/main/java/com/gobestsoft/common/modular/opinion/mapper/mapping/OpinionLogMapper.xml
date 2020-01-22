@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.opinion.mapper.OpinionLogMapper">
+
+    <update id="update">
+        update app_opinion_log set reply_content=#{replyContent},reply_time=#{replyTime},status=#{status}
+        where opinion_id = #{opinionId} and org_id = #{orgId}
+    </update>
+
+    <select id="selectListByCondition" resultType="java.util.Map">
+        select
+            a.id,a.reply_content as replyContent,a.reply_time as replyTime,a.create_date as createDate,a.status,
+            b.nick_name as createUser,c.nick_name as fromPerson,d.simplename as fromDept,f.simplename as toDept,g.simplename as orgName
+        from app_opinion_log a
+        left join app_user b on a.create_user=b.auid
+        left join app_user c on a.from_person=c.auid
+        left join sys_dept d on a.from_dept=d.id
+        left join sys_dept f on a.to_dept=f.id
+        left join sys_dept g on a.org_id=g.id
+        where opinion_id = #{opinionId}
+        order by create_date desc
+    </select>
+
+    <select id="selectReplyContent" resultType="string">
+        select reply_content as replyContent
+        from app_opinion_log
+        where opinion_id = #{opinionId} and org_id = #{orgId}
+    </select>
+
+</mapper>

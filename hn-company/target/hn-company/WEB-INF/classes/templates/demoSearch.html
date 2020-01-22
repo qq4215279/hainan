@@ -1,0 +1,117 @@
+<body>
+<css>
+    <link th:href="@{/static/plugin/bootstrap-table/bootstrap-table.min.css}" rel="stylesheet">
+</css>
+
+<div class="container">
+
+    <div class="form-horizontal">
+       x
+            <div class="col-sm-6">
+                <search:input label="用户名称" name="name" value=""
+                              placeholder="帐号/姓名/手机号" type="text"></search:input>
+            </div>
+
+            <div class="col-sm-6">
+                <search:select label="下拉框(民族)" name="ethnic"
+                               code="lib_ethnic_group"></search:select>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-6">
+                <search:datetime label="日期" name="datetime"
+                                 format="yyyy-MM-dd"></search:datetime>
+            </div>
+            <div class="col-sm-6">
+                <search:datetime label="日期时间" name="datetime2"
+                                 istime="true" format="yyyy-MM-dd HH:mm:ss"></search:datetime>
+            </div>
+        </div>
+
+
+        <div class="row text-center">
+            <qx:btn id="btn1" class="btn btn-default" fa="fa fa-address-book" label="deflult" role=""
+                    permission=""></qx:btn>
+            <qx:btn id="btn2" class="btn btn-primary" fa="fa fa-address-book" label="primary" permission="" onclick="alert(1)"></qx:btn>
+            <qx:btn id="btn3" class="btn btn-success" fa="fa fa-address-book" label="success" permission=""></qx:btn>
+            <qx:btn id="btn4" class="btn btn-info" fa="fa fa-address-book" label="info" permission=""></qx:btn>
+            <qx:btn id="btn5" class="btn btn-warning" fa="fa fa-address-book" label="warning" permission=""></qx:btn>
+            <qx:btn id="btn6" class="btn btn-danger" fa="fa fa-address-book" label="danger" permission=""></qx:btn>
+        </div>
+    </div>
+
+    <div id="demoSearchTableToolbar">
+        <qx:btn id="btn7" class="btn btn-primary" fa="fa fa-address-book" label="primary" permission=""></qx:btn>
+        <qx:btn id="btn8" class="btn btn-success" fa="fa fa-address-book" label="success" permission=""></qx:btn>
+        <qx:btn id="btn9" class="btn btn-info" fa="fa fa-address-book" label="info" permission=""></qx:btn>
+        <qx:btn id="btn10" class="btn btn-warning" fa="fa fa-address-book" label="warning" permission=""></qx:btn>
+        <qx:btn id="btn11" class="btn btn-danger" fa="fa fa-address-book" label="danger" permission=""></qx:btn>
+    </div>
+    <table id="demoSearchTable" data-mobile-responsive="true" data-click-to-select="true">
+    </table>
+
+</div>
+
+<js>
+    <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table.min.js}"></script>
+    <script th:src="@{/static/plugin/bootstrap-table/locale/bootstrap-table-zh-CN.min.js}"></script>
+    <script th:src="@{/static/js/bootstrap-table-object.js}"></script>
+    <script>
+        /**
+         * Banner初始化
+         */
+        var demoSearch = {
+            id: "demoSearchTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            relationId: $('#relationId').val(),
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        demoSearch.initColumn = function () {
+            return [
+                {field: 'selectItem', checkbox: true},
+                {title: '姓名', field: 'name', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {title: '年龄', field: 'age', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {title: '地址', field: 'address', align: 'center', valign: 'middle'}
+            ]
+        };
+
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        demoSearch.formParams = function () {
+            var queryData = {};
+            queryData['name'] = $("#name").val();
+            queryData['ethnic'] = $("#ethnic").val();
+            queryData['datetime'] = $("#datetime").val();
+            queryData['datetime2'] = $("#datetime2").val();
+            return queryData;
+        }
+
+        /**
+         * 查询资讯列表
+         */
+        demoSearch.search = function () {
+            demoSearch.table.refresh({query: demoSearch.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = demoSearch.initColumn();
+            var table = new BSTable(demoSearch.id, "/getDemoSearchList", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(demoSearch.formParams());
+            demoSearch.table = table.init();
+        });
+
+    </script>
+
+</js>
+</body>

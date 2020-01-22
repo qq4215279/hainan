@@ -1,0 +1,247 @@
+<css xmlns:form="http://www.w3.org/1999/html" xmlns:form="http://www.w3.org/1999/html">
+    <div th:replace="fragment/fargment :: treeCss"></div>
+    <link th:href="@{/static/css/_fstyle.css}" rel="stylesheet">
+    <style type="text/css">
+        .ztree li span.button.pIcon01_ico_open, .ztree li span.button.pIcon01_ico_close,
+        .ztree li span.button.pIcon01_ico_docu {
+            margin-right: 2px;
+            background: url('../../static/plugin/ztree/img/diy/1_open.png') no-repeat scroll 0 0 transparent;
+            vertical-align: top;
+            *vertical-align: middle
+        }
+
+        .ztree li span.button.pIcon02_ico_open, .ztree li span.button.pIcon02_ico_close,
+        .ztree li span.button.pIcon02_ico_docu {
+            margin-right: 2px;
+            background: url('../../static/plugin/ztree/img/diy/2.png') no-repeat scroll 0 0 transparent;
+            vertical-align: top;
+            *vertical-align: middle
+        }
+    </style>
+</css>
+<body>
+<div class="form-horizontal" id="memreoutForm">
+    <input type="hidden" id="deptId" th:value="${member.deptId}">
+    <input type="hidden" id="memId" th:value="${member.id}">
+    <input type="hidden" id="reOutId" value="">
+    <div class="row">
+        <div class="col-sm-1"></div>
+        <div class="col-sm-4">
+            <form:text label="姓名" id="name" name="name" value="${personInfo.name}" type="text"
+                       disabled="true"></form:text>
+            <form:text label="证件号" id="certificateNum" name="certificateNum" value="${personInfo.certificateNum}"
+                       type="text" disabled="true"></form:text>
+            <form:text label="工作单位" id="workUnit" name="workUnit" value="${personInfo.workUnit}" type="text"
+                       disabled="true"></form:text>
+        </div>
+        <div class="col-sm-4">
+            <form:text label="所在工会" id="nowDeptName" name="nowDeptName" value="${deptname}" type="text"
+                       disabled="true"></form:text>
+            <form:text id="pName" label="转入工会" name="pName" value=""
+                       onclick="memReOutDlg.showPNameSelectTree();" must="true" readonly="true"></form:text>
+        </div>
+
+        <!-- 这是父级菜单下拉框 -->
+        <div id="pNameContent" class="menuContent" style="display: none; position: absolute; z-index: 200;">
+            <div class="row" style="width: 300px !important;">
+                <div class="col-sm-9">
+                    <input type="text" id="keyword" placeholder="请输入工会全称" style="width:225px; height:35px">
+                </div>
+                <div class="col-sm-3">
+                    <qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="memReOutDlg.searchDeptName()"></qx:btn>
+                </div>
+            </div>
+            <ul id="pNameTree" class="ztree tree-box" style="width: 300px !important;"></ul>
+        </div>
+    </div>
+    <div class="row text-center">
+        <qx:btn fa="fa fa-check" label="提交" permission="" onclick="memReOutDlg.submit()"></qx:btn>
+        <qx:btn fa="fa fa-eraser" label="取消" permission="" onclick="memReOutDlg.close()"></qx:btn>
+    </div>
+</div>
+</body>
+
+<js>
+    <div th:replace="fragment/fargment :: treeJs"></div>
+    <script th:src="@{/static/plugin/ztree/jquery.ztree.core.min.js}"></script>
+    <script th:src="@{/static/plugin/ztree/jquery.ztree.exhide.min.js}"></script>
+    <script type="text/javascript">
+
+        /*
+         * 初始对话框
+         */
+        var memReOutDlg = {
+            recordData: {},
+            deptZtree: null,
+            pNameZtree: null,
+            validateFields: {
+                pName: {
+                    validators: {
+                        notEmpty: {
+                            message: '转入工会不能为空！'
+                        }
+                    }
+                }
+            }
+        }
+        /**
+         * 关闭此对话框
+         */
+        memReOutDlg.close = function () {
+            App.closeSelfIframe();
+        }
+
+        /**
+         * 显示父级菜单下拉框
+         * @returns
+         */
+        memReOutDlg.showPNameSelectTree = function () {
+            App.showInputTree("pName", "pNameContent");
+        };
+
+        /**
+         * 清除数据
+         */
+        memReOutDlg.clearData = function () {
+            this.recordData = {};
+        }
+
+        /**
+         * 设置对话框中的数据
+         * param key 数据的名称
+         */
+        memReOutDlg.set = function (key) {
+            this.recordData[key] = $("#" + key).val();
+            return this;
+        }
+
+        /**
+         * 收集数据
+         */
+        memReOutDlg.collectData = function () {
+            this.set('deptId')
+                .set('memId')
+                .set('reOutId')
+        }
+
+        /**
+         * 验证数据是否为空
+         */
+        memReOutDlg.validate = function () {
+            $('#memreoutForm').data("bootstrapValidator").resetForm();
+            $('#memreoutForm').bootstrapValidator('validate');
+            return $("#memreoutForm").data('bootstrapValidator').isValid();
+        }
+
+        /**
+         * 点击提交
+         */
+        memReOutDlg.submit = function () {
+            this.clearData();
+            this.collectData();
+            //校验表单是否填写完整
+            if (!this.validate()) {
+                errorFocus();
+                return;
+            }
+
+            var oldDept = $("#deptId").val();
+            var newDept = $("#reOutId").val();
+            if(oldDept == newDept){
+                layer.msg("不能转入同一个工会");
+                return false;
+            }
+
+            App.loadingAjax({
+                url: App.ctxPath + "/dept/member/memoutsave",
+                data: memReOutDlg.recordData,
+                success: function (result) {
+                    if (result.code = 200) {
+                        App.success(result.message);
+                        memReOutDlg.close();
+                    }
+                }
+            });
+        }
+
+        /**
+         * 点击父级菜单下拉框input框时
+         * @param e
+         * @param treeId
+         * @param treeNode
+         * @returns
+         */
+        memReOutDlg.onClickPName = function (e, treeId, treeNode) {
+            $("#pName").attr("value", memReOutDlg.pNameZtree.getSelectedVal());
+            $("#reOutId").attr("value", treeNode.id);
+        };
+
+        $(function () {
+            App.initValidator("memreoutForm", memReOutDlg.validateFields);
+            //初始化父级菜单下拉框
+            var pNameTree = new $ZTree("pNameTree", "dept/tree");
+            pNameTree.bindOnClick(memReOutDlg.onClickPName);
+            pNameTree.init();
+            memReOutDlg.pNameZtree = pNameTree;
+        });
+
+
+        //搜索工会
+        var hiddenNodes = [];
+        memReOutDlg.searchDeptName = function () {
+            var ztreeObj = $.fn.zTree.getZTreeObj("pNameTree");
+            //显示上次搜索后隐藏的结点
+            ztreeObj.showNodes(hiddenNodes);
+            //返回true表示要过滤，需要隐藏，返回false表示不需要过滤，不需要隐藏
+            function filterFunc(node){
+                var keyword=$("#keyword").val();
+                //如果当前结点，或者其父结点可以找到，或者当前结点的子结点可以找到，则该结点不隐藏
+                if(memReOutDlg.searchParent(keyword,node) || memReOutDlg.searchChildren(keyword,node.children)){
+                    return false;
+                }
+                return true;
+            };
+
+            //获取不符合条件的叶子结点
+            hiddenNodes=ztreeObj.getNodesByFilter(filterFunc);
+
+            //隐藏不符合条件的叶子结点
+            ztreeObj.hideNodes(hiddenNodes);
+        }
+
+        //搜索父节点
+        memReOutDlg.searchParent = function (keyword,node) {
+
+            if(node == null){
+                return false;
+            }
+            if(node.name.indexOf(keyword)!=-1){
+                return true;
+            }
+            //递归查找父结点
+            return memReOutDlg.searchParent(keyword,node.getParentNode());
+        }
+
+        //搜索子节点
+        memReOutDlg.searchChildren = function (keyword,children){
+
+            if(children == null || children.length == 0){
+                return false;
+            }
+            for(var i = 0;i < children.length;i++){
+                var node = children[i];
+                if(node.name.indexOf(keyword)!=-1){
+                    return true;
+                }
+                //递归查找子结点
+                var result = memReOutDlg.searchChildren(keyword,node.children);
+                if(result){
+                    return true;
+                }
+            }
+            return false;
+        }
+
+    </script>
+
+</js>

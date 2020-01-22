@@ -1,0 +1,46 @@
+<css xmlns:form="http://www.w3.org/1999/html" xmlns:form="http://www.w3.org/1999/html">
+    <div  include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal" id="deptMemberForm">
+			<div class="row">
+				<div class="col-sm-2"></div>
+	            <div class="col-sm-8">
+                    <form:area label="留言内容" name="content" must="true" value="${appUserLeaveMessage.content}" disabled="true"></form:area>
+					<form:text label="联系方式" id="contact" name="contact" value="${appUserLeaveMessage.contact}" type="text" disabled="true"></form:text>
+					<form:text label="创建时间" id="createTime" name="createTime" value="${appUserLeaveMessage.create_time}" type="text" disabled="true"></form:datetime>
+				</div>
+	        </div>
+            <div class="row btn-group-m-t">
+                <div class="col-sm-4 col-sm-offset-5">
+                    <qx:btn  fa="fa fa-eraser" label="取消" permission="" onclick="OptDeptMember.close()"></qx:btn>
+                </div>
+            </div>
+    </div>
+</div>
+</body>
+<js>
+  <script type="text/javascript" >
+
+  /* 
+   * 初始对话框
+   */
+   var OptDeptMember = {
+	    recordData: {},
+	    deptZtree: null,
+	    pNameZtree: null,
+	    validateFields: {}
+   }
+  
+   /**
+    * 关闭此对话框
+    */
+    OptDeptMember.close = function() {
+       parent.layer.close(window.parent.OptAppUser.layerIndex);
+   }
+   
+    </script>
+    
+</js>

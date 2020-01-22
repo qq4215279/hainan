@@ -1,0 +1,26 @@
+<body style="background:#fff">
+<style type="text/css">
+	#phone{ margin:0 auto; width:510px; height:814px; background:url('../static/img/preview_phone.jpg') no-repeat;}
+	#frame{ margin:100px 0 0 97px; width:320px; border:2px solid #333;}
+	#qrcode{ position:absolute; top:200px; left:50%; margin-left:230px; width:200px; height:300px; text-align:center; line-height:30px;}
+</style>
+	<meta charset="UTF-8">
+	<div id="phone">
+		<iframe id="frame" src="" height="565" width="320" frameborder="0"></iframe>
+	</div>
+<js>
+	<script type="text/javascript">
+		$(function(){
+			$('#frame').attr('src',getIframeSrc());
+		});
+
+		function getIframeSrc(){
+			var src = "";
+			src = App.ctxPath+'/article/demo';
+			return src;
+		}
+
+	</script>
+</js>
+</body>
+

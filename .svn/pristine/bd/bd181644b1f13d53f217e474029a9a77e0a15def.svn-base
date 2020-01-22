@@ -1,0 +1,41 @@
+package com.gobestsoft.api.sign;
+
+import com.gobestsoft.core.util.DateUtil;
+import com.gobestsoft.core.util.MD5Util;
+
+import java.io.UnsupportedEncodingException;
+import java.util.*;
+
+/**
+ * create by gtw
+ * on 2018/5/31 下午7:56
+ */
+public class BaseSign {
+
+    public static void main(String[] args) {
+        validateSign(new TreeMap<>());
+    }
+
+
+    protected static void validateSign(SortedMap<String, String> parameters) {
+        String timestamp = DateUtil.getAllTime();
+        System.out.println("时间戳:"+timestamp);
+        parameters.put("timestamp", timestamp);
+        StringBuilder sb = new StringBuilder();
+        Set<Map.Entry<String, String>> entrySet = parameters.entrySet();
+        Iterator<Map.Entry<String, String>> it = entrySet.iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, String> entry = it.next();
+            sb.append(entry.getKey() + "=" + entry.getValue());
+        }
+        System.out.println("拼接Str:"+sb.toString());
+        try {
+            String sign = MD5Util.encryptByUtf8(sb.toString() + "Gobest_zghn_As").toUpperCase();
+            System.out.println("签名：" + sign);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+}

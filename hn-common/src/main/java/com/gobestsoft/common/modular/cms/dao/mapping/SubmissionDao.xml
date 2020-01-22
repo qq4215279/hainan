@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.cms.dao.SubmissionDao">
+	
+    
+    <insert id="addSubmission">
+    	INSERT INTO my_contribute
+	    	(auid,
+	    	content,
+	    	img_path,
+	    	create_time,
+	    	img2_path,
+	    	img3_path,
+	    	img4_path,
+	    	img5_path,
+	    	img6_path,
+	    	img7_path,
+	    	img8_path,
+	    	img9_path,
+	    	district_code,
+	    	addr,
+	    	pos_lng,
+	    	pos_lat,
+	    	article_id,
+	    	status)	
+    	VALUES(
+	    	#{userId},
+	    	#{content}, 
+	    	#{img1},
+	    	#{creatTime},
+	    	#{img2},
+	    	#{img3},
+	    	#{img4},
+	    	#{img5},
+	    	#{img6},
+	    	#{img7},
+	    	#{img8},
+	    	#{img9},
+	    	#{districtCode},
+	    	#{address},
+	    	#{lng},
+	    	#{lat},
+	    	#{articleId},
+	    	-1)
+    </insert>
+    
+    <!--<insert id="personalSubmission">
+    	INSERT INTO cms_article(
+    	     id,media_type,content)
+    	    VALUES(
+    	    #{articleId},9,#{content})
+    </insert>-->
+    
+    <resultMap type="com.gobestsoft.common.modular.cms.model.SubmissionMine" 
+    id="mineSubmissionMap">
+		<id column="id" property="id" />
+		<result column="create_time" property="createTime" />
+		<result column="content" property="content" />
+		<result column="addr" property="address" />
+		<result column="collect_num" property="collect_total" />
+		<result column="thumbup_num" property="thumbsUp_total" />
+		<result column="comm_num" property="comment_total" />
+		<result column="district_code" property="cityCode" />
+		<result column="pos_lng" property="lng" />
+		<result column="pos_lat" property="lat" />
+		<result column="status" property="status" />
+		<result column="article_id" property="articleId" />
+		<result column="img_path" property="pictures1" />
+		<result column="img2_path" property="pictures2" />
+		<result column="img3_path" property="pictures3" />
+		<result column="img4_path" property="pictures4" />
+		<result column="img5_path" property="pictures5" />
+		<result column="img6_path" property="pictures6" />
+		<result column="img7_path" property="pictures7" />
+		<result column="img8_path" property="pictures8" />
+		<result column="img9_path" property="pictures9" />
+		<result column="amount" property="amount" />
+	</resultMap>
+	<!--废弃-->
+    <select id="mineSubmission" resultMap="mineSubmissionMap">
+    	
+    	Select 
+    		con.id,
+    		con.create_time,
+    		con.content,
+    		con.addr,
+    		art.collect_num,
+    		art.thumbup_num,
+    		art.comm_num,
+    		con.district_code,
+    		con.pos_lat,
+    		con.pos_lng,
+    		con.status,
+    		con.article_id,
+    		con.img_path,
+    		con.img2_path,
+    		con.img3_path,
+    		con.img4_path,
+    		con.img5_path,
+    		con.img6_path,
+    		con.img7_path,
+    		con.img8_path,
+    		con.img9_path,
+    		(select count(1) from my_contribute where auid = #{auId}) as amount
+    	FROM 
+				my_contribute as con
+    		
+			LEFT JOIN  
+				cms_article as art
+			ON 
+    		con.article_id = art.id 
+    	where 
+    		con.auid=#{auId}
+    		order by con.create_time desc
+    	<if test="startIndex!=-1 and pageSize!=-1">
+			LIMIT ${pageSize} OFFSET ${startIndex}
+		</if>
+    
+    	
+    </select>
+</mapper>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="renderer" content="webkit"/>
+    <title>网上工作平台 - 主页</title>
+    <link rel="shortcut icon" th:href="@{/static/favicon.ico}"/>
+    <link th:href="@{/static/plugin/bootstrap-3.3.7/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{/static/plugin/font-awesome-4.7.0/css/font-awesome.min.css}" rel="stylesheet"/>
+    <link th:href="@{/static/css/animate.css}" rel="stylesheet"/>
+    <link th:href="@{/static/css/style.css}" rel="stylesheet"/>
+    <link th:href="@{/static/css/index.css}" rel="stylesheet"/>
+</head>
+<body class="fixed-sidebar full-height-layout container-index">
+<div class="row top1">
+    <nav class="navbar navbar-static-top" role="navigation"
+         style="margin-bottom: 0">
+        <p class="gz-title">欢迎使用海南工会云平台</p>
+        <ul class="nav navbar-top-links navbar-right logi">
+            <li class="dropdown" style="border: 0;">
+                <a data-toggle="dropdown" class="dropdown-toggle count-info" href="#">
+                    <i class="fa fa-bell fa-2x"></i>
+                    <div style="background-color: #ff2222;position: absolute; width: 10px;height: 10px; border-radius: 50%;right: 15px; top: 5px;"></div>
+                </a>
+                <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                    <li><a class="J_menuItem" th:href="@{/sysMsg/page/msg}">消息列表</a></li>
+                </ul>
+            </li>
+            <li class="dropdown" style="border: 0;"><a
+                    data-toggle="dropdown" class="dropdown-toggle count-info" href="#">
+						<span>
+                            <img th:src=" @{/static/img/gh-logo.png}" id="userAvatar" class="img-circle img_head"
+                                 width="64px" height="64px"/>
+                            <strong class="font-bold" th:text="${user.name}"></strong>
+							<b class="caret"></b>
+					</span>
+            </a>
+                <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                    <!--<li><a class="J_menuItem" th:href="@{/mgr/user_info}">个人资料</a></li>-->
+                    <li><a class="J_menuItem" th:href="@{/user_chpwd}">修改密码</a></li>
+                </ul>
+
+            </li>
+            <li id="logout-li"><a th:href="@{/logout}">
+                <i class="fa fa-power-off icon_fa" style="padding-left: 13px; position: relative;"></i>
+            </a></li>
+        </ul>
+
+    </nav>
+</div>
+<div id="wrapper">
+    <nav th:replace="layout/_tab :: tab"></nav>
+    <div th:replace="layout/_right :: right"></div>
+    <!--<div th:replace="layout/_theme :: theme"></div>-->
+    <!-- 底部 -->
+    <div class="footer">
+        <div class="pull-right">
+            &copy; 2017-2018 <a href="http://www.gobestsoft.com" target="_blank">gobestsoft.com</a>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/static/js/jquery-1.12.4.min.js}"></script>
+<script th:src="@{/static/plugin/bootstrap-3.3.7/js/bootstrap.min.js}"></script>
+<script th:src="@{/static/plugin/metisMenu/jquery.metisMenu.js}"></script>
+<script th:src="@{/static/plugin/slimscroll/jquery.slimscroll.min.js}"></script>
+<script th:src="@{/static/plugin/layer/layer.js}"></script>
+<script th:src="@{/static/js/hplus.js}"></script>
+<script th:src="@{/static/js/contabs.js}"></script>
+<!-- 第三方插件 -->
+<script th:src="@{/static/plugin/echarts/echarts-all.js}"></script>
+<script th:src="@{/static/plugin/pace/pace.min.js}"></script>
+<script th:src="@{/static/js/App.js}"></script>
+<script>
+    $(function () {
+        $(".section").on("click", function () {
+            $(this).find("div").toggleClass("iconr");
+            $(this).find("i").toggleClass("secr");
+        });
+
+        /**
+         * 头像错误加载方法
+         */
+        $("#userAvatar").error(function () {
+            var avatarUrl = App.ctxPath + "static/img/gh-logo.png";
+            $("#userAvatar").attr("src", avatarUrl);
+        });
+    })
+
+
+</script>
+</body>
+
+</html>

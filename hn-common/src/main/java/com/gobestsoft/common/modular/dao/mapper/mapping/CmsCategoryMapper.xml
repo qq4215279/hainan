@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dao.mapper.CmsCategoryMapper">
+    <resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.dao.model.CmsCategoryPojo">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="pid" jdbcType="INTEGER" property="pid"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="create_time" jdbcType="VARCHAR" property="createTime"/>
+        <result column="create_user" jdbcType="VARCHAR" property="createUser"/>
+        <result column="update_time" jdbcType="VARCHAR" property="updateTime"/>
+        <result column="update_user" jdbcType="VARCHAR" property="updateUser"/>
+        <result column="icon" jdbcType="VARCHAR" property="icon"/>
+        <result column="del_flg" jdbcType="SMALLINT" property="delFlg"/>
+
+    </resultMap>
+
+    <insert id="insertColumnAll">
+        insert into cms_category
+        (id,pid,name,create_time,create_user,update_time,update_user,icon,del_flg)
+        values (
+            #{id},#{pid},#{name},#{createTime},#{createUser},#{updateTime},#{updateUser},#{icon},#{delFlg}
+        )
+    </insert>
+
+    <select id="selectTopicList" resultType="com.gobestsoft.common.modular.dao.model.CmsCategoryPojo">
+        SELECT t.*,
+        (select su.account
+          from sys_user su
+        where su.uid = t.create_user) as account
+        FROM cms_category t
+        WHERE
+        t.del_flg = 0
+        <if test="type == 0">
+            and t.pid=1000
+        </if>
+        <if test="type == 1">
+            and t.pid=100
+        </if>
+        <if test="name != null and name != ''">
+            AND (
+            t.name LIKE CONCAT('%',#{name},'%')
+            )
+        </if>
+        <if test="begDate != null and begDate != ''">
+            AND t.create_time &gt;= #{begDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND t.create_time &lt;= #{endDate}
+        </if>
+        ORDER BY t.create_time DESC
+    </select>
+
+    <select id="getTopicInfoById" resultType="com.gobestsoft.common.modular.dao.model.CmsCategoryPojo">
+        select t.* from cms_category t where id = #{id}
+    </select>
+
+    <update id="updateTopicInfoById" parameterType="com.gobestsoft.common.modular.dao.model.CmsCategoryPojo">
+        update cms_category
+        set
+        name = #{name},
+        icon = #{icon},
+        update_time = #{updateTime},
+        update_user = #{updateUser}
+        where id = #{id}
+    </update>
+
+    <update id="delTopic">
+      UPDATE cms_category
+        SET del_flg = 1
+        WHERE id = #{id}
+    </update>
+
+    <select id="getCategoryList" resultType="com.gobestsoft.common.modular.dao.model.CmsCategoryPojo">
+        SELECT cms_category.id, cms_category.name from cms_category
+        where cms_category.pid != 0
+        and cms_category.del_flg = 0
+        <if test="type == 0">
+            and cms_category.pid != 1000
+        </if>
+        <if test="type == 1">
+            and cms_category.pid != 100
+        </if>
+    </select>
+
+    <select id="getMaxIdByPid" resultType="java.lang.Integer">
+        select max(id) from cms_category where pid=#{pid}
+    </select>
+
+</mapper>

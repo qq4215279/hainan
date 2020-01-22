@@ -1,0 +1,857 @@
+<css>
+    <link th:href="@{http://xiumi.us/connect/ue/v5/xiumi-ue-v5.css}" rel="stylesheet">
+    <link th:href="@{/static/css/fileUpload.css}" rel="stylesheet">
+</css>
+<body>
+<style type="text/css">
+    .paper {
+        position:relative;
+        width:100%;
+        margin: 10px 0;
+        min-height: 600px;
+        background:#fff;
+        border:1px solid #eee;
+        float:left;
+        box-shadow:0 0 5px rgba(0,0,0,0.27),0 0 20px  rgba(0,0,0,.1) inset;
+    }
+    .paper::after,.paper::before {
+        content:'';
+        position:absolute;
+        bottom:6px;
+        width:100px;
+        height:1px;
+        z-index:-1;
+        box-shadow:0 2px 12px 5px rgba(0,0,0,.3);
+    }
+    .paper::after {
+        left:4px;
+        transform:rotate(-6deg);
+    }
+    .paper::before {
+        right:4px;
+        transform:rotate(6deg);
+    }
+
+    .myTable{
+        width: 90%;
+        margin: 20px auto;
+        table-layout: fixed;
+        border-collapse: collapse;
+    }
+    .myTable th,tr,td{
+        border: 1px solid #333;
+    }
+    .myTable thead tr,th{
+        border: 0px !important;
+    }
+
+    .myTable tbody td{
+        height: 33px;
+        line-height: 33px;
+        padding: 5px;
+        text-align: center;
+        font-family: '楷体';
+
+    }
+    .exclude{
+
+        border-top: 0px!important;
+        border-top: 0px!important;
+    }
+
+    .bold{
+        font-weight: bold;
+        font-family: 'Microsoft YaHei';
+    }
+    .paper:hover .download_tag{
+        display: inline-block;
+    }
+    .download_tag {
+
+        display: inline-block;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 140px;
+        height: 50px;
+        filter: alpha(Opacity=80);
+        -moz-opacity: 0.5;
+        opacity: 0.5;
+        background-color: #333;
+        color: #FFF;
+        text-align: center;
+        line-height: 50px;
+        border-radius: 10px;
+        display: none;
+        cursor: pointer;
+    }
+
+    tr.bold td{
+        font-weight: bold;
+        font-family: 'Microsoft YaHei';
+    }
+    tr.overflow{
+        overflow-wrap: break-word; word-break: break-all;
+    }
+    [v-cloak] {
+        display: none;
+    }
+    .inline-block{
+        display: inline-block;
+        position: relative;
+    }
+</style>
+
+        <div class="form-horizontal" id="srvStraitenedForm">
+        <input type="hidden" id="id" th:value="${straitened.id}">
+        <input type="hidden" id="straitenedLogId" th:value="${straitenedLogId}">
+        <input type="hidden" id="isExamine" th:value="${isExamine}">
+        <input type="hidden" id="level" th:value="${level}">
+            <div class="row" id="app">
+                <div class="paper paper0 col-sm-8" v-if="load" v-cloak>
+                    <span class="download_tag" th:value="${straitened.id}" onclick="download('paper0','海南省职工服务（帮扶）中心困难职工建档申请表',0,this)">下载</span>
+                    <table class="myTable">
+                        <thead>
+                        <tr>
+                            <th style="text-align: center;" colspan="15"><h2 style="font-weight:400;">海南省职工服务（帮扶）中心困难职工建档申请表</h2></th>
+                        </tr>
+                        <tr>
+                            <th colspan="11"></th>
+
+                            <th colspan="4" style="text-align: right">申报日期：{{obj.createTime}}</th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td class="bold">职工编号</td><td colspan="4">{{obj.stationCard}}</td>
+                            <td class="bold">困难类别</td><td colspan="4">{{obj.srvCategoryName}}</td>
+                            <td class="bold">建档标准</td><td colspan="4">{{obj.filingStandardName}}</td>
+
+                        </tr>
+                        <tr class="bold">
+                            <td >姓名</td><td>民族</td>
+                            <td>性别</td><td colspan="2">政治面貌</td>
+                            <td colspan="3">身份证号</td>
+                            <td>出生日期</td><td>健康状况</td>
+                            <td colspan="3">残疾类别</td>
+                            <td>工作状态</td><td >劳模类型</td>
+
+                        </tr>
+                        <tr>
+                            <td>{{obj.name}}</td><td>{{obj.nationName}}</td>
+                            <td>{{obj.sexName}}</td><td colspan="2">{{obj.politicalStatusName}}</td>
+                            <td colspan="3">{{obj.certificateNum}}</td>
+                            <td>{{obj.birthday}}</td><td>{{obj.healthName}}</td>
+                            <td colspan="3">{{obj.disability?obj.disabilityName:''}}</td>
+                            <td>{{obj.workStatusName}}</td><td>{{obj.modelWorkerName}}</td>
+
+                        </tr>
+                        <tr class="bold">
+                            <td colspan="2">住房类型</td> <td>建筑面积</td>
+                            <td colspan="2">手机号码</td>
+                            <td colspan="2">其他联系方式</td>
+                            <td>邮政编码</td>
+                            <td colspan="2">工作时间</td>
+                            <td colspan="2">所属行业</td>
+                            <td>婚姻状况</td><td colspan="2">户口类型</td>
+                        </tr>
+                        <tr >
+                            <td colspan="2">{{obj.houseTypeName}}</td><td>{{obj.houseArea}}</td>
+                            <td colspan="2">{{obj.mobile}}</td>
+                            <td colspan="2">{{obj.otherContactTel}}</td>
+                            <td>{{obj.zipCode}}</td>
+                            <td colspan="2">{{obj.workTime}}</td>
+                            <td colspan="2">{{obj.industryTypeName}}</td>
+                            <td>{{obj.maritalStatusName}}</td> <td colspan="2">{{obj.householdTypeName}}</td>
+                        </tr>
+                        <tr class="bold">
+                            <td colspan="3">现居住地址</td>
+                            <td colspan="3">工作单位</td>
+                            <td colspan="3">单位性质</td>
+                            <td colspan="3">企业状况</td>
+                            <td colspan="3">是否单亲 (指离异或丧偶，且带有小孩)</td>
+
+                        </tr>
+                        <tr>
+                            <td colspan="3">{{obj.liveAddress}}</td>
+                            <td colspan="3">{{obj.workUnit}}</td>
+                            <td colspan="3">{{obj.unitTypeName}}</td>
+                            <td colspan="3">{{obj.enterpriseSituationName}}</td>
+                            <td colspan="3">
+                                <label><input v-bind:checked="obj.isSingleParent==1" type="checkbox" > 是</label>
+                                <input type="checkbox" v-bind:checked="obj.isSingleParent==0"> 否</label>
+                            </td>
+
+                        </tr>
+
+                        <tr class="bold">
+                            <td colspan="2">本人月均收入</td>
+                            <td colspan="2">家庭其他年收入</td>
+                            <td colspan="3">家庭年度总收入</td>
+                            <td>家庭人口</td><td colspan="2">家庭人均收入</td>
+                            <td colspan="3">户口所在地行政区划(精确到街道)</td>
+                            <td colspan="2">医保状况</td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="2">{{obj.monthlyIncome}}</td>
+                            <td colspan="2">{{obj.familyYearIncomeOther}}</td>
+                            <td colspan="3">{{obj.familyYearIncome}}</td>
+                            <td>{{obj.familyPopulation}}</td><td colspan="2">{{obj.familyMonthIncomeAvg}}</td>
+                            <td colspan="3">{{obj.householeAddress}}{{obj.address}}</td>
+                            <td colspan="2">{{obj.medicalInsuranceName}}</td>
+                        </tr>
+                        <tr class="bold">
+                            <td class="bold" colspan="3">是否具有自救能力 <label><input v-bind:checked="obj.hasSaveOneself==1" type="checkbox" > 是</label>
+                                <input type="checkbox" v-bind:checked="obj.hasSaveOneself==0"> 否</label>
+                            </td>
+                            <td  colspan="6" >劳动合同签订日期：{{obj.laborContractStart}}到{{obj.laborContractEnd}}{{obj.laborContractEnd==undefined || obj.laborContractEnd==''?'  &nbsp;&nbsp; 年&nbsp;&nbsp;   月&nbsp;&nbsp;   日':''}} <label>（<input type="checkbox" v-bind:checked="obj.laborContractEnd==undefined"> 无固定期限)</label></td>
+                            <td colspan="3" >是否为零就业家庭</td>
+                            <td colspan="3" ><label><input v-bind:checked="obj.familyNoWorker==1" type="checkbox" > 是</label>
+                                <input type="checkbox" v-bind:checked="obj.familyNoWorker==0"> 否</label></td>
+                        </tr>
+                        <tr class="bold">
+                            <td colspan="5" class="bold">工会会员服务卡（大海惠工卡）卡号</td> <td colspan="10">{{obj.memberCardNo}}</td>
+
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="border-right: 0;height: 100px;vertical-align: top;text-align: left" class="bold">致困原因简述：</td> <td style="border-left: 0;vertical-align: top;text-align: left" colspan="12">{{obj.reason}}</td>
+                        </tr>
+                        <tr class="bold">
+                            <td v-bind:rowspan="obj.contacts.length+2">家庭成员(不含员工本人)</td>
+                            <td >姓名</td>
+                            <td>关系</td>
+                            <td>性别</td>
+                            <td>政治面貌</td>
+                            <td>文化程度</td>
+                            <td colspan="2">身份证号</td>
+                            <td>年龄</td>
+                            <td>医保状况</td>
+                            <td>健康状况</td>
+                            <td>月收入</td>
+                            <td>身份</td>
+                            <td colspan="2">单位或学校</td>
+                        </tr>
+
+                        <tr class="overflow" v-for="c in obj.contacts">
+                            <td>{{c.name}}</td>
+                            <td>{{c.relationName}}</td>
+                            <td>{{c.sexName}}</td>
+                            <td>{{c.politicalStatusName}}</td>
+                            <td>{{c.educationName}}</td>
+                            <td colspan="2">{{c.certificateNum}}</td>
+                            <td>{{c.age}}</td>
+                            <td>{{c.medicalInsuranceName}}</td>
+                            <td>{{c.healthName}}</td>
+                            <td>{{c.monthlyIncome}}</td>
+                            <td>{{c.identityName}}</td>
+                            <td colspan="2">{{c.unit}}</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td colspan="2"></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td colspan="2"></td>
+                        </tr>
+                        <!--<tr>
+                            <td v-bind:rowspan="1+2*obj.logModels.length" colspan="2" style="text-align: left;font-weight: bold">
+                                <div style="display: inline-block;width: 100%;">本人姓名：______</div>
+                                <div style="display: inline-block;width: 100%">_____/_____/_____</div>
+                            </td>
+                            <td colspan="13" style="">审核意见 </td>
+                        </tr>
+                        <template v-for="log in obj.logModels">
+                            <tr style="height: 60px;border-top: 0;">
+                                <td colspan="13" style="text-align: left;border-bottom-color: #fff;" align="top">
+                                    经{{log.fullname}}审核{{log.status==2?'通过':'拒绝'}},原因：{{log.comment}}
+                                </td>
+                            </tr>
+                            <tr style="border-top: 0;border-top-color: #fff;">
+                                <td colspan="10" style="text-align: center;border-right:0" align="top" >审核人签字：</td>
+                                <td colspan="3" style="text-align: left;border-left:0" align="top">工会盖章：<div style="height: 15px;font-size:10px">{{log.checkTime}}</div>
+                                </td>
+                            </tr>
+                        </template>-->
+                        <tr>
+                            <td rowspan="3" colspan="2" style="text-align: left;font-weight: bold">
+                                <div style="display: inline-block;width: 100%;">
+                                    本人承诺填写的家庭情况和提供的证明材料真实有效。
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align: left;font-weight: bold">
+                                本单位工会审核意见: <br>经审核该家庭符合困难职工建档认定条件。
+                            </td>
+                            <td colspan="3" style="text-align: left;font-weight: bold">
+                                所属上级工会审核意见：<br>经审核该家庭符合困难职工建档认定条件。
+                            </td>
+                            <td colspan="3" style="text-align: left;font-weight: bold">
+                                驻会产业工会意见：<br>经审核该家庭符合困难职工建档认定条件。
+                            </td>
+                            <td colspan="4" style="text-align: left;font-weight: bold">
+                                省职工服务中心审核意见：<br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align: left;font-weight: bold">审核人签名：</td>
+                            <td colspan="3" style="text-align: left;font-weight: bold">审核人签名：</td>
+                            <td colspan="3" style="text-align: left;font-weight: bold">审核人签名：</td>
+                            <td colspan="4" style="text-align: left;font-weight: bold">审核人签名：</td>
+                        </tr>
+
+                        <tr>
+                            <td rowspan="3" colspan="2" style="text-align: left;font-weight: bold">
+                                (按指模)：
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align: left;font-weight: bold">
+                                工会主席(负责人)签名：
+                            </td>
+                            <td colspan="3" style="text-align: left;font-weight: bold">
+                                工会主席(负责人)签名：
+                            </td>
+                            <td colspan="3" style="text-align: left;font-weight: bold">
+                                工会主席(负责人)签名：
+                            </td>
+                            <td colspan="4" style="text-align: left;font-weight: bold">
+                                中心主任(负责人)签名：
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align: right;font-weight: bold">(盖工会章)</td>
+                            <td colspan="3" style="text-align: right;font-weight: bold">(盖工会章)</td>
+                            <td colspan="3" style="text-align: right;font-weight: bold">(盖工会章)</td>
+                            <td colspan="4" style="text-align: right;font-weight: bold">(盖工会章)</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align: right;font-weight: bold">年 月 日</td>
+                            <td colspan="3" style="text-align: right;font-weight: bold">年 月 日</td>
+                            <td colspan="3" style="text-align: right;font-weight: bold">年 月 日</td>
+                            <td colspan="3" style="text-align: right;font-weight: bold">年 月 日</td>
+                            <td colspan="4" style="text-align: right;font-weight: bold">年 月 日</td>
+                        </tr>
+
+                        </tbody>
+
+
+                    </table>
+                </div>
+
+                <div class="paper col-sm-8 paper1" v-if="load" v-for="(s,i) in obj.studies" :key="i">
+                    <span class="download_tag" :value="s.id" onclick="download('paper1','海南省职工服务(帮扶)中心困难职工子女助学申请表',1,this)">下载</span>
+                    <table class="myTable">
+                        <thead>
+                        <tr>
+                            <th style="text-align: center;" colspan="10">
+                                <h2 style="font-weight:400;">
+                                    海南省职工服务(帮扶)中心困难职工子女助学申请表
+                                </h2>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                               <td class="bold">姓名</td> <td>{{s.name}} </td>
+                               <td class="bold">性别</td> <td>{{s.sexName}} </td>
+                               <td class="bold">民族</td> <td>{{s.nationName}} </td>
+                               <td class="bold">年龄</td> <td> {{s.age}}</td>
+                               <td colspan="2"><label> <input type="checkbox" v-bind:checked="s.isCurrent==1">应届</label>
+                                   <label> <input v-bind:checked="s.isCurrent==0" type="checkbox">往届</label>
+                               </td>
+                            </tr>
+                            <tr>
+                               <td class="bold">身份证号</td> <td colspan="3">{{s.certificateNum}} </td>
+                               <td class="bold">手机号</td> <td colspan="2">{{s.mobile}} </td>
+                               <td class="bold">家庭人口</td> <td colspan="2"> {{obj.familyPopulation}}</td>
+                            </tr>
+                            <tr>
+                               <td class="bold">高考分数</td> <td colspan="2">{{s.collegeScore}} </td>
+                               <td class="bold">政治面貌</td> <td colspan="2"> {{s.politicalStatusName}}</td>
+                               <td colspan="2">类别(本科/大专)</td> <td colspan="2">{{s.educationName}} </td>
+                            </tr>
+                            <tr>
+                               <td class="bold">录取院校</td> <td colspan="2">{{s.educationName}} </td>
+                               <td class="bold">录取专业</td> <td colspan="2">{{s.enrollMajor}} </td>
+                               <td class="bold">学制(年)</td> <td >{{s.schoolYearName}} </td>
+                               <td class="bold">录取批次</td> <td > {{s.enrollBatchName}}</td>
+                            </tr>
+                            <tr>
+                               <td class="bold">录取时间</td> <td colspan="2">{{(s.enrollTime).formateDate()}} </td>
+                               <td class="bold">毕业时间</td> <td colspan="2">{{s.graduationTime}} </td>
+                               <td class="bold">学杂费/年</td> <td colspan="3">  {{s.learnMoney}}（元）</td>
+                            </tr>
+                            <tr>
+                               <td class="bold" colspan="2">是否申请助学贷</td> <td colspan="3"> {{s.hasLoanName}}</td>
+                               <td class="bold" colspan="2">助贷金额</td> <td colspan="3">  {{s.loanMoney?s.loanMoney:0}}（元）</td>
+                            </tr>
+                            <tr>
+                               <td  colspan="10" style="text-align: left">现家庭地址：{{s.liveAddress}}{{s.address}}</td>
+                            </tr>
+                            <tr>
+                                <td class="bold">建档职工姓名</td> <td>{{obj.name}} </td>
+                                <td class="bold">性别</td> <td >{{obj.sexName}} </td>
+                                <td class="bold">年龄</td> <td >{{obj.age}} </td>
+                                <td class="bold">身份证</td><td colspan="3">{{obj.certificateNum}}</td>
+                            </tr>
+                            <tr>
+                                <td class="bold">工作单位</td> <td colspan="2">{{obj.workUnit}} </td>
+                                <td class="bold">工种(岗位)</td> <td >{{obj.industryTypeName}} </td>
+                                <td class="bold">月收入</td> <td >{{obj.monthlyIncome}} </td>
+                                <td class="bold">是否农民工</td><td colspan="2">{{obj.memberInfo.isFarmer==1?'是':'否'}}</td>
+                            </tr>
+                            <tr>
+                                <td class="bold" colspan="2">大海惠工卡账号</td> <td colspan="4">{{obj.memberCardNo}} </td>
+                                <td class="bold">手机号</td> <td colspan="3">{{obj.mobile}} </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="2" class="bold">劳动合同签订时间</td><td colspan="4">{{obj.laborContractStart}}到{{obj.laborContractEnd}}{{obj.laborContractEnd==undefined || obj.laborContractEnd==''?'  &nbsp;&nbsp; 年&nbsp;&nbsp;   月&nbsp;&nbsp;   日':''}}
+                                <label>（<input type="checkbox" v-bind:checked="obj.laborContractEnd==undefined"> 无固定期限)</label>
+                            </td>
+                                <td class="bold">是否低保户</td><td colspan="3"></td>
+                            </tr>
+                            <tr class="bold">
+                                <td colspan="10" style="text-align: left">本人承诺在申请海南省职工服务中心助学救助前，未获得政府部门和工会组织的资金救助。该承诺真实有效，本人愿接受相关部门监督，若有不符，本人自愿返还工会救助的助学资金，并承担相应法律责任。 </td>
+                            </tr>
+
+                            <tr class="bold">
+                                <td style="text-align: left;border-right: 0" colspan="5">承诺人(建档职工)：</td>
+                                <td style="text-align: left;border-left: 0" colspan="5">(亲笔签名并按手印)</td>
+                            </tr>
+                            <tr>
+                                <td class="bold" style="text-align: left;height: 100px;vertical-align: top;" colspan="10" >致困原因简述：{{obj.reason}}</td>
+                            </tr>
+
+                            <tr>
+                                <td class="bold" colspan="10" style="text-align: left;height: 100px;vertical-align: top;">
+                                    <div>本单位工会审核意见:经审核,该家庭符合困难职工建档认定条件。</div>
+                                    <div>
+                                        <div class="inline-block">审核人签名:</div>
+                                        <div class="inline-block" style="left: 40%;">工会主席(负责人)签名:</div>
+                                        <div class="inline-block" style="left: 60%;">(盖工会章)</div>
+                                    </div>
+                                    <div>
+                                        <div class="inline-block">审核人联系方式:</div>
+                                        <div class="inline-block" style="left: 70%;">年 月 日</div>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="paper col-sm-8 paper2" v-if="load" v-for="(m,i) in obj.medicals" :key="i">
+                    <span class="download_tag" :value="m.id" onclick="download('paper2','海南省职工服务(帮扶)中心困难职工医疗救助申请表',2,this)">下载</span>
+                    <table class="myTable">
+                        <thead>
+                        <tr>
+                            <th style="text-align: center;" colspan="10">
+                                <h2 style="font-weight:400;">
+                                    海南省职工服务(帮扶)中心困难职工医疗救助申请表
+                                </h2>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                               <td class="bold">建档职工姓名</td> <td>{{obj.name}} </td>
+                               <td class="bold">性别</td> <td>{{obj.sexName}} </td>
+                               <td class="bold">年龄</td> <td> {{obj.age}}</td>
+                                <td class="bold">手机号</td><td colspan="3">{{obj.mobile}}</td>
+                            </tr>
+                            <tr>
+                               <td class="bold">工作单位</td> <td colspan="9">{{obj.workUnit}} </td>
+                            </tr>
+                            <tr>
+                               <td class="bold" colspan="2">建档职工工会会员服务（大海惠工）卡账号</td> <td colspan="4">{{obj.memberCardNo}} </td>
+                               <td class="bold">身份证号</td> <td colspan="3"> {{obj.certificateNum}}</td>
+                            </tr>
+                            <tr>
+                               <td class="bold">患者姓名</td> <td >{{m.name}} </td>
+                               <td class="bold" colspan="2">与建档职工关系</td> <td colspan="2">{{m.relationName}} </td>
+                               <td class="bold">性别</td> <td >{{m.sexName}} </td>
+                               <td class="bold">年龄</td> <td > {{m.age}}</td>
+                            </tr>
+                            <tr >
+                               <td class="bold" colspan="2">工作单位</td> <td colspan="3">{{m.work_unit}} </td>
+                               <td class="bold" colspan="2">身份证号</td> <td colspan="3">  {{m.certificateNum}}</td>
+                            </tr>
+                            <tr>
+                               <td class="bold" >病种</td> <td colspan="2"> {{m.diseaseName}}</td>
+                               <td class="bold" colspan="4">申请救助日前一年内的个人实际支出费用(元)<br>
+                                   （须提供含门诊、住院结算单、药物等票据，不得重复提供）(由基层单位核算)</td>
+                                <td colspan="3"> </td>
+                            </tr>
+
+                            <tr>
+                                <td class="bold" colspan="2">住院次数 </td><td colspan="3">{{m.hospitalizationNum}} 次</td>
+                                <td class="bold" colspan="3">省职工服务中心复核个人自付金额（元）</td><td colspan="2"></td>
+                            </tr>
+                            <tr>
+                                <td class="bold" colspan="2">本单位救助金额 </td><td colspan="3">{{m.unitDonationMoney}} 元</td>
+                                <td class="bold" colspan="3">社会救助金额</td><td colspan="2">{{m.sociologyDonationMoney}}</td>
+                            </tr>
+                            <tr>
+                                <td class="bold" colspan="2" style="height: 100px;">住院时间及后续治疗情况 </td><td colspan="8">{{m.remark}} </td>
+                            </tr>
+
+
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            <div th:if="${isExamine==1}" class="row text-center" style="margin-bottom: 10px">
+                <label class="col-sm-2 control-label">
+                    建档标准
+                </label>
+                <div class="col-sm-5">
+                    <select class="form-control" name="filingStandard" id="filingStandard">
+                        <option value="" disabled>选择建档标准</option>
+                        <option th:each="obj:${lib_filing_standard.dict}" th:value="${obj.code}" th:text="${obj.name}" ></option>
+                    </select>
+                </div>
+            </div>
+            <div th:if="${isExamine==1}" class="row text-center" style="margin-bottom: 10px">
+                <label class="col-sm-2 control-label">
+                    困难类别
+                </label>
+                <div class="col-sm-5">
+                    <select class="form-control" name="srvCategory" id="srvCategory">
+                        <option value="" disabled>选择困难类别</option>
+                        <option th:each="obj:${lib_difficult.dict}"  th:value="${obj.code}" th:text="${obj.name}" ></option>
+                    </select>
+                </div>
+            </div>
+            <div th:if="${isExamine==1}" class="row text-center">
+	        	<div class="row">
+                    <label class="col-sm-2 control-label">
+                        上传图片
+                    </label>
+                    <div class="col-sm-8">
+                        <div style="display: table">
+                            <div style="display: table-cell; width: 35%">
+                                <input class="form-control" type="text" id="sysAttachments" name="sysAttachments" style="width:10px;display: none;" >
+                            </div>
+                            <div class="jquery-fileupload">
+                                <label for="fileupload" class="btn btn-info" style="display:inline-block;width:100px">
+                                    <i class="fa fa-upload">选择上传</i>
+                                </label>
+                                <div class="uploadBtn" style="display:none">
+                                    <input id="fileupload" type="file" name="attch" accept="image/*">
+                                    <span>+选择文件</span>
+                                </div>
+                                <span class="tips"></span>
+                                <div style="clear: both"></div>
+                                <table>
+                                    <tbody class="filesName"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="progress-bar progress-bar-success"></div>
+                    </div>
+
+                </div>
+                <div class="row" id="spArea" style="margin: 10px 0">
+                    <label class="col-sm-2 control-label">
+                        附件材料
+                    </label>
+                    <div class="col-sm-8" id="spfiles">
+                        <div th:each="attach : ${sysAttachments}" style="float:left">
+                            <a th:href="${attach}" target="_blank"><img th:src="${attach}" style="width: 200px;height: 100px;" ></a>
+                        </div>
+                    </div>
+               </div>
+           </div>
+
+            <div th:if="${isExamine==0}" class="row text-center" style="margin-bottom: 10px">
+	           <label class="col-sm-2 control-label">
+                                         附件材料
+	           </label>
+               <div class="col-sm-8">
+                   <div th:each="attach : ${sysAttachments}" style="margin-left:10px; margin-top: 10px; float:left">
+                 	      <a th:href="${attach}" target="_blank"><img th:src="${attach}" style="width: 200px;height: 100px;" ></a>
+                   </div>
+               </div>
+           </div>
+
+
+            <div class="row text-center" th:if="${isExamine==1}" style="margin-bottom: 10px">
+                <label class="col-sm-2  control-label" ><span style="color:red;"> * </span>审核意见</label>
+                <div class="col-sm-5">
+                           <textarea name="comment" id="comment" class="form-control" maxlength="200"
+                                     style="width: 90%;height: 80px;resize: none;"></textarea>
+                </div>
+            </div>
+            <div class="row col-sm-offset-2"  th:if="${isExamine==1}" style="margin-bottom: 10px">
+                    <qx:btn class="btn btn-primary"  fa="fa fa-check" label="通过" permission=""
+                            onclick="checkDlg.agree()" ></qx:btn>
+                    <qx:btn class="btn btn-primary"  fa="fa fa-check" label="转办" permission=""
+                            onclick="checkDlg.transfer()" ></qx:btn>
+                    <qx:btn class="btn btn-danger" fa="fa fa-eraser" label="拒绝" permission=""
+                            onclick="checkDlg.refuse()" ></qx:btn>
+                    <qx:btn class="btn btn-info" fa="fa fa-eraser" label="取消" permission=""
+                            onclick="checkDlg.close()" ></qx:btn>
+                </div>
+
+        </div>
+</body>
+<js>
+    <div  th:include="fragment/fargment :: clipJs"></div>
+    <div  th:include="fragment/fargment :: fileUploadJs"></div>
+    <script th:src="@{/static/ueditor/ueditor.config.js}"></script>
+    <script th:src="@{/static/ueditor/ueditor.all.js}"></script>
+    <script th:src="@{/static/js/vue.min.js}"></script>
+    <!--<script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>-->
+    <script type="text/javascript" >
+    $(function(){
+        /*  $("#spArea").css("display","none"); */
+
+        //验证form表单
+        //App.initValidator("srvStraitenedForm", checkDlg.validateFields);
+        var isExamine = $("#isExamine").val();
+        var level = $("#level").val();
+
+        new Vue({
+          el:'#app',
+          data:{
+              obj:{},
+              load:false
+          },
+          beforeCreate:function(){
+              String.prototype.formateDate=function(){
+                  return  this.substr(0,4)+'年'+this.substr(4,2)+'月'+this.substr(6,2)+'日';
+
+              };
+
+              App.showLoading();
+          },
+          created:function(){
+              var that = this;
+              $.ajax({
+                  url:App.ctxPath+'/srv/straitened/getStraitenedDetail',
+                  data:{id:$('#id').val()},
+                  type:'post',
+                  dataType:'json',
+                  success:function(data){
+                      that.obj = data;
+                      that.load=true;
+                  },complete:function(){
+                      App.closeLoading();
+                  }
+              });
+          },methods:{
+              download:function(paper,filename){
+                   // App.print(paper,filename);
+              }
+          }
+
+        });
+
+
+    });
+
+    function download(pager,filename,type,obj) {
+        let paths = window.document.location.pathname.split('/');
+        let pathName = "/";
+        if(paths.length>0){ pathName = pathName + paths[1] }
+        let id = $(obj).attr("value");
+        location.href = pathName + "/srv/straitened/downloadWord?fileName="+filename+".docx&type="+type+"&id="+id;
+    }
+
+
+  /* 
+   * 初始对话框
+   */
+   var checkDlg = {
+	    recordData: {},
+	    deptZtree: null,
+	    pNameZtree: null,
+	    validateFields: {}
+   }
+
+   /**
+    * 设置对话框中的数据
+    * param key 数据的名称
+    */
+    checkDlg.set = function(key) {
+       this.recordData[key] = $("#" + key).val();
+       return this;
+   }
+  
+  /**
+   * 信息设定
+   */
+   checkDlg.collectData = function () {
+	   this
+	   .set('id')
+	   .set('comment')
+	   .set('supportLogId')
+	   .set('srvCategory')
+	   .set('filingStandard')
+	   .set('straitenedLogId');
+	   
+	   var sysAttachments = "";
+       $("#spArea img").each(function () {
+    	   var index = $(this).attr("src").lastIndexOf("straitened");
+    	   sysAttachments+= $(this).attr("src").substring(index, $(this).attr("src").length) + ",";
+       });
+       sysAttachments=sysAttachments.substring(0,sysAttachments.length)
+       this.recordData["sysAttachments"]=sysAttachments;
+
+   }
+  
+   /**
+    * 清空数据
+    */
+    checkDlg.clearData = function () {
+       this.recordData = {};
+   };
+   
+   /**
+    * 验证数据
+    */
+    checkDlg.validate = function () {
+       $('#srvStraitenedForm').data("bootstrapValidator").resetForm();
+       $('#srvStraitenedForm').bootstrapValidator('validate');
+       return $("#srvStraitenedForm").data('bootstrapValidator').isValid();
+   };
+   
+   /**
+    * 附件材料上传
+    */
+   var uploadStatus=0;
+   $("#fileupload").fileupload({
+       url: App.ctxPath + 'srv/straitened/upload',
+       start: function (e) {
+           uploadStatus=1;
+           $("#sysAttachments").val('');
+           $('#progressText').html('0%');
+           $('#progressText').css('color', 'black');
+           $('#progress .progress-bar').css('width', '0%');
+       },
+       progressall: function (e, data) {
+           var progress = parseInt(data.loaded / data.total * 100, 10);
+           $('#progressText').html(progress + '%')
+           $('#progress .progress-bar').css('width', progress + '%');
+       },
+       done: function (e, data) {
+           uploadStatus=0;
+           $('#progressText').html('complete');
+           $('#progressText').css('color', 'green')
+           /* $('#spArea').css("display","block"); */
+           addsp(data.result);
+       },
+       fail: function (e, data) {
+           $('#progressText').html('error');
+           $('#progressText').css('color', 'red')
+       }
+   });
+
+  /**
+   *审核通过
+   */
+   checkDlg.agree = function(){
+	   if(uploadStatus!=0){
+           return App.error("当前正在上传文件，请等待文件上传完成");
+       }
+	   this.clearData();
+	   this.collectData();
+	   if(!checkDlg.recordData.filingStandard){
+	       App.error("请选择建档标准")
+	       return;
+       }
+	   if(!checkDlg.recordData.srvCategory){
+	       App.error("请选择困难类型")
+	       return;
+       }
+	   var comment = $("#comment").val();
+       if(comment == null || comment == ""){
+    	   App.error("审核意见不能为空!");
+   		   return;
+       }
+       //提交信息
+       var ajax = new $ax(App.ctxPath + "srv/straitened/submit/2", function (data) {
+           App.success("审核通过!");
+           window.parent.OptStraitened.table.refresh();
+           checkDlg.close();
+       }, function (data) {
+           App.error("审核提交失败!" + data.responseJSON.message + "!");
+       });
+       ajax.set(checkDlg.recordData);
+       ajax.start();
+	  
+   }
+  
+  /**
+   *拒绝审核
+   */
+   checkDlg.refuse = function(){
+	   if(uploadStatus!=0){
+           return App.error("当前正在上传文件，请等待文件上传完成");
+       }
+	   this.clearData();
+       this.collectData();
+       var comment = $("#comment").val();
+       if(comment == null || comment == ""){
+    	   App.error("审核意见不能为空!");
+   		   return;
+       }
+       //提交信息
+       var ajax = new $ax(App.ctxPath + "srv/straitened/submit/3", function (data) {
+           App.success("审核拒绝!");
+           window.parent.OptStraitened.table.refresh();
+           checkDlg.close();
+       }, function (data) {
+           App.error("审核提交失败!" + data.responseJSON.message + "!");
+       });
+       ajax.set(checkDlg.recordData);
+       ajax.start();
+   }
+  /**
+   *转办
+   */
+  checkDlg.transfer = function(){
+      var index = layer.open({
+          type: 2,
+          title: '转办页面',
+          area: ['50%', '70%'], //宽高
+          fix: false, //不固定
+          maxmin: true,
+          content: App.ctxPath + '/srv/straitened/transfer?type=1&id=' +$("#id").val(),
+          end:function(){
+              window.parent.OptStraitened.table.refresh();
+              checkDlg.close();
+          }
+      });
+      this.layerIndex = index;
+  }
+   /**
+    * 关闭此对话框
+    */
+    checkDlg.close = function() {
+       parent.layer.close(window.parent.OptStraitened.layerIndex);
+   }
+   
+    function addsp(fileName) {
+    	var area=$('<div style="margin-left:10px; margin-top: 10px; float:left">' + '<a href= "' + fileName + '" target="_blank"><img src=" ' + fileName + ' " style="width: 200px;height: 100px;"></div>');
+        $("#spfiles").append(area);
+    }
+    $("#spfiles").on("click",".fa-close",function () {
+        $(this).parent().remove();
+    })
+    </script>
+    
+</js>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dept.mapper.DeptMemberApplyMapper">
+
+  <resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.dept.model.DeptMemberApply">
+    <result column="id" jdbcType="INTEGER" property="id" />
+    <result column="auid" jdbcType="VARCHAR" property="auid" />
+    <result column="apply_type" jdbcType="INTEGER" property="applyType" />
+    <result column="check_flag" jdbcType="INTEGER" property="checkFlag" />
+    <result column="apply_status" jdbcType="VARCHAR" property="applyStatus" />
+    <result column="create_uid" jdbcType="VARCHAR" property="createUid" />
+    <result column="create_time" jdbcType="VARCHAR" property="createTime" />
+    <result column="update_uid" jdbcType="VARCHAR" property="updateUid" />
+    <result column="update_time" jdbcType="VARCHAR" property="updateTime" />
+    <result column="member_id" jdbcType="INTEGER" property="memberId" />
+    <result column="member_card" jdbcType="VARCHAR" property="memberCard" />
+    <result column="unit_name" jdbcType="VARCHAR" property="unitName" />
+  </resultMap>
+  
+  <sql id="columns">
+  	dept_member_apply.id,
+  	dept_member_apply.auid,
+  	dept_member_apply.person_id,
+  	dept_member_apply.dept_id,
+  	dept_member_apply.unit_name,
+  	dept_member_apply.apply_status as status,
+  	dept_member_apply.create_time
+  </sql>
+  
+  <!-- 入会多条件分页查询 -->
+  <select id="selectByCondition" resultType="map">
+		SELECT
+	  dept_member_apply.id,
+	  dept_member_apply.auid,
+	  dept_member_apply.person_id,
+	  dept_member_apply.dept_id,
+	  dept_member_apply.unit_name,
+	  dept_member_apply.apply_status as status,
+	  dept_member_apply.create_time,
+	  person_info.name,person_info.sex,dept_member.id as member_id,
+	  log.apply_status log_status
+	  FROM dept_member_apply
+	  LEFT JOIN person_info on person_info.id = dept_member_apply.person_id
+	  LEFT JOIN dept_member on dept_member.person_id = dept_member_apply.person_id
+	  INNER JOIN
+	  (
+	 	 SELECT dept_member_apply_log.*  FROM dept_member_apply_log,dept_member_apply
+	     WHERE check_dept_id= #{deptId} order by dept_member_apply_log.create_time
+	  and dept_member_apply_log.apply_id = dept_member_apply.id
+	  desc limit  1
+
+	  ) log on log.apply_id =  dept_member_apply.id
+	  where
+	  1=1
+	  <if test="name != null and name != ''">
+		  AND person_info.name like CONCAT('%',#{name},'%')
+	  </if>
+	  <if test="status != null and status != ''">
+		  AND dept_member_apply.apply_status = #{status}
+	  </if>
+		ORDER BY dept_member_apply.apply_status,dept_member_apply.create_time
+	</select>
+	
+  <!-- 转会第一级工会审核页多条件分页查询 -->
+  <select id="selectFirstCheckByCondition" resultType="map">
+		SELECT  <include refid="columns"></include>,person_info.name,person_info.sex ,P.num as lognum
+		FROM dept_member_apply
+		left join dept_member on dept_member_apply.member_id = dept_member.id
+		left join person_info on person_info.id = dept_member.person_id
+		join (select apply_id,count(create_org_id) as num,create_org_id from dept_member_apply_log GROUP BY apply_id HAVING  create_org_id = #{orgId})P on P.apply_id=dept_member_apply.id		
+		and dept_member_apply.apply_type = 2 and P.num >= 1
+		<if test="name != null and name != ''">
+			AND person_info.name like CONCAT('%',#{name},'%')
+		</if>
+		<if test="status != null and status != ''">
+			AND dept_member_apply.apply_status = #{status}
+		</if>
+		<if test="createTime != null and createTime != ''">
+			AND dept_member_apply.create_time like CONCAT(#{createTime},'%')
+		</if>
+		ORDER BY dept_member_apply.apply_status,dept_member_apply.create_time
+	</select>
+	
+  <!-- 转会第二级工会审核页多条件分页查询 -->
+  <select id="selectTwoCheckByCondition" resultType="map">
+		SELECT  <include refid="columns"></include>,person_info.name,person_info.sex 
+		FROM dept_member_apply
+		left join dept_member on dept_member_apply.member_id = dept_member.id
+		left join person_info on person_info.id = dept_member.person_id
+		join (SELECT distinct(apply_id) as apply_id,count(id) as num FROM dept_member_apply_log WHERE next_check_org_id = #{orgId})P on P.apply_id=dept_member_apply.id		
+		and dept_member_apply.apply_type = 2 and P.num > 1
+		<if test="name != null and name != ''">
+			AND person_info.name like CONCAT('%',#{name},'%')
+		</if>
+		<if test="status != null and status != ''">
+			AND dept_member_apply.apply_status = #{status}
+		</if>
+		<if test="createTime != null and createTime != ''">
+			AND dept_member_apply.create_time like CONCAT(#{createTime},'%')
+		</if>
+		ORDER BY dept_member_apply.apply_status,dept_member_apply.create_time
+	</select>
+	
+	<!-- 预备会员多条件分页查询 -->
+	<select id="selectPrePareMemberPageByCondition" resultType="map">
+		select <include refid="columns"></include>,person_info.name,person_info.sex from dept_member_apply 
+		<!--left join dept_member on dept_member_apply.member_id=dept_member.id-->
+		left join dept_member on dept_member_apply.person_id=dept_member.person_id
+		left join person_info on person_info.id = dept_member.person_id
+		where dept_member.type=#{type} 
+		<if test="unitName != null and unitName != ''">
+			and dept_member_apply.unit_name  like CONCAT('%',#{unitName},'%') 
+		</if>
+		<if test="name != null and name != ''">
+			and person_info.name  like CONCAT('%',#{name},'%') 
+		</if>
+		<if test="certificateNum != null and certificateNum != ''">
+			and person_info.certificate_num  like CONCAT('%',#{certificateNum},'%') 
+		</if>
+		order by dept_member.dept_id,dept_member_apply.create_time
+	</select>
+	
+	<!-- 根据单位名称，会员类型；查询会员表中的预备会员信息 -->
+    <select id="selectListByUnitName" resultType="map">
+	 select <include refid="columns"></include>,person_info.name from dept_member_apply
+	 left join dept_member on dept_member.id = dept_member_apply.member_id
+	 left join person_info on person_info.id=dept_member.person_id
+	 where dept_member.type=#{type} and (dept_member_apply.unit_name=#{unitName} 
+	 or dept_member_apply.unit_name=#{unionName} or dept_member_apply.unit_name=#{unionSimpleName} )
+    </select>
+	
+	<!-- 上级工会报备多条件查询 -->
+	<select id="selectPreparationMemberPageByCondition" resultType="map">
+		select <include refid="columns"></include> , person_info.name,person_info.sex,sys_dept.fullname,sys_dept.simplename
+		from dept_member_apply
+		left join dept_member on dept_member_apply.member_id = dept_member.id
+		left join person_info on dept_member.person_id = person_info.id
+		left join sys_dept on dept_member.dept_id=sys_dept.id 
+		where dept_member_apply.apply_status=#{applyStatus} and dept_member_apply.apply_type=#{applyType}
+		and sys_dept.pid=#{orgId}
+		<if test="unionName != null and unionName != ''">
+			and sys_dept.simpfullnamelename  like CONCAT('%',#{unionName},'%') 
+		</if>
+		<if test="name != null and name != ''">
+			and person_info.name  like CONCAT('%',#{name},'%') 
+		</if>
+		<if test="certificateNum != null and certificateNum != ''">
+			and person_info.certificate_num  like CONCAT('%',#{certificateNum},'%') 
+		</if>
+		order by dept_member.dept_id,dept_member_apply.create_time
+	</select>
+
+
+	<update id="updateDeptId">
+		update dept_member_apply
+		set dept_id = #{deptId}
+		where id=#{id}
+
+	</update>
+	<update id="updateAuditDeptId">
+		update dept_member_apply_log
+		set check_reason =#{transfer_reason},
+		check_flag=1,
+		apply_status=2,
+		check_dept_id=#{deptId},
+		check_time = date_format(now(),'%Y%m%d%H%i%s')
+		where exists (
+			select id from dept_member_apply where id=#{id} and apply_status =-1
+		)
+		and apply_id =#{id}
+	</update>
+
+</mapper>

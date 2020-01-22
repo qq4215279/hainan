@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dept.mapper.DeptInviteMapper">
+
+    <resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.dept.model.AppInviteDept">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="auid" jdbcType="CHAR" property="auId"/>
+        <result column="unit_name" jdbcType="VARCHAR" property="unitName"/>
+        <result column="create_time" jdbcType="VARCHAR" property="createTime"/>
+        <result column="is_dept" jdbcType="SMALLINT" property="isDept"/>
+
+    </resultMap>
+
+    <sql id="columns">
+        app_invite_dept.id,
+        app_invite_dept.auid,
+        app_invite_dept.unit_name,
+        app_invite_dept.create_time,
+        app_invite_dept.is_dept
+    </sql>
+
+    <select id="getSelectAppInviteDateList" resultType="map">
+        select <include refid="columns"></include> ,COUNT(*) as count from app_invite_dept
+        where is_dept=0
+            <if test="unionName!=null and unionName!=''">
+                and unit_name like CONCAT('%',#{unionName},'%')
+            </if>
+            <if test="begDate!=null and begDate!=''">
+                and create_time >= #{begDate}
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                and create_time &lt;= #{endDate}
+            </if>
+            group by unit_name
+            order by create_time desc
+    </select>
+
+    <select id="getAppInviteDeptDataToModel" resultType="map">
+        SELECT p.name,
+        p.sex,
+        p.birthday,
+        p.certificate_num,
+        p.mobile,
+        p.domicile,
+        p.member_change_date,
+        p.work_unit,
+        p.native_place,
+        p.homeplace,
+        p.is_farmer,
+        D1.name AS sexName,
+        D2.name AS nation,
+        D3.name AS work_situation,
+        D4.name AS certificate_type,
+        D5.name AS education,
+        D6.name AS technology_level,
+        D7.name AS household,
+        D8.name AS political_status,
+        D9.name as member_change,
+        D10.name as member_change_reason
+
+        from person_info p
+        INNER  JOIN dept_member_apply d on p.id=d.person_id and  d.person_id in(SELECT person_id from app_invite_dept aid,dept_member_apply dma where aid.auid=dma.auid
+        and aid.auid in( select auid  from app_invite_dept where unit_name=#{unitName}  order by create_time desc))
+        LEFT  JOIN sys_dict AS D1 ON D1.code=p.sex AND D1.group_code='lib_sex'
+        LEFT  JOIN sys_dict AS D2 ON D2.code=p.nation AND D2.group_code='lib_ethnic_group'
+        LEFT  JOIN sys_dict AS D3 ON D3.code=p.work_situation AND D3.group_code='lib_work_situation'
+        LEFT  JOIN sys_dict AS D4 ON D4.code=p.certificate_type AND D4.group_code='lib_identification_type'
+        LEFT  JOIN sys_dict AS D5 ON D5.code=p.education AND D5.group_code='lib_education_code'
+        LEFT  JOIN sys_dict AS D6 ON D6.code=p.technology_level AND D6.group_code='lib_technology'
+        LEFT  JOIN sys_dict AS D7 ON D7.code=p.household AND D7.group_code='lib_household'
+        LEFT  JOIN sys_dict AS D8 ON D8.code=p.political_status AND D8.group_code='lib_political_status'
+        LEFT  JOIN sys_dict AS D9 ON D9.code=p.member_change AND D9.group_code='lib_member_change'
+        LEFT  JOIN sys_dict AS D10 ON D10.code=p.member_change_reason AND D10.group_code='lib_member_change_reason'
+        <where>
+        <if test="name != null and name != ''">
+                AND p.name like concat('%',#{name},'%')
+            </if>
+            <if test="query_sex!=null and query_sex!=''">
+                AND p.sex =#{query_sex}
+            </if>
+            <if test="query_ethnicGroup!=null and query_ethnicGroup!=''">
+                AND p.nation=#{query_ethnicGroup}
+            </if>
+            <if test="query_workSituation !=null and query_workSituation !=''">
+                AND p.work_situation=#{query_workSituation}
+            </if>
+            <if test="query_certificateType !=null and query_certificateType !=''">
+                AND p.certificate_type=#{query_certificateType}
+            </if>
+            <if test="query_certificateNum !=null and query_certificateNum !=''">
+                AND p.certificate_num LIKE CONCAT('%',#{query_certificateNum},'%')
+            </if>
+            <if test="query_education !=null and query_education !=''">
+                AND p.education=#{query_education}
+            </if>
+            <if test="query_technologyLevel !=null and query_technologyLevel !=''">
+                AND p.technology_level=#{query_technologyLevel}
+            </if>
+            <if test="query_workSituation !=null and query_workSituation !=''">
+                AND p.work_situation like concat('%',#{query_workSituation},'%')
+            </if>
+            <if test="query_mobile !=null and query_mobile !=''">
+                AND p.mobile like concat('%',#{query_mobile},'%')
+            </if>
+            <if test="query_household !=null and query_household !=''">
+                AND p.household =#{query_household}
+            </if>
+            <if test="query_domicile !=null and query_domicile !=''">
+                AND p.domicile like concat('%',#{query_domicile},'%')
+            </if>
+            <if test="query_memberChange !=null and query_memberChange !=''">
+                AND p.member_change =#{query_memberChange}
+            </if>
+            <if test="query_memberChangeDate_start !=null and query_memberChangeDate_start !=''">
+                AND p.member_change_date <![CDATA[>=]]> #{query_memberChangeDate_start}
+            </if>
+            <if test="query_memberChangeDate_end !=null and query_memberChangeDate_end !=''">
+                AND p.member_change_date <![CDATA[<=]]> #{query_memberChangeDate_end}
+            </if>
+            <if test="query_politicalStatus !=null and query_politicalStatus !=''">
+                AND p.political_status = #{query_politicalStatus}
+            </if>
+            <if test="query_workUnit !=null and query_workUnit !=''">
+                AND p.work_unit like concat('%',#{query_workUnit},'%')
+            </if>
+            <if test="query_nativePlace !=null and query_nativePlace !=''">
+                AND p.native_place like concat('%',#{query_nativePlace},'%')
+            </if>
+            <if test="query_farmer_flag !=null and query_farmer_flag !=''">
+                AND p.is_farmer=#{query_farmer_flag}
+            </if>
+        </where>
+    </select>
+
+    <select id="getUnitName" resultMap="BaseResultMap">
+        SELECT unit_name from app_invite_dept
+          <if test="keyWord != null and keyWord != ''">
+              where unit_name like '%${unit_name}%'
+          </if>
+        GROUP BY unit_name
+    </select>
+</mapper>

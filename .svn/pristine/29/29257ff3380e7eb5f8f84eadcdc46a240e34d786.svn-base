@@ -1,0 +1,30 @@
+   .menu{
+      padding-left:0px!important;
+      background-color:white;
+      margin-top:10px;
+      border:1px solid #ddd; 
+      
+   }
+   .menu li{
+      height:30px;
+      line-height:30px;
+      padding-left:20px;
+      padding-right:20px;
+      list-style:none;
+      width:150px;
+      
+   }
+   .menu li:hover{
+     background-color:#f0f0f0;
+     cursor:pointer;
+   }
+   .line1{
+      border-bottom:1px solid #ddd;
+   }
+   .panel-body{
+      overflow-x:scroll;
+   }
+   .node_name{
+   	  font-size:14px;
+   }
+   

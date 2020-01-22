@@ -1,0 +1,21 @@
+<body xmlns:th="http://www.w3.org/1999/xhtml">
+    <div class="ibox float-e-margins">
+        <div class="ibox-content">
+            <div class="form-horizontal" id="moneyForm">
+                <input type="hidden" th:value="${pojo.id}" id="id"/>
+                <div class="row">
+                    <div class="col-sm-7 b-r">
+                        <form:text id="rescuedName" label="姓名" disabled="true" value="${pojo.rescuedName}" />
+                        <form:text id="sex" label="性别" disabled="true" value="${pojo.sexName}" />
+                        <form:text id="age" label="年龄" disabled="true" value="${pojo.age}" />
+                        <form:text id="certificateNum" label="身份证号" disabled="true" value="${pojo.certificateNum}" />
+                        <form:text id="workStatus" label="工作状态" disabled="true" value="${pojo.workStatusName}" />
+                        <form:figure id="moneyNum" label="发放金额(元)" disabled="true" value="${pojo.moneyNum}" />
+                        <form:text id="status" label="状态" disabled="true" value="${pojo.statusName}" />
+                        <form:area id="remark" label="备注信息" disabled="true" value="${pojo.remark}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

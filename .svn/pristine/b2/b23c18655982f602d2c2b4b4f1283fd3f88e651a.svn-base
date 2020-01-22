@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dao.mapper.AppMessageMapper">
+    <resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.dao.model.AppMessagePojo">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="operation_mode" property="operationMode"/>
+        <result column="operation" property="operation"/>
+        <result column="appoint" property="appoint"/>
+        <result column="is_push" property="isPush"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+
+    <select id="getMessagesByAuid" resultType="java.util.Map">
+
+        select temp.* from (
+
+           SELECT M.id,M.title,M.content,M.cover,M.operation_mode,M.operation,M.create_time,IFNULL(R.is_open,0)AS is_open FROM app_message AS M
+            INNER JOIN app_message_relation AS R ON M.id=R.message_id
+            WHERE R.del_flg=0 AND R.auid=#{auid} AND M.create_time &gt;= #{createTime} AND M.category_id=${categoryId}
+            UNION ALL
+            SELECT M.id,M.title,M.content,M.cover,M.operation_mode,M.operation,M.create_time,0 AS is_open FROM app_message AS M
+            WHERE M.create_time &gt;= #{createTime} AND M.appoint=0 AND NOT EXISTS(SELECT 1 FROM app_message_relation WHERE auid=#{auid}  AND message_id=M.id)
+            AND M.category_id=${categoryId}
+       )temp order by temp.create_time desc
+    </select>
+
+
+    <select id="getNotReadMessagesByAuid" resultType="java.lang.Integer">
+        SELECT getMessageUnreadcoUNT(#{auid},#{createTime},NULL)
+    </select>
+
+    <select id="getRegisterIds" resultType="java.lang.String">
+        select registration_id from app_user where auid in(
+        <foreach collection="auids" item="auid" separator=",">
+            #{auid}
+        </foreach>
+        ) AND IFNULL(IF(strcmp(registration_id,''),registration_id,null),null) IS NOT NULL
+    </select>
+
+
+    <select id="getAllMessageCategory" resultType="java.util.Map">
+        select id,name  from app_message_category
+    </select>
+
+    <select id="getMessageRelationAppUser" resultType="java.util.HashMap">
+		select  auid as id,nick_name AS nickName,account  From app_user WHERE auid IN (select auid From app_message_relation WHERE message_id=#{messageId})
+	</select>
+
+
+    <select id="getAllMessage" resultType="java.util.HashMap">
+        SELECT
+        T1.id,
+        T1.title,
+        T1.content,
+        T1.operation_mode,
+        T1.operation,
+        T1.create_time,
+        t1.appoint,
+        T1.category_id,
+        T1.is_push,
+        T2.name,
+        T3.name AS categoryName
+        FROM
+        app_message AS T1
+        LEFT JOIN
+        sys_user AS T2 ON T1.create_user = T2.uid
+        LEFT JOIN
+        app_message_category AS T3 ON T3.id = T1.category_id
+        WHERE
+        1=1
+        <if test="categoryId!=null">
+            AND T1.category_id=#{categoryId}
+        </if>
+        <if test="appoint!=null">
+            AND T1.appoint=#{appoint}
+        </if>
+        ORDER BY T1.create_time DESC
+    </select>
+
+
+    <select id="getUserMessageCategory" resultType="java.util.Map">
+        SELECT C.id AS category_id,C.name,C.icon,
+        getMessageUnreadCount(#{auid}, #{createTime}, C.id)AS unRead_count
+        FROM app_message_category AS C
+    </select>
+
+    
+    <select id="getLastMessage" resultMap="BaseResultMap">
+        SELECT * FROM (SELECT M.* FROM app_message AS M WHERE M.appoint=0 and M.create_time &gt;= #{createTime}  AND M.category_id=#{categoryId}
+        UNION ALL
+        select M2.* from app_message AS M2  INNER JOIN app_message_relation AS R2 ON M2.id=R2.message_id
+        WHERE  M2.appoint=1 AND R2.auid=#{auid} AND M2.category_id = #{categoryId})AS T
+        ORDER BY T.create_time DESC limit 1
+    </select>
+</mapper>

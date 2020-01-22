@@ -1,0 +1,131 @@
+<css>
+    <div th:include="fragment/fargment :: bootstrapTableCss"></div>
+    <link th:href="@{/static/css/layui.css}" rel="stylesheet"/>
+</css>
+<body>
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="layui-form" id="publishForm">
+            <input type="hidden" id="articleId" th:value="${articleId}"/>
+            <input type="hidden" id="pubtype" th:value="${pubtype}"/>
+            <div class="form-group">
+                <div class ="row">
+                    <div class="col-sm-3"><h3>推送栏目</h3></div>
+                    <div class="col-sm-5"><h3>状态</h3></div>
+                    <div class="col-sm-2"><h3>操作信息</h3></div>
+                </div>
+                <hr>
+                <div class="row" th:each="record : ${publishList}">
+                    <div class="col-sm-1">
+                        <div class="layui-form-item" th:if="${record.exist}">
+                            <input type="checkbox" name="switch" th:id="${'swt'+ record.categoryId}" lay-skin="switch" lay-filter="layChk" lay-text="ON|OFF" checked>
+                        </div>
+                        <div class="layui-form-item" th:if="${record.exist != true } ">
+                            <input type="checkbox" name="switch" th:id="${'swt'+ record.categoryId}" lay-skin="switch" lay-filter="layChk" lay-text="ON|OFF">
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <label class="layui-form-label" style="text-align:left;width:100px" th:text="${record.categoryName}"></label>
+                    </div>
+
+                    <div th:if="${record.exist != true}">
+                        <div th:id="${'displayArea'+ record.categoryId}" style="display: none">
+                            <div class="col-sm-2">
+                                <select  th:id="${'sel'+ record.categoryId}" th:value="${record.pubStatus}" style="width:40px" lay-filter="laySel">
+                                    <option th:value=1 th:if="${record.pubStatus == 1}" selected>上架</option>
+                                    <option th:value=1 th:if="${record.pubStatus != 1}" >上架</option>
+                                    <option th:value=0 th:if="${record.pubStatus == 0}" selected>下架</option>
+                                    <option th:value=0 th:if="${record.pubStatus != 0}" >下架</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4" style="margin-left:20px">
+                                <button class="layui-btn" th:onclick="|publishSingle('${record.categoryId}')|" style="float: right">执行</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${record.exist} ">
+                        <div th:id="${'displayArea'+record.categoryId}">
+                            <div class="col-sm-2">
+                                <select  th:id="${'sel'+ record.categoryId}" th:value="${record.pubStatus}" style="width:40px" lay-filter="laySel">
+                                    <option th:value=1 th:if="${record.pubStatus == 1}" selected>上架</option>
+                                    <option th:value=1 th:if="${record.pubStatus != 1}" >上架</option>
+                                    <option th:value=0 th:if="${record.pubStatus == 0}" selected>下架</option>
+                                    <option th:value=0 th:if="${record.pubStatus != 0}" >下架</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4" style="margin-left:20px">
+                                <button class="layui-btn" th:onclick="|publishSingle('${record.categoryId}')|" style="float: right">执行</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+            </div>
+        </div>
+    </div>
+</div>
+<js>
+<script th:src="@{/static/js/layui.all.js}"></script>
+    <script>
+        var publishForm = layui.form
+                ,layer = layui.layer;
+
+        function publishSingle(cateId){
+            if(checkData(cateId)){
+                var ajax = new $ax(App.ctxPath+"/articlevalid/publish", function (data) {
+                    if(data.code === 200 && data.message !== ""){
+                        App.success(data.message)}
+                }, function (data) {
+                    App.error("该条资讯正在被使用，无法下架!");
+                });
+                //on/off开关
+                var switchFlg = $('#swt' + cateId)[0].checked;
+                ajax.set("articleId",$('#articleId').val());
+                ajax.set("categoryId",cateId);
+                ajax.set("divide",switchFlg);
+                ajax.set("pubStatus",$('#sel'+ cateId).val());
+                ajax.start();
+            }
+
+        }
+
+        function checkData(cateId){
+            return true;
+        }
+
+        publishForm.on('switch(layChk)', function(data){
+            var id = data.elem.id.replaceAll(/[^0-9]/ig,'');
+            /*var typeId = $('#pubtype').val();
+            if(typeId === 0){
+                id = data.elem.id.right(3).valueOf();
+            } else if(typeId === 1){
+                id = data.elem.id.right(4).valueOf();
+            }*/
+            if(data.elem.checked){
+                layer.tips('设定状态后，点击执行按钮',data.othis,{tips:[2,'#acb4b4']});
+                $('#displayArea' + id).show();
+            }else{
+                publishSingle(id);
+                $('#displayArea' + id).hide();
+            }
+        });
+
+        publishForm.on('select(laySel)',function(data){
+
+            var id = data.elem.id.replaceAll(/[^0-9]/ig,'');
+            /*var typeId = $("#pubtype").val();
+            if(typeId === 0){
+                id = data.elem.id.right(3).valueOf();
+            } else if(typeId === 1){
+                id = data.elem.id.right(4).valueOf();
+            }*/
+            if(data.value === 2){
+                $('#date' + id).show();
+            }else{
+                $('#date' + id).hide();
+            }
+
+        });
+    </script>
+</js>
+</body>

@@ -1,0 +1,127 @@
+package com.gobestsoft.core.util;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author gutongwei
+ * <p>
+ * 2017年12月15日
+ */
+@Configuration
+@ConfigurationProperties(prefix = "uploadSite")
+public class WebSiteUtil {
+
+    private String address;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    @Autowired
+    private WebSiteUtil util;
+
+    private static WebSiteUtil webSiteUtil;
+
+    @PostConstruct
+    public void init() {
+        webSiteUtil = this;
+        webSiteUtil.util = this.util;
+    }
+
+    /**
+     * 获取静态文件访问地址
+     *
+     * @param relativePath 相对路径
+     * @return
+     */
+    public static String getBrowseUrl(String relativePath) {
+
+        if (StringUtils.isEmpty(relativePath)) {
+            return "";
+        }
+        if (relativePath.startsWith("http://") || relativePath.startsWith("https://") || relativePath.startsWith("ftp://")) {
+            return relativePath;
+        }
+        return webSiteUtil.util.getAddress() + relativePath;
+    }
+
+    /**
+     * 获取静态文件访问地址
+     *
+     * @param relativePath 相对路径
+     */
+    public static String[] getBrowseUrl(String... relativePath) {
+        if (relativePath == null) {
+            return new String[]{};
+        }
+        String[] urList = new String[relativePath.length];
+        int index = 0;
+        for (String string : relativePath) {
+            urList[index] = String.valueOf(getBrowseUrl(string));
+            index++;
+        }
+        return urList;
+    }
+
+
+    /**
+     * 获取静态文件访问地址
+     *
+     * @param relativePaths 相对路径
+     * @return
+     */
+    public static List<String> getBrowseUrl(List<String> relativePaths) {
+        List<String> urList = new ArrayList<String>();
+        for (String string : relativePaths) {
+            urList.add(getBrowseUrl(string));
+        }
+        return urList;
+    }
+
+    /**
+     * 根绝绝URL绝对路径，剔除域名段，获取保存的相对路径
+     *
+     * @param urlPath
+     * @return
+     */
+    public static String getRelativePath(String urlPath) {
+        if (StringUtils.isEmpty(urlPath)) {
+            return null;
+        }
+        if (urlPath.trim().startsWith(webSiteUtil.util.getAddress())) {
+            return urlPath.trim().replace(webSiteUtil.util.getAddress(), "");
+        }
+        return null;
+    }
+
+
+    /**
+     * base64
+     *
+     * @param
+     * @return 当图路径
+     * @throws IOException
+     */
+    public static String base64TransferImage(String str, String relativePath, String folderName) throws IOException {
+        if (StringRegularUtil.isURL(str)) {
+            return str;
+        }
+        String img = str.replace("data:image/jpeg;base64,", "");
+        String coverPath = FileUtil.createCover(img, relativePath, folderName);
+        return coverPath;
+    }
+
+
+}

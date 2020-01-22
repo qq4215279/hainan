@@ -1,0 +1,25 @@
+package com.gobestsoft.mamage.moudle.weak.controller;
+
+import com.gobestsoft.mamage.moudle.weak.service.WeakService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * 弱口令管理
+ */
+@RestController
+@RequestMapping("/weak")
+public class WeakController {
+
+    @Resource
+    private WeakService weakService;
+
+    @GetMapping("get")
+    public void getWeakInfo(HttpServletResponse response){
+        weakService.getWeakInfo(response);
+    }
+}

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+<style>
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body, html {
+	overflow-x: hidden;
+	box-sizing: border-box;
+    background-color: white;
+
+}
+.head{
+	font-size: 25px;
+    font-family: "Times New Roman",Georgia,Serif;
+    }
+body {
+	padding: 10px;
+}
+
+.subscribe {
+	position: relative;
+	margin-top: 15px;
+	height: 50px;
+}
+
+.subscribe img {
+	height: 50px;
+	width: 50px;
+	border-radius: 25px;
+}
+
+.subscribe .content {
+	position: absolute;
+	left: 55px;
+	top: 0;
+	height: 50px;
+	right: 85px;
+}
+
+.subscribe .content h6 {
+	font-size: 15px;
+	line-height: 25px;
+}
+
+.subscribe .content p {
+	font-size: 13px;
+	line-height: 25px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.subscribe .status {
+	width: 80px;
+	position: absolute;
+	right: 0;
+	text-align: center;
+	top: 10px;
+	height: 30px;
+	line-height: 30px;
+	color: #ffffff;
+	font-size: 14px;
+	border-radius: 5px;
+}
+
+.subscribed {
+	background-color: #75C0F5;
+}
+
+.not-subscribed {
+	background-color: #2A90D8;
+}
+.time{
+	text-align: center;
+}
+.text img{
+	max-width: -webkit-fill-available;
+}
+</style>
+</head>
+<body>
+	<!-- 头部信息 -->
+	<h1 class="head" id="head" >loading...</h1>
+	 
+	 
+	<!-- 视频信息展示区域 -->
+	<div id="videoArea" style="display:none;" >
+		<iframe id="videoFrame" frameborder="0" width="100%" 
+			src="" allowfullscreen></iframe>
+	</div>
+	 
+	  
+	<div class="text" id= 'content'></div>
+
+
+	<script th:src="@{/static/js/jquery-1.12.4.min.js}"></script>
+	<script th:src="@{/static/js/common/gb-common.js}"></script>
+	<script th:src="@{/static/cms/js/APlayer.min.js}"></script>
+	<script th:src="@{/static/js/App.js}"></script>
+
+    <script type="text/javascript">
+        App.setCtxPath("${ctxPath}");
+    </script>
+    
+	<script>
+	$(function(){
+		
+		var title = window.parent.parent.$('#title').val();
+		$('#head').text(title);
+		var jumpUrl = window.parent.parent.$('#jumpUrl').val();
+		if(typeof jumpUrl != "undefined" && jumpUrl != ""){
+			if (!jumpUrl.startsWith("http://") && !jumpUrl.startsWith("https://")) {
+				jumpUrl = App.ctxPath + "/" + jumpUrl;
+			}
+
+			var infoType = window.parent.parent.$('#infoChalType').val();
+			if('0'!=infoType){
+				if(!('undefine'==jumpUrl || ''==jumpUrl)){
+					$('#videoFrame').attr('src',jumpUrl);
+					$('#videoArea').css('display','block');
+				}
+			}
+        }
+
+		var content =  window.parent.parent.$('#ueForPreView').val();
+		$('#content').html(content);
+
+	});
+
+	</script>
+</body>
+</html>

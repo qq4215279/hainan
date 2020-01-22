@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.cms.mapper.ArticleMapper">
+
+    <!-- 条件查询 集合 -->
+    <select id="selectByCondition" resultType="com.gobestsoft.common.modular.cms.model.Article">
+        SELECT t.* 
+        FROM cms_article t 
+        WHERE 
+        t.del_Flg = 0 
+        <if test="status != null and status != 0">
+            AND t.status = #{status}
+        </if>
+        <if test="title != null and title != ''">
+            AND ( 
+            	t.title LIKE CONCAT('%',#{title},'%') 
+            	OR t.roundup LIKE CONCAT('%',#{title},'%') 
+            	OR t.source_from LIKE CONCAT('%',#{title},'%') 
+            )
+        </if>
+        <if test="begDate != null and begDate != ''">
+            AND t.pub_time &gt;= #{begDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND t.pub_time &lt;= #{endDate}
+        </if>
+        ORDER BY t.id DESC
+    </select>
+
+
+    <!-- 对应addArticle方法，新增一条资讯 -->
+    <insert id="addArticle" parameterType="com.gobestsoft.common.modular.cms.model.Article">
+		INSERT INTO cms_article (
+		id,
+		title,
+		tags,
+		roundup,
+		source_from,
+		author,
+		cover_path,
+		content,
+		template_type,
+		org_id,
+		create_user,
+		create_time,
+		update_user,
+		update_time,
+		jump_url,
+		info_type,
+		district_code,
+        sort,
+        is_on_top,
+        is_on_top_overdue_time,
+        is_share,
+        is_topic,
+        is_topic_check,
+        is_like,
+        is_collect,
+        published_time,
+        status
+		)
+		VALUES(
+		#{id},
+		#{title},
+		#{tags},
+		#{roundup},
+		#{sourceFrom},
+		#{author},
+		#{coverPath},
+		#{content},
+		#{templateType},
+		#{orgId},
+		#{createUser},
+		#{createTime},
+		#{updateUser},
+		#{updateTime},
+		#{jumpUrl},
+		#{infoType},
+		#{districtCode},
+        #{sort},
+        #{isOnTop},
+        #{isOnTopOverdueTime},
+        #{isShare},
+        #{isTopic},
+        #{isTopicCheck},
+        #{isLike},
+        #{isCollect},
+        #{publishedTime},
+        #{status}
+		)
+	</insert>
+
+    <!-- 对应updateArticle方法，修改一条资讯 -->
+    <update id="updateArticle" parameterType="com.gobestsoft.common.modular.cms.model.Article">
+        UPDATE cms_article
+        SET
+        title = #{title},
+        tags = #{tags},
+        roundup= #{roundup},
+        source_From= #{sourceFrom},
+        author = #{author},
+        template_type= #{templateType},
+        <if test="coverPath != null and coverPath != ''">
+        cover_path= #{coverPath},
+        </if>
+        content = #{content},
+        pub_time= #{pubTime},
+        pub_user= #{pubUser},
+        <if test="status != null ">
+        status = #{status},
+        </if>
+        sort= #{sort},
+        <if test="orgId != null ">
+        org_id = #{orgId},
+        </if>
+        published_time= #{publishedTime},
+        pub_status = #{pubStatus},
+        is_on_top = #{isOnTop},
+        is_on_top_overdue_time = #{isOnTopOverdueTime},
+        check_desc = #{checkDesc},
+        check_date = #{checkDate},
+        check_user_id = #{checkUserId},
+        is_share = #{isShare},
+        is_Topic= #{isTopic},
+        is_Like= #{isLike},
+        is_Collect= #{isCollect},
+        update_User= #{updateUser},
+        update_Time= #{updateTime},
+        jump_url=#{jumpUrl},
+        info_type=#{infoType},
+        district_code=#{districtCode}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 对应updateArticle方法，修改一条资讯 -->
+    <update id="delArticle">
+		UPDATE cms_article
+		SET del_flg = 1
+		WHERE id = #{id}
+	</update>
+
+	<!-- 修改资讯状态 有效 和 无效 -->
+    <update id="updateArticleStatusById">
+        UPDATE cms_article
+        SET published_status = #{status},
+        	update_user = #{updateUser},
+			update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 主键查询 -->
+    <select id="selectById" resultType="com.gobestsoft.common.modular.cms.model.Article">
+		SELECT * FROM cms_article
+		WHERE id = #{id}
+	</select>
+
+    <!--根据用户检索对应资讯一览内容-->
+    <select id="selectArtilceList" resultType="com.gobestsoft.common.modular.cms.model.Article">
+        select * from (SELECT ca1.*,'查看编辑' as divide
+        FROM cms_article ca1
+        WHERE exists(
+                  SELECT *
+                  FROM cms_approve_log cal
+                  WHERE cal.info_id = ca1.id and (cal.from_dept = #{deptId} OR cal.to_dept = #{deptId}))
+              AND
+              ca1.del_Flg = 0
+        union ALL
+        select ca2.*,'草稿编辑' as divide from cms_article ca2
+        where not exists(select * from cms_approve_log cal
+        WHERE cal.info_id = ca2.id ) and ca2.create_user = #{userId}
+         and ca2.del_flg = 0) ca
+        WHERE
+         1=1
+        AND ca.info_type = #{infoType}
+        <if test="status != null">
+            AND ca.published_status = #{status}
+        </if>
+        <if test="title != null and title != ''">
+            AND (
+            ca.title LIKE CONCAT('%',#{title},'%')
+            OR ca.roundup LIKE CONCAT('%',#{title},'%')
+            OR ca.source_from LIKE CONCAT('%',#{title},'%')
+            )
+        </if>
+        <if test="begDate != null and begDate != ''">
+            AND ca.published_time &gt;= #{begDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND ca.published_time &lt;= #{endDate}
+        </if>
+        ORDER BY ca.create_time DESC
+    </select>
+
+    <!--根据用户检索已审核资讯一览内容-->
+    <select id="selectValidList" resultType="com.gobestsoft.common.modular.cms.model.Article">
+        SELECT * from
+          <if test="deptId != 1">
+              (
+              SELECT
+              ca1.*
+              FROM
+              cms_article ca1
+              WHERE
+              EXISTS (
+              SELECT
+              *
+              FROM
+              cms_approve_log cal
+              WHERE
+              cal.info_id = ca1.id
+              AND (
+              cal.from_dept = #{deptId}
+              OR cal.to_dept = #{deptId}
+              )
+              )
+              AND ca1.del_Flg = 0
+              ) ca1
+          </if>
+
+        <if test="deptId == 1">
+            cms_article ca1
+        </if>
+        WHERE
+        ca1.status = 1
+        <if test="deptId == 1">
+            and ca1.del_Flg = 0
+        </if>
+        <if test="category != '' or seminar !=''">
+            and ca1.id in (
+            select ca.id
+            from cms_article ca
+            LEFT JOIN r_article_category rcc
+            on ca.id = rcc.article_id
+            where rcc.category_id = #{category} or rcc.category_id = #{seminar}
+            ORDER BY ca.id
+            )
+        </if>
+        <if test="title != null and title != ''">
+            AND (
+            ca1.title LIKE CONCAT('%',#{title},'%')
+            OR ca1.roundup LIKE CONCAT('%',#{title},'%')
+            OR ca1.source_from LIKE CONCAT('%',#{title},'%')
+            )
+        </if>
+        <if test="begDate != null and begDate != ''">
+            AND ca1.published_time &gt;= #{begDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND ca1.published_time &lt;= #{endDate}
+        </if>
+        ORDER BY
+        ca1.id DESC
+    </select>
+
+    <!-- 获取推送消息列表-->
+    <select id="selectPublishList" resultType="com.gobestsoft.common.modular.cms.model.CmsRelationEntity" >
+        SELECT
+          case when r.id is null then false else true end as exist,
+          c.id as categoryId,
+          c.name as categoryName,
+          r.pub_status as pubStatus,
+          r.published_time as published_time
+        FROM cms_category c LEFT JOIN r_article_category r ON c.id = r.category_id AND r.article_id = #{articleId}
+        WHERE
+        del_flg = 0
+        <if test="type == 0">
+        AND pid != 0
+        AND pid != 1000
+        </if>
+        <if test="type == 1">
+            AND pid = 1000
+        </if>
+        order by categoryId
+    </select>
+
+    <!--获取指定资讯栏目状态 -->
+    <select id="selectCmsRelation" resultType="com.gobestsoft.common.modular.cms.model.CmsRelationEntity" >
+        select
+          rac.id as id,
+          rac.article_id as articleId,
+          rac.category_id as categoryId,
+          rac.pub_status as pubStatus,
+          rac.published_time as publishedTime
+        from r_article_category rac
+        where rac.article_id=#{articleId}
+          and rac.category_id=#{categoryId}
+    </select>
+
+    <!--更新定向推送栏目 -->
+    <update id="updateCmsRelation">
+        UPDATE r_article_category SET pub_status=#{pubStatus}
+        WHERE
+		id=#{id}
+</update>
+
+    <insert id="insertCmsRelation">
+        INSERT INTO r_article_category(article_id, category_id,pub_status)
+		VALUES (#{articleId}, #{categoryId},#{pubStatus});
+    </insert>
+    <delete id="deleteCmsRelation">
+        delete from r_article_category where id = #{id}
+    </delete>
+</mapper>

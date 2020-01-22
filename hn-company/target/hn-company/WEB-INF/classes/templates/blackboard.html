@@ -1,0 +1,102 @@
+<body xmlns:th="http://www.thymeleaf.org" xmlns:form="http://www.w3.org/1999/html">
+<css>
+
+    <link th:href="@{/static/assets/css/paper-dashboard.css}" rel="stylesheet"/>
+    <link th:href="@{/static/css/iconfont.css}" rel="stylesheet"/>
+    <link th:href="@{/static/plugin/webuploader/webuploader.css}" rel="stylesheet"/>
+
+</css>
+<div class="container-fluid" style="padding: 0 !important;">
+    <div class="row">
+        <div class="col-sm-12"></div>
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row" style="background-color: #FFFFFF;">
+                    <div class="col-md-6" >
+                        <div class="row">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label head-scu-label">头像：</label>
+                                <div class="col-sm-4">
+                                    <div id="avatarPreId">
+                                        <div th:if="${user.avatar == null}">
+                                            <img width="100px" height="100px" th:src="@{/static/img/user-default.png}">
+                                        </div>
+                                        <div th:if="${user.avatar != null}">
+                                            <img width="100px" height="100px" th:src="${user.avatar}">
+                                        </div>
+                                    </div>
+                                 </div>
+                            <div class="col-sm-5">
+                                <div class="head-scu-btn upload-btn" id="avatarBtnId">
+                                    <i class="fa fa-upload"></i>&nbsp;上传
+                                </div>
+                            </div>
+                            <input type="hidden" id="avatar" th:value="${user.avatar}"/>
+                        </div>
+                        </div><br/>
+                        <div class="row">
+                            <form:text id="account" label="账户：" name="account" value="${user.account}" style="width:250px;background-color: #ffffff;" disabled="true" isMust="true"></form:text>
+                        </div><br/>
+                        <div class="row">
+                            <form:text id="pName" label="上级工会名称：" name="pName" value="${pojo.pName}" style="width:250px;background-color: #ffffff;" disabled="true" ></form:text>
+                        </div><br/>
+                        <div class="row">
+                            <form:text id="enterpriseName" label="公司名称：" name="enterpriseName" value="${pojo.enterpriseName}" style="width:250px;background-color: #ffffff;" disabled="true" ></form:text>
+                        </div><br/>
+                        <div class="row">
+                            <form:text id="address" label="公司地址：" name="address" value="${pojo.address}" style="background-color: #ffffff;" disabled="true" ></form:text>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <br/>
+                        <div class="row">
+                            <form:text id="phone" label="电话：" name="phone" value="${user.phone}" style="background-color: #ffffff;" disabled="true" ></form:text>
+                        </div><br/>
+                        <div class="row">
+                            <form:text id="email" label="邮箱：" name="email" value="${user.email}" style="width:250px;background-color: #ffffff;" disabled="true" ></form:text>
+                        </div><br/>
+                        <div class="row">
+                            <form:figure id="enterpriseNumber" label="公司规模：" name="enterpriseNumber" value="${pojo.enterpriseNumber}" max="999999999" min="1" style="width:250px;background-color: #ffffff;" disabled="true"></form:figure>
+                        </div><br/>
+                        <div class="row">
+                            <form:text id="website" label="公司网址：" name="website" value="${pojo.website}" style="width:250px;background-color: #ffffff;" disabled="true" ></form:text>
+                        </div><br/>
+                        <div class="row">
+                            <form:select id="industryType" label="所属行业：" style="background-color: #ffffff;" name="industryType"  code="lib_industry_type"  value="${pojo.industryType}" disabled="true"></form:select>
+                        </div><br/>
+                        <div class="row">
+                            <form:select id="economicType" label="经济类型：" style="background-color: #ffffff;" name="economicType"  code="lib_economic_type"  value="${pojo.economicType}" disabled="true"></form:select>
+                        </div><br/>
+                        <div class="row">
+                            <form:area id="introduce" label="公司介绍: " style="background-color: #ffffff;" name="introduce" value="${pojo.introduce}" disabled="true"></form:area>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="background-color: #FFFFFF;">
+                    <input type="hidden" id="qualificationId" th:value="${pojo.id}">
+                    <input type="hidden" id="economic_type_name" th:value="${pojo.economicType}">
+                    <input type="hidden" id="industry_type_name" th:value="${pojo.industryType}">
+                    </br>
+                    <div class="col-sm-12" style="text-align: center;">
+                        <qx:btn label="编辑" fa="fa fa-edit" class="btn btn-default" onclick="QualificationDlg.editChlickFun()">
+                        </qx:btn>
+                        <qx:btn label="保存" fa="fa fa-check" class="btn btn-default" onclick="QualificationDlg.saveChlickFun()">
+                        </qx:btn>
+                        <qx:btn label="取消" fa="fa fa-eraser" class="btn btn-default" onclick="QualificationDlg.cancelChlickFun()">
+                        </qx:btn>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<js>
+    <script th:src="@{/static/assets/js/bootstrap-notify.js}"></script>
+    <script th:src="@{/static/assets/js/paper-dashboard.js}"></script>
+    <script th:src="@{/static/plugin/webuploader/webuploader.min.js}"></script>
+    <script th:src="@{/static/js/web-upload-object.js}"></script>
+    <script th:src="@{/static/js/blackboard.js}"></script>
+</js>
+
+</body>

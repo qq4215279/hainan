@@ -1,0 +1,137 @@
+<body xmlns:th="http://www.w3.org/1999/xhtml">
+    <div class="ibox float-e-margins">
+        <div class="ibox-content">
+            <div class="form-horizontal" id="moneyForm">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form:text id="rescuedName" label="姓名" name="name" must="true"/>
+                        <label style="color: red; position: inherit;top: 34px;z-index: 999;">*</label>
+                        <search:select id="sex" label="性别" name="sex" code="lib_sex" must="true"/>
+                        <br />
+                        <form:figure id="age" label="年龄" name="age" min="1" must="true" value="18"/>
+                        <form:text id="certificateNum" label="身份证号" name="certificate-num" />
+                        <search:select id="workStatus" label="工作状态" name="workStatus" code="lib_work_status" must="true"/>
+                        <br />
+                        <form:figure id="moneyNum" label="发放金额(元)" name="money-num" min="1" value="1" must="true"/>
+                        <!--<div class="form-group has-feedback">
+                            <label class="col-sm-4 control-label">
+                                <label style="color: red; position: inherit;top: 2px;">*</label>状态
+                            </label>
+                            <div class="col-sm-8" id="status">
+                                <label class="radio-inline"><input type="radio" name="status" checked value="0">待处理</label>
+                                <label class="radio-inline"><input type="radio" name="status" value="1">通过</label>
+                                <label class="radio-inline"><input type="radio" name="status" value="2">拒绝</label>
+                            </div>
+                        </div>-->
+                        <form:area id="remark" label="备注信息" name="remark" />
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <qx:btn class="btn btn-primary" fa="fa fa-check" label="提交" onclick="MoneyAdd.addSubmit()" />
+                    <qx:btn class="btn btn-primary" fa="fa fa-eraser" label="取消" onclick="MoneyAdd.close()" />
+                </div>
+            </div>
+        </div>
+    </div>
+<js>
+    <script>
+
+        /**
+         * 角色详情对话框（可用于添加和修改对话框）
+         */
+        let MoneyAdd = {
+            articleData: {},
+            baseUrl: App.ctxPath + 'srv/straitened/money',
+            validateFields: {
+                name: {
+                    validators: {
+                        notEmpty: {
+                            message: '姓名不能为空'
+                        }
+                    }
+                },
+                sex: {
+                    validators: {
+                        notEmpty: {
+                            message: '性别不能为空'
+                        }
+                    }
+                },
+                moneyNum: {
+                    validators: {
+                        notEmpty: {
+                            message: '发放金额不能为空'
+                        }
+                    }
+                }
+            }
+        };
+
+        App.initValidator("moneyForm", MoneyAdd.validateFields);
+
+        /**
+         * 清除数据
+         */
+        MoneyAdd.clearData = function () {
+            this.articleData = {};
+        };
+
+        /**
+         * 设置对话框中的数据
+         */
+        MoneyAdd.set = function (key) {
+            this.articleData[key] = (typeof value == "undefined") ? $("#" + key).val() : value;
+            return this;
+        };
+
+        /**
+         * 收集数据
+         */
+        MoneyAdd.collectData = function () {
+            this.set('rescuedName').set('sex').set('age')
+                .set('certificateNum').set('workStatus').set('moneyNum')
+                .set('remark');
+        };
+
+        /**
+         * 关闭此对话框
+         */
+        MoneyAdd.close = function () {
+            parent.layer.close(window.parent.Money.layerIndex);
+        };
+
+        /**
+         * 验证数据是否为空
+         */
+        MoneyAdd.validate = function () {
+            $('#moneyForm').data("bootstrapValidator").resetForm();
+            $('#moneyForm').bootstrapValidator('validate');
+            return $("#moneyForm").data('bootstrapValidator').isValid();
+
+        };
+        /**
+         * 提交添加用户
+         */
+        MoneyAdd.addSubmit = function () {
+
+            this.clearData();
+            this.collectData();
+            if (!this.validate()) {
+                errorFocus();
+                return;
+            }
+
+            //提交信息
+            let ajax = new $ax(MoneyAdd.baseUrl + "/doSave", function (data) {
+                App.success("添加成功!");
+                window.parent.Money.table.refresh();
+                MoneyAdd.close();
+            }, function (data) {
+                App.error("添加失败!");
+            });
+            ajax.set(MoneyAdd.articleData);
+            ajax.start();
+        };
+    </script>
+</js>
+</body>

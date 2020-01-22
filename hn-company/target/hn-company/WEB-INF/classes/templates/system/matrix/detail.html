@@ -1,0 +1,231 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+	<div class="ibox-content">
+		<div class="form-horizontal" id="infoForm">
+			@if(isNotEmpty(cmsMediaMatrixPojo)){ <input type="hidden" id="id"
+				value="${cmsMediaMatrixPojo.id}"> @}else{ <input
+				type="hidden" id="id" value=""> @}
+			<div class="row">
+				@if(isNotEmpty(cmsMediaMatrixPojo)){
+				<!-- 编辑状态 -->
+				<#input name="媒体名称" id="mediaName" mustFlg="true" underline="true"
+					value="${cmsMediaMatrixPojo.mediaName}" />
+				<#select name="媒体类型" id="mediaType" mustFlg="true" underline="true"
+					options="${mediaTypeList}"
+					defaultVal='${cmsMediaMatrixPojo.mediaType}'></#select>
+				<#photoClip name="LOGO" id="logo" width="280" height="280"
+					viewWidth="90" viewHeight="90" underline="true"
+					defImg="${cmsMediaMatrixPojo.logo}" />
+				@}else{
+				<!-- 新增状态 -->
+				<#input name="媒体名称" id="mediaName" mustFlg="true" underline="true" />
+				<#select name="媒体类型" id="mediaType" mustFlg="true" underline="true"
+					options="${mediaTypeList}"></#select>
+				<#photoClip name="LOGO" id="logo" width="280" height="280"
+					viewWidth="90" viewHeight="90" underline="true" />
+				@}
+				<div class="form-group">
+					<label class="col-sm-3 control-label"> <span
+						class="must-star">*</span> 展示页面
+					</label>
+					<div class="col-sm-5" align="center">
+						<#ueditor id="content" name="content" />
+					</div>
+				</div>
+				<div class="hr-line-dashed"></div>
+			</div>
+
+			<div class="row btn-group-m-t">
+				<div class="col-sm-12" align="center">
+					<#button name="提交" icon="fa-send" clickFun="DetailPage.submit()"
+						btnCss="info" />
+					&nbsp;
+					<#button name="返回" icon="fa-eraser" clickFun="DetailPage.close()" btnCss="danger"/> &nbsp;
+                    <#button name="预览" icon="fa-eye" clickFun="DetailPage.preview()" btnCss="warning"/> &nbsp;
+                </div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="defUeValue" style="display: none">${cmsMediaMatrixPojo.forward}</div>
+<script src="${ctxPath}/static/js/plugins/xiumi/xiumi-ue-dialog-v5.js"></script>
+<script type="text/javascript">
+
+    /** 富文本编辑器初期化 */
+    var ue = UE.getEditor('content');
+
+    /**
+     * 画面初期处理
+     */
+    $(function () {
+        Feng.initValidator("infoForm", DetailPage.validateFields);
+
+        // 编辑器初始化完成再赋值
+        ue.ready(function() {
+            ue.setContent($("#defUeValue").html());  // 赋值给UEditor
+        });
+    });
+
+    /**
+     * 初始化详情对话框
+     */
+    var DetailPage = {
+        infoData: {},
+        zTreeInstance: null,
+        validateFields: {
+//                checkDesc: {
+//                    validators: {
+//                        notEmpty: {
+//                            message: '审核意见不能为空'
+//                        },
+//                        stringLength: {
+//                            max: 200
+//                        }
+//                    }
+//                }
+        }
+    };
+
+    /**
+     * 清除数据
+     */
+    DetailPage.clearData = function () {
+        this.infoData = {};
+    }
+
+    /**
+     * 设置对话框中的数据
+     */
+    DetailPage.set = function (key, val) {
+        this.infoData[key] = (typeof value == "undefined") ? $("#" + key).val() : value;
+        return this;
+    }
+
+    /**
+     * 设置对话框中的数据
+     *
+     */
+    DetailPage.get = function (key) {
+        return $("#" + key).val();
+    }
+
+    /**
+     * 关闭此对话框
+     */
+    DetailPage.close = function () {
+        parent.layer.close(window.parent.IndexPage.dlgIndex);
+    }
+
+    /**
+     * 收集数据
+     */
+    DetailPage.collectData = function () {
+        this
+            .set('id')
+            .set('mediaType')
+            .set('mediaName')
+            .set('logo')
+            .set('forward')
+        ;
+        this.infoData['forward'] = ue.getContent();
+    }
+
+    /**
+     * 验证数据是否为空
+     */
+    DetailPage.validate = function () {
+        $('#infoForm').data("bootstrapValidator").resetForm();
+        $('#infoForm').bootstrapValidator('validate');
+        return $("#infoForm").data('bootstrapValidator').isValid();
+    }
+
+    /**
+     * 提交按钮响应
+     */
+    DetailPage.submit = function () {
+        if($("#id").val() === ""){
+            // 新增的场合
+            DetailPage.submitAdd();
+        } else {
+            // 更新的场合
+            DetailPage.submitUpdate();
+        }
+    }
+
+    /**
+     * 提交新增
+     */
+    DetailPage.submitAdd = function () {
+        this.clearData();
+        this.collectData();
+
+        if (!this.validate()) {
+            errorFocus();
+            return;
+        }
+        //提交信息
+        var ajax = new $ax(Feng.ctxPath + "/system/mediaMatrix/add", function (data) {
+                Feng.success("提交成功!");
+                window.parent.IndexPage.table.refresh();
+                DetailPage.close();
+            },
+            function (data) {
+                Feng.error("提交失败!" + data.responseJSON.message + "!");
+            });
+
+        ajax.set(DetailPage.infoData);
+        ajax.start();
+    }
+
+    /**
+     * 提交修改
+     */
+    DetailPage.submitUpdate = function () {
+        this.clearData();
+        this.collectData();
+
+        if (!this.validate()) {
+            errorFocus();
+            return;
+        }
+        //提交信息
+        var ajax = new $ax(Feng.ctxPath + "/system/mediaMatrix/update", function (data) {
+                Feng.success("提交成功!");
+                window.parent.IndexPage.table.refresh();
+                DetailPage.close();
+            },
+            function (data) {
+                Feng.error("提交失败!" + data.responseJSON.message + "!");
+            });
+
+        ajax.set(DetailPage.infoData);
+        ajax.start();
+    }
+
+    /**
+     * 预览
+     */
+    DetailPage.preview = function () {
+
+        this.clearData();
+        this.collectData();
+        if (!this.validate()) {
+            errorFocus();
+            return;
+        }
+        //存ue
+        $('#ueForPreView').val(this.infoData['forward']);
+        var index = layer.open({
+            type: 2,
+            title: '预览',
+            area: ['100%', '100%'], //宽高
+            maxmin: false,
+            fix: false, //不固定
+            content: Feng.ctxPath + '/article/article_preview'
+        });
+        layer.full(index);
+        this.layerIndex = index;
+    }
+</script>
+@}

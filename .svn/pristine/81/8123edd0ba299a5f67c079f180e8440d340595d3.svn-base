@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dept.mapper.AppCheckLogMapper">
+
+    <!-- 通用版全部字段,可用于插入 -->
+    <sql id="commonColumns">
+        app_check_log.id,
+        app_check_log.auid,
+        app_check_log.type,
+        app_check_log,invite_num,
+        app_check_log.comment,
+        app_check_log.record_flow_info,
+        app_check_log.create_time,
+        app_check_log.del_flg
+    </sql>
+
+    <select id="getSelectByInfo" resultType="com.gobestsoft.common.modular.dept.model.AppCheckLog">
+        SELECT <include refid="commonColumns"/> from app_check_log
+        where type = #{type}
+        and auid = #{auid}
+    </select>
+
+    <update id="delCheckLog">
+        UPDATE app_check_log
+        SET del_flg = 1
+        WHERE auid = #{auid}
+        and type = #{type}
+    </update>
+
+</mapper>

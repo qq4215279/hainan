@@ -1,0 +1,160 @@
+{
+  "cacheSecond": 180,
+  "cacheSecondComment": "本配置缓存时间（秒）",
+  "srvStraitenedReissue": true,
+  "srvStraitenedReissueComment": "困难帮扶允许重新提交",
+  "bigDataAdditionTime":"20181001",
+  "appHome": {
+    "firstListMap": [
+      {
+        "icon": "icon/home_icon_rhzh.png",
+        "name": "入会转会",
+        "id": "100"
+      },
+      {
+        "icon": "icon/home_icon_flwq.png",
+        "name": "法律维权",
+        "id": "200"
+      },
+      {
+        "icon": "icon/home_icon_phfl.png",
+        "name": "普惠商城",
+        "id": "300"
+      },
+      {
+        "icon": "icon/home_icon_knbf.png",
+        "name": "困难帮扶",
+        "id": "400"
+      },
+      {
+        "icon": "icon/home_icon_zgsw.png",
+        "name": "职工书屋",
+        "id": "500"
+      },
+      {
+        "icon": "icon/home_icon_jnpx.png",
+        "name": "技能培训",
+        "id": "600"
+      },
+      {
+        "icon": "icon/home_icon_jyfw.png",
+        "name": "就业服务",
+        "id": "700"
+      },
+      {
+        "icon": "icon/home_icon_hdhd.png",
+        "name": "活动专区",
+        "id": "800"
+      }
+    ],
+    "secondListMap": [
+      {
+        "icon": "icon/home_under_xwzx.png",
+        "name": "新闻资讯",
+        "id": "1001",
+        "label": "看.新闻资讯"
+      },
+      {
+        "icon": "icon/home_under_fljt.png",
+        "name": "法律讲堂",
+        "id": "1002",
+        "label": "学.法律知识"
+      },
+      {
+        "icon": "icon/home_under_xlyz.png",
+        "name": "心灵驿站",
+        "id": "1003",
+        "label": "阅.心理文章"
+      },
+      {
+        "icon": "icon/home_under_lmgj.png",
+        "name": "劳模工匠",
+        "id": "1004",
+        "label": "致.工匠精神"
+      }
+    ]
+  },
+  "images": {
+    "consult": [
+      {
+        "flzximage": "srv/law/legal_rec_flzx.png"
+      }
+    ],
+    "question": [
+      {
+        "fywtimage": "srv/law/legal_rec_fywt.png"
+      }
+    ],
+    "diffhelp": [
+      {
+        "knbfimage": "srv/law/help_rec_bkjz.png"
+      }
+    ],
+    "lawSupport": {
+      "type_1": "srv/law/support_xstj.png",
+      "type_2": "srv/law/support_wsdx.png",
+      "type_3": "srv/law/support_xstj.png",
+      "type_4": "srv/law/support_xstj.png",
+      "type_5": "srv/law/support_xstj.png"
+    },
+    "xlyz": {
+      "home_icon": [
+        {
+          "name": "心理知识",
+          "icon":"xlyz/icon/xlzs.png"
+        },
+        {
+          "name": "心理测试",
+          "icon":"xlyz/icon/xlcs.png"
+        },
+        {
+          "name": "心理咨询",
+          "icon":"xlyz/icon/xlzx.png"
+        },
+        {
+          "name": "心理按摩",
+          "icon":"xlyz/icon/xlam.png"
+        }
+
+      ]
+    }
+  },
+  "forum": {
+    "category": [
+      {
+        "id": 0,
+        "icon": "flkt/fzfg.png",
+        "name": "法律法规"
+      },
+      {
+        "id": 1,
+        "icon": "flkt/flwd.png",
+        "name": "法律问答"
+      },
+      {
+        "id": 2,
+        "icon": "flkt/aljx.png",
+        "name": "案例精选"
+      },
+      {
+        "id": 3,
+        "icon": "flkt/ldfjsq.png",
+        "name": "劳动法计算器"
+      },
+      {
+        "id": 4,
+        "icon": "flkt/flsl.png",
+        "name": "法律沙龙"
+      },
+      {
+        "id": 5,
+        "icon": "flkt/mzyk.png",
+        "name": "每周一课"
+      }
+    ]
+  },
+  "signOut_content":{
+      "message1":"1. 帮扶救助申请、法律维权记录等将被删除，请确保所有提交的申请已完结。账户删除后可能产生的退换货、维权等权益将视作自动放弃。\n2. 个人身份信息、账户信息、积分等工会会员权益将被清空且无法恢复\n3. 该账户将无法登录普惠商城。",
+      "message2":"1、 您所申请注销的海南工会云账号应当是您依照本协议的约定注册并由本公司提供给您本人的账号。您自注册该账号时起，使用该账号进行的一切行为符合国家法律法规、《服务协议》及其他海南工会云发布的一切规则、规范的要求。\n2、 您应确保您有权决定该账号的注销事宜，不侵犯任何第三方的合法权益，如因此引发任何投诉争议，由您自行承担并使海南省总工会免责。\n3、 在您申请注销海南工会云账号前，您应当确保该账号处于正常状态，且在注销申请提起时该账号下无未完结的交易，无进行中的投诉纠纷或处罚，并符合海南工会云所要求的一切账号注销条件。\n4、 您充分知晓海南工会云账号注销将导致本公司终止为您提供本服务，本协议约定的双方的权利义务终止（依本协议其他条款另行约定不得终止的或依其性质不能终止的除外），同时还可能对于该账号产生包括但不限于如下结果：\nA、 您将无法再次使用该账号登录普惠商城平台网站（域名为http://shop.hnszgh.org:9087/b2b2c/public/index.php)，进行任何操作；\nB、 您的账号内所有历史记录信息将被清除并无法再次找回；\nC、 您的账号内所获得的任何优惠信息（积分、普惠商城优惠券、商品优惠券等）都将作废。\n5、 您应当依照海南工会云规定的程序进行海南工会云账号注销，且您承诺该账号注销申请一经提交，您不会以任何理由要求海南工会云予以撤销。\n6、 特别地，如果您的海南工会云账号在连续12个月内没有任何操作行为，且满足本协议规定的其他注销条件时，本公司有权依照本协议的规定或国家相关法律法规的要求主动进行注销，由此引发的一切后果由您本人承担。"
+  }
+}

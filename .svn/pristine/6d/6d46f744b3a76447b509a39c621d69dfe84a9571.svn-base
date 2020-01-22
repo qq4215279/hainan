@@ -1,0 +1,150 @@
+<css>
+    <link th:href="@{http://xiumi.us/connect/ue/v5/xiumi-ue-v5.css}" rel="stylesheet">
+    <link th:href="@{/static/css/fileUpload.css}" rel="stylesheet">
+</css>
+<style>
+textarea.form-control {
+	    height: 300px;
+	}
+.form-horizontal .control-label {
+    text-align: left;
+    width: 100px;
+}
+</style>
+<body>
+<form class="form-horizontal" id="add-form">
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal" id="articleForm">
+            <div class="row">
+                <div class="col-sm-10">
+                	<div th:if="${msg!=null}" class="row">
+                		<span style="color: red;" th:text="${msg}"></span>
+                	</div>
+                	<div  class="row">
+                        <label class="col-sm-2">转办工会： </label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="deptId" name="deptId">
+                                <option value="">选择工会</option>
+                                <option th:if="${#strings.isEmpty(pid)== false}" disabled value="">上级工会</option>
+                                <option th:if="${#strings.isEmpty(pid)== false}"  th:value="${pid}" th:text="${pname}"></option>
+                                <option th:if="${#lists.size(sons)>0}" disabled value="">下级工会</option>
+                                <option th:each="son :${sons}" th:text="${son.fullname}" th:value="${son.deptId}"></option>
+
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-sm-10">
+                    <form:area id="transferReason" name="transferReason" label="转办原因："></form:area></div>
+                <div class="col-sm-5" align="center">
+                    <input type='hidden' id="id" th:value="${id}"/>
+                    <input type="hidden" id="infoChalType"/>
+                    <div id="content"></div>
+                </div>
+            </div>
+            <div class="row col-sm-offset-2">
+                <qx:btn id="ensure" class="btn btn-primary" fa="fa fa-check" label="提交" onclick="ArticleDlg.submit()" disabled="false"></qx:btn>
+                <qx:btn id="cancel" class="btn btn-primary" fa="fa fa-eraser" label="取消" onclick="ArticleDlg.close()" ></qx:btn>
+            </div>
+        </div>
+    </div>
+</div>
+</form>
+<js>
+    <div  th:include="fragment/fargment :: clipJs"></div>
+    <div  th:include="fragment/fargment :: fileUploadJs"></div>
+    <script th:src="@{/static/js/jquery.formHelp.js}"></script>
+    <script th:src="@{/static/ueditor/ueditor.config.js}"></script>
+    <script th:src="@{/static/ueditor/ueditor.all.js}"></script>
+    <script th:inline="javascript">
+ 		if([[${notTransfer}]]) {
+ 			$("#ensure").attr("disabled","true");
+ 		}
+ 		var type= [[${type}]]
+ 		console.log(type);
+ 		
+        /** 富文本编辑器初期化 */
+//         var ue = UE.getEditor('content', {});
+
+
+
+        /**
+         * 角色详情对话框（可用于添加和修改对话框）
+         */
+        var ArticleDlg = {
+            articleData: {},
+            deptZtree: null,
+            pNameZtree: null,
+            validateFields: {
+            	// transferReason: {
+                //     validators: {
+                //         notEmpty: {
+                //         	message: '转办原因不能为空'
+                //         }
+                //     }
+                // }
+            }
+        };
+        App.initValidator("add-form", ArticleDlg.validateFields);
+        
+        /**
+         * 关闭此对话框
+         */
+        ArticleDlg.close = function () {
+            parent.layer.close(window.parent.checkDlg.layerIndex);
+        };
+
+        /**
+         * 验证数据是否为空
+         */
+        ArticleDlg.validate = function () {
+            //$('#articleForm').data("bootstrapValidator").resetForm();
+            $('#add-form').bootstrapValidator('validate');
+            return $("#add-form").data('bootstrapValidator').isValid();
+        };
+
+
+         /**
+    	 * 提交回复
+     */
+     ArticleDlg.submit = function () {
+    	 if (!this.validate()) {
+             errorFocus();
+             return;
+         }
+         if($('#deptId').val()==undefined){
+             App.error("请选择转办的单位");
+             return;
+         }
+        //使用serializeJson方法的时候引用jquery.formHelp.js文件
+        var parameter = $("#add-form").serializeJson();
+         $('#ensure').prop('disabled','disabled');
+        App.loadingAjax({
+            url: App.ctxPath + "/srv/straitened/transferSubmit",
+            type:"POST",
+//             contentType:"application/json",
+            data: {type:type,id:$("#id").val(),transferReason:$("#transferReason").val(),deptId:$('#deptId').val()}, //JSON.stringify(parameter),
+//             dataType:'json',
+            success: function (data) {
+                if (data.code = 200) {
+                    layer.msg("操作成功", {icon: 1},function(){
+                    	ArticleDlg.close();
+                        parent.checkDlg.close();
+                    	parent.checkDlg.search();
+                    });
+                } else {
+                    App.error("操作失败! " + data.message + "!");
+                }
+
+            }, error: function (data) {
+                App.error("操作失败! ");
+            }
+
+        });
+    }
+
+    </script>
+</js>
+</body>

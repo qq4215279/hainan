@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.cms.dao.SubscriptionDao">
+	<!--文件已废弃-->
+	<resultMap type="com.gobestsoft.common.modular.cms.model.SubscriptionNumber"
+		id="subscriptionNumberMap">
+		<id column="media_id" property="id" />
+		<result column="media_name" property="name" />
+		<result column="create_time" property="create_time" />
+		<result column="subscribe_cnt" property="subscribe_cnt" />
+		<result column="avatar_path" property="avatar" />
+		<result column="description" property="description" />
+		<result column="subscribed" property="subscribed" />
+		<result column="cover_path" property="cover_url" />
+	</resultMap>
+
+	<sql id="medisColumn">
+		id AS media_id,media_name,create_time,subscribe_cnt,avatar_path,description,cover_path,
+		(select count(0) from my_subscribe where auid=#{auId} and
+		my_subscribe.media_id=cms_media.id)as subscribed
+	</sql>
+
+	<select id="getNotSubscriptionNumber" resultMap="subscriptionNumberMap">
+		SELECT
+		<include refid="medisColumn" />
+		FROM cms_media WHERE cms_media.id
+		NOT IN (SELECT media_id FROM my_subscribe WHERE auid=#{auId})
+		ORDER BY
+		cms_media.create_time DESC
+		<if test="startIndex!=-1 and pageSize!=-1">
+			LIMIT ${pageSize} OFFSET
+			${startIndex}
+		</if>
+	</select>
+
+
+	<select id="getSubscriptionNumber" resultMap="subscriptionNumberMap">
+		select
+		cms_media.id AS media_id,cms_media.media_name,my_subscribe.create_time,cms_media.subscribe_cnt,
+		avatar_path,description,cover_path from my_subscribe
+		inner join cms_media on my_subscribe.media_id=cms_media.id
+		where my_subscribe.auid=#{auId}
+		ORDER BY my_subscribe.create_time DESC
+		<if test="startIndex!=-1 and pageSize!=-1">
+			LIMIT ${pageSize} OFFSET
+			${startIndex}
+		</if>
+	</select>
+
+
+	<select id="getAllSubscriptionNumber" resultMap="subscriptionNumberMap">
+		SELECT
+		<include refid="medisColumn" />
+		FROM cms_media
+		ORDER BY
+		create_time DESC
+		LIMIT ${pageSize} OFFSET
+		${startIndex}
+	</select>
+
+
+	<select id="getSingleSubscriptionNumber" resultMap="subscriptionNumberMap">
+		SELECT
+		<include refid="medisColumn" />
+		FROM cms_media WHERE id=#{id}
+	</select>
+
+	<resultMap id="subscriptionArticleMap"
+		type="com.gobestsoft.common.modular.cms.model.SubscriptionArticle">
+		<result column="id" property="article_id" />
+		<result column="media_id" property="subscriber_id" />
+		<result column="media_name" property="subscriber_name" />
+		<result column="avatar_path" property="subscriber_avatar" />
+		<result column="create_time" property="create_time" />
+		<result column="title" property="title" />
+		<result column="cover_path" property="cover" />
+	</resultMap>
+
+	<select id="getSubscriptionArticles" resultMap="subscriptionArticleMap">
+		SELECT
+		cms_article.id,cms_article.title,cms_article.cover_path,
+		cms_article.media_id,cms_media.media_name,cms_media.avatar_path,
+		cms_article.create_time
+		FROM cms_article inner join cms_media ON
+		cms_article.media_id=cms_media.id
+		ORDER BY
+		cms_article.published_time DESC
+		LIMIT ${pageSize} OFFSET
+		${startIndex}
+	</select>
+
+
+	<resultMap id="subscriptionDynamicMap"
+		type="com.gobestsoft.common.modular.cms.model.SubscriptionAndDynamic">
+		<id column="media_id" property="id" />
+		<result column="media_name" property="name" />
+		<result column="create_time" property="create_time" />
+		<result column="subscribe_cnt" property="subscribed_total" />
+		<result column="avatar_path" property="avatar" />
+		<result column="description" property="describe" />
+		<result column="subscribed" property="subscribed" />
+		<result column="cover_path" property="cover_url" />
+		<collection property="dynamics" javaType="java.util.ArrayList"
+			select="getSubscriptionDynamics" column="{mediaId=media_id}"
+			ofType="com.gobestsoft.common.modular.cms.model.SubscriptionDynamic"></collection>
+	</resultMap>
+
+	<resultMap id="dynamicMap"
+		type="com.gobestsoft.common.modular.cms.model.SubscriptionDynamic">
+		<id column="id" property="id" />
+		<result column="title" property="title" />
+		<result column="media_name" property="name" />
+		<result column="avatar_url" property="avatar" />
+		<result column="create_time" property="create_time" />
+		<result column="cover_path" property="cover" />
+	</resultMap>
+
+	<select id="getSubscriptionAndDynamics" resultMap="subscriptionDynamicMap">
+		SELECT
+		<include refid="medisColumn" />
+		FROM cms_media WHERE id=#{mediaId}
+	</select>
+	<select id="getSubscriptionDynamics" resultMap="dynamicMap">
+		select
+		cms_article.id,cms_article.title,cms_article.create_time,cms_article.cover_path,cms_media.media_name,cms_media.avatar_path
+		from cms_article
+		LEFT JOIN cms_media ON cms_article.media_id=cms_media.id
+		WHERE cms_article.media_id=#{mediaId}
+		ORDER BY cms_article.create_time DESC limit 10
+	</select>
+
+	<insert id="addSubscribedNumber">
+		INSERT INTO my_subscribe(auid, media_id,create_time)
+		VALUES (#{auId}, #{id},#{createTime});
+	</insert>
+
+	<delete id="delSubscribedNumber">
+		DELETE FROM my_subscribe WHERE auid=#{auId} AND
+		media_id=#{id};
+	</delete>
+
+	<select id="subscribedNumber" resultType="java.lang.Integer">
+		SELECT COUNT(0) FROM
+		my_subscribe WHERE auid=#{auId} AND media_id=#{id};
+	</select>
+	
+	<resultMap type="com.gobestsoft.common.modular.cms.model.AllSubscribe" id="allSubscribedNumber">
+    		<result column="media_id" property="id" />
+    		<result column="media_name" property="name" />
+    		<result column="avatar_path" property="avatar" />
+    		<result column="description" property="description" />
+    		<result column="subscribe_cnt" property="subscribe_cnt" />
+    		<result column="create_time" property="create_time" />
+    		<result column="subscribed" property="flag" />
+	</resultMap>
+	
+	<select id="getAllSubscribedNumber" resultMap="allSubscribedNumber">
+	
+	select id AS media_id,media_name,create_time,subscribe_cnt,avatar_path,description,cover_path,
+		(
+		<choose>
+			<when test="auId!=null and auId!='' ">
+				select count(0) from my_subscribe where auid=#{auId} and
+				my_subscribe.media_id=cms_media.id
+			</when>
+			<otherwise>
+				select 0
+			</otherwise>
+		</choose>
+		)as subscribed FROM cms_media 
+		
+		LIMIT ${pageSize} OFFSET ${startIndex}
+	</select>
+</mapper>

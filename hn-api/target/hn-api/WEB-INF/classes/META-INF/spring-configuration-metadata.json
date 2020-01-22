@@ -1,0 +1,101 @@
+{
+  "groups": [{
+    "name": "api",
+    "type": "com.gobestsoft.api.config.properties.ApiProperties",
+    "sourceType": "com.gobestsoft.api.config.properties.ApiProperties"
+  }],
+  "properties": [
+    {
+      "name": "api.api-web-site",
+      "type": "java.lang.String",
+      "description": "接口基地址",
+      "sourceType": "com.gobestsoft.api.config.properties.ApiProperties"
+    },
+    {
+      "name": "api.apk-download",
+      "type": "java.lang.String",
+      "description": "安卓apk下载地址",
+      "sourceType": "com.gobestsoft.api.config.properties.ApiProperties"
+    },
+    {
+      "name": "api.app-store-link",
+      "type": "java.lang.String",
+      "description": "IOS itunes下载地址",
+      "sourceType": "com.gobestsoft.api.config.properties.ApiProperties"
+    },
+    {
+      "name": "api.course-url",
+      "type": "java.lang.String",
+      "description": "课程访问路径",
+      "sourceType": "com.gobestsoft.api.config.properties.ApiProperties"
+    },
+    {
+      "name": "api.download-url",
+      "type": "java.lang.String",
+      "description": "下载地址",
+      "sourceType": "com.gobestsoft.api.config.properties.ApiProperties"
+    },
+    {
+      "name": "api.file-upload-path",
+      "type": "java.lang.String",
+      "description": "上传文件地址",
+      "sourceType": "com.gobestsoft.api.config.properties.ApiProperties"
+    },
+    {
+      "name": "api.h5-parameter",
+      "type": "java.lang.String",
+      "sourceType": "com.gobestsoft.api.config.properties.ApiProperties"
+    },
+    {
+      "name": "api.matrix-logo",
+      "type": "java.lang.String",
+      "sourceType": "com.gobestsoft.api.config.properties.ApiProperties"
+    },
+    {
+      "name": "api.mobile-most-time",
+      "type": "java.lang.Integer",
+      "description": "短信范围次数",
+      "sourceType": "com.gobestsoft.api.config.properties.ApiProperties",
+      "defaultValue": 0
+    },
+    {
+      "name": "api.open-sign",
+      "type": "java.lang.Boolean",
+      "description": "接口签名验证是否打开",
+      "sourceType": "com.gobestsoft.api.config.properties.ApiProperties",
+      "defaultValue": false
+    },
+    {
+      "name": "api.php-site",
+      "type": "java.lang.String",
+      "sourceType": "com.gobestsoft.api.config.properties.ApiProperties"
+    },
+    {
+      "name": "api.review-base-url",
+      "type": "java.lang.String",
+      "description": "访问资讯",
+      "sourceType": "com.gobestsoft.api.config.properties.ApiProperties"
+    },
+    {
+      "name": "api.salt",
+      "type": "java.lang.String",
+      "description": "接口加密关键字",
+      "sourceType": "com.gobestsoft.api.config.properties.ApiProperties"
+    },
+    {
+      "name": "api.upper-integral",
+      "type": "java.lang.Integer",
+      "description": "当日积分上限",
+      "sourceType": "com.gobestsoft.api.config.properties.ApiProperties",
+      "defaultValue": 0
+    },
+    {
+      "name": "api.write-logs",
+      "type": "java.lang.Boolean",
+      "description": "日志输出",
+      "sourceType": "com.gobestsoft.api.config.properties.ApiProperties",
+      "defaultValue": false
+    }
+  ],
+  "hints": []
+}

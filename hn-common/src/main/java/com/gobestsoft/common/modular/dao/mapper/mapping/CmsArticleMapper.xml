@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dao.mapper.CmsArticleMapper">
+    <resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.dao.model.CmsArticlePojo">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="sub_title" property="subTitle"/>
+        <result column="tags" property="tags"/>
+        <result column="roundup" property="roundup"/>
+        <result column="source_from" property="sourceFrom"/>
+        <result column="author" property="author"/>
+        <result column="cover_path" property="coverPath"/>
+        <result column="content" property="content"/>
+        <result column="info_type" property="infoType"/>
+        <result column="template_type" property="templateType"/>
+        <result column="sort" property="sort"/>
+        <result column="org_id" property="orgId"/>
+        <result column="published_time" property="publishedTime"/>
+        <result column="published_user" property="publishedUser"/>
+        <result column="published_user_id" property="publishedUserId"/>
+        <result column="end_time" property="endTime"/>
+        <result column="status" property="status"/>
+        <result column="is_on_top" property="isOnTop"/>
+        <result column="is_on_top_overdue_time" property="isOnTopOverdueTime"/>
+        <result column="check_desc" property="checkDesc"/>
+        <result column="check_date" property="checkDate"/>
+        <result column="check_user_id" property="checkUserId"/>
+        <result column="is_share" property="isShare"/>
+        <result column="is_topic" property="isTopic"/>
+        <result column="is_topic_check" property="isTopicCheck"/>
+        <result column="is_like" property="isLike"/>
+        <result column="is_collect" property="isCollect"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="del_flg" property="delFlg"/>
+    </resultMap>
+
+
+    <select id="selectShowOne" resultType="java.util.Map">
+        SELECT T1.*,T2.name AS editor,
+        (SELECT IFNULL(COUNT(0) ,0) FROM cms_article_operation_log WHERE type=1 AND article_id=T1.id)
+        AS browseNum,
+        (select IFNULL(COUNT(0) ,0) FROM cms_comment where article_id=T1.id and status=1 and del_flg=0)
+        AS commentNum
+        FROM cms_article AS T1
+        LEFT JOIN sys_user AS T2 ON T1.create_user=T1.id
+        WHERE T1.id=#{articleId} AND T1.del_flg=0 AND T1.status =1 AND IFNULL(T1.published_time,#{nowTime}) &lt;= #{nowTime}
+    </select>
+
+
+    <resultMap id="cmsArticleMap" type="com.gobestsoft.common.modular.cms.model.CmsArticleEntity">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="sub_title" property="subTitle"/>
+        <result column="tags" property="tags"/>
+        <result column="roundup" property="roundup"/>
+        <result column="source_from" property="sourceFrom"/>
+        <result column="author" property="author"/>
+        <result column="cover_path" property="coverPath"/>
+        <result column="content" property="content"/>
+        <result column="info_type" property="infoType"/>
+        <result column="district_code" property="districtCode"/>
+        <result column="template_type" property="templateType"/>
+        <result column="column" property="column"/>
+        <result column="sort" property="sort"/>
+        <result column="org_id" property="orgId"/>
+        <result column="published_time" property="publishedTime"/>
+        <result column="published_status" property="publishedStatus"/>
+        <result column="published_uid" property="publishedUid"/>
+        <result column="under_time" property="underTime"/>
+        <result column="status" property="status"/>
+        <result column="is_on_top" property="isOnTop"/>
+        <result column="is_on_top_overdue_time" property="isOnTopOverdueTime"/>
+        <result column="check_desc" property="checkDesc"/>
+        <result column="check_date" property="checkDate"/>
+        <result column="check_user_id" property="checkUserId"/>
+        <result column="is_share" property="isShare"/>
+        <result column="is_topic" property="isTopic"/>
+        <result column="is_topic_check" property="isTopicCheck"/>
+        <result column="is_like" property="isLike"/>
+        <result column="is_collect" property="isCollect"/>
+        <result column="create_user" property="createUser"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_user" property="updateUser"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="del_flg" property="delFlg"/>
+        <result column="browseNum" property="browseNum"/>
+        <result column="thumbsUpNum" property="thumbsUpNum"/>
+    </resultMap>
+
+    <select id="articleList" resultMap="cmsArticleMap">
+        SELECT `id`,`title`,`sub_title`,`tags`,`roundup`,`source_from`,`author`,`template_type`,`cover_path`,
+        `content`,`info_type`,`district_code`,`jump_url`,`status`,`sort`,`org_id`,
+        `published_time`,`published_status`,`published_uid`,`under_time`,`is_on_top`,`is_on_top_overdue_time`,
+        `check_desc`,`check_date`,`check_uid`,`is_share`,`is_topic`,`is_topic_check`,`is_like`,`is_collect`,
+        `create_user`,`create_time`,`update_user`,`update_time`,`del_flg`,
+        '0' AS thumbsUpNum,
+        '0' AS browseNum
+        FROM cms_article
+        WHERE del_flg=0 AND status=1 AND published_status=1
+        <choose>
+            <when test="isCollected==1 and auid!=null and auid!=''">
+                AND EXISTS (SELECT 1 FROM cms_article_operation_log AS log WHERE log.article_id=cms_article.id AND log.type=3 AND log.auid=#{auid})
+            </when>
+            <otherwise>
+                <if test="categoryId!=null">
+                    AND EXISTS (SELECT article_id FROM r_article_category AS C WHERE C.article_id=cms_article.id
+                    AND C.category_id =${categoryId} AND C.pub_status=1)
+                </if>
+                <if test="keyword!=null and keyword!=''">
+                    AND ( title like CONCAT('%',#{keyword},'%')
+                    OR roundup like CONCAT('%',#{keyword},'%')
+                    OR source_from like CONCAT('%',#{keyword},'%') )
+                </if>
+                <if test="cityCode!=null and cityCode!=''">
+                    AND (district_code = #{cityCode} OR IFNULL(district_code,'')='')
+                </if>
+            </otherwise>
+        </choose>
+
+        ORDER BY sort DESC,published_time DESC
+    </select>
+    <!--根据传入的资讯流水号查询点赞数和阅读量-->
+    <select id="articleOperationCount" parameterType="list" resultType="java.util.Map">
+
+       select temp.* from (
+        SELECT IFNULL(COUNT(0) ,0) num ,article_id, 0 type FROM cms_article_operation_log WHERE type=0 AND article_id in
+        <foreach collection="list" separator="," open="(" close=")" item="id">
+            #{id}
+        </foreach>
+        group by article_id
+        union
+        SELECT IFNULL(COUNT(0) ,0) num ,article_id ,1 type FROM cms_article_operation_log WHERE type=1 AND article_id in
+        <foreach collection="list" separator="," open="(" close=")" item="id">
+            #{id}
+        </foreach>
+        group by article_id
+       )temp
+
+
+    </select>
+
+    <insert id="addArticleOperation">
+        INSERT INTO cms_article_operation_log (article_id,auid,create_time,type)
+        VALUES (#{articleId},#{auid},#{createTime},${type});
+  </insert>
+
+
+    <select id="getArticleOperationCount" resultType="Integer">
+        SELECT COUNT(0) FROM cms_article_operation_log
+        WHERE article_id=#{articleId} AND type=${type}
+        <if test="auid!=null and auid!=''">
+            AND auid=#{auid}
+        </if>
+    </select>
+
+    <update id="delArticleOperation">
+       DELETE FROM  cms_article_operation_log
+       WHERE article_id=#{articleId} AND type=${type} AND auid=#{auid}
+    </update>
+
+
+    <select id="articleDetail" resultType="java.util.Map">
+        SELECT id,title,source_from,author,content,is_share,is_like,is_collect,is_topic,cover_path,
+        (SELECT IFNULL(COUNT(0) ,0) FROM cms_article_operation_log WHERE type=0 AND article_id=cms_article.id)AS
+        thumps_up_num,
+        (SELECT IFNULL(COUNT(0) ,0) FROM cms_article_operation_log WHERE type=3 AND article_id=cms_article.id)AS
+        collection_num,
+        (select IFNULL(COUNT(0) ,0) FROM cms_comment where article_id=cms_article.id and status=1 and del_flg=0)AS
+        comment_num,
+        <choose>
+            <when test="auid != null and auid !='' ">
+                (SELECT IFNULL(COUNT(0) ,0) FROM cms_article_operation_log WHERE type=0 AND article_id=cms_article.id
+                AND auid=#{auid})AS
+                has_thumps_up,
+                (SELECT IFNULL(COUNT(0) ,0) FROM cms_article_operation_log WHERE type=3 AND article_id=cms_article.id
+                AND auid=#{auid})AS
+                has_collection
+            </when>
+            <otherwise>
+                0 AS has_thumps_up,
+                0 AS has_collection
+            </otherwise>
+        </choose>
+        FROM cms_article
+        WHERE del_flg=0 AND status=1
+        AND id=#{id}
+    </select>
+
+
+    <select id="articleSelectList" resultMap="cmsArticleMap">
+        SELECT `id`,`title`,`sub_title`,`tags`,`roundup`,`source_from`,`author`,`template_type`,`cover_path`,
+        `content`,`info_type`,`jump_url`,`status`,`sort`,`org_id`,
+        `published_time`,`published_user`,`published_user_id`,`end_time`,`is_on_top`,`is_on_top_overdue_time`,
+        `check_desc`,`check_date`,`check_user_id`,`is_share`,`is_topic`,`is_topic_check`,`is_like`,`is_collect`,
+        `create_user`,`create_time`,`update_user`,`update_time`,`del_flg`,
+        CASE WHEN cms_article.is_on_top =1 AND
+        IFNULL(IF(strcmp(is_on_top_overdue_time,''),is_on_top_overdue_time,null),'${nowTime}') &lt;= '${nowTime}' THEN 1
+        ELSE 0 END AS topCount,
+        (SELECT IFNULL(COUNT(0) ,0) FROM cms_article_operation_log WHERE type=0 AND article_id=cms_article.id)AS
+        thumbsUpNum,
+        (SELECT IFNULL(COUNT(0) ,0) FROM cms_article_operation_log WHERE type=1 AND article_id=cms_article.id)AS
+        browseNum
+        FROM cms_article
+        WHERE del_flg=0 AND status=1
+        <if test="categoryId!=null">
+            AND EXISTS (SELECT article_id FROM r_article_category AS C
+            WHERE
+            C.article_id=cms_article.id
+            AND C.category_id IN (SELECT id FROM cms_category
+            WHERE (id=${categoryId} or pid=${categoryId})
+        </if>
+        <if test="keyword!=null and keyword!=''">
+            AND title like '%${keyword}%'
+        </if>
+        ORDER BY topCount DESC,sort DESC,published_time DESC
+    </select>
+
+
+    <select id="articleVideoList" resultMap="cmsArticleMap">
+        SELECT `id`,`title`,`sub_title`,`tags`,`roundup`,`source_from`,`author`,`template_type`,`cover_path`,
+        `content`,`info_type`,`jump_url`,`status`,`sort`,`org_id`,
+        `published_time`,`published_user`,`published_user_id`,`end_time`,`is_on_top`,`is_on_top_overdue_time`,
+        `check_desc`,`check_date`,`check_user_id`,`is_share`,`is_topic`,`is_topic_check`,`is_like`,`is_collect`,
+        `create_user`,`create_time`,`update_user`,`update_time`,`del_flg`,
+        CASE WHEN cms_article.is_on_top =1 AND
+        IFNULL(IF(strcmp(is_on_top_overdue_time,''),is_on_top_overdue_time,null),'${nowTime}') &lt;= '${nowTime}' THEN 1
+        ELSE 0 END AS topCount,
+        (SELECT IFNULL(COUNT(0) ,0) FROM cms_article_operation_log WHERE type=0 AND article_id=cms_article.id)AS
+        thumbsUpNum,
+        (SELECT IFNULL(COUNT(0) ,0) FROM cms_article_operation_log WHERE type=1 AND article_id=cms_article.id)AS
+        browseNum
+        FROM cms_article
+        WHERE del_flg=0 AND status=1
+        AND info_type=2
+        ORDER BY topCount DESC,sort DESC,published_time DESC
+    </select>
+
+    <select id="getHotArticleKey" resultType="java.util.Map">
+        select cm.id,
+            cm.title,
+            (select IFNULL(count(0),0)
+            from cms_article_operation_log ca
+            where type = 1 and ca.article_id = cm.id) as browse_num
+        FROM
+            cms_article cm
+            WHERE del_flg=0
+            AND status=1
+            and EXISTS (select 1 from
+            cms_article_operation_log bb
+            where bb.article_id = cm.id)
+            ORDER BY browse_num DESC
+            limit 10
+    </select>
+</mapper>

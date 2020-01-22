@@ -1,0 +1,526 @@
+<css >
+    <div  td:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<style>
+    .bigData table td{
+
+        text-align: center; vertical-align: middle;
+
+    }
+
+</style>
+<body>
+<div class="row bigData layui-form">
+
+    <input type="hidden" id="cityId" th:value="${cityId}">
+    <div class="col-sm-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">工会新媒体</div>
+            <div class="panel-body bootstrap-table">
+                <div id="demoSearchTableToolbar1">
+                    <qx:btn  class="btn btn-primary" fa="fa fa-pencil" label="编辑" onclick="editData(this,NewMediaData)"></qx:btn>
+                </div>
+
+                <div class="fixed-table-container" style="padding: 10px  0;">
+                    <div class="fixed-table-header" ></div>
+                    <div class="fixed-table-body">
+                        <table id="demoSearchTable" data-mobile-responsive="true" class="table table-hover table-striped" data-click-to-select="true">
+                            <tbody th:with="obj=${bigData.newMediaData}">
+                            <tr>
+                                <td >
+                                    网站访问人数
+                                </td>
+                                <td>
+                                    <label >
+                                        <input class="form-control" name="website_view_count" th:value="${obj.website_view_count}" disabled type="number" min="0">
+                                    </label>
+                                </td>
+                                <td>
+                                        APP注册人数
+                                </td>
+                                <td>
+                                    <label >
+                                        <input class="form-control" name="app_signUp_count" th:value="${obj.app_signUp_count}" disabled type="number" min="0">
+                                    </label>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td >
+                                    微信公众号粉丝
+                                </td>
+                                <td>
+                                    <label >
+                                        <input class="form-control" name="wechat_fans_count" th:value="${obj.wechat_fans_count}" disabled type="number" min="0">
+                                    </label>
+                                </td>
+                                <td>
+                                    APP访问量
+                                </td>
+                                <td>
+                                    <label >
+                                        <input class="form-control" name="app_visit_count" th:value="${obj.app_visit_count}" disabled type="number" min="0">
+                                    </label>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td >
+                                    发布量
+                                </td>
+                                <td>
+                                    <label >
+                                        <input class="form-control" name="publish_count" th:value="${obj.publish_count}" disabled type="number" min="0">
+                                    </label>
+                                </td>
+                                <td>
+                                    阅读量
+                                </td>
+                                <td>
+                                    <label >
+                                        <input class="form-control" name="read_count" th:value="${obj.read_count}" disabled type="number" min="0">
+                                    </label>
+
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td >
+                                    评论量
+                                </td>
+                                <td>
+                                    <label >
+                                        <input class="form-control" name="comment_count" th:value="${obj.comment_count}" disabled type="number" min="0">
+                                    </label>
+                                </td>
+                                <td>
+                                    点击量
+                                </td>
+                                <td>
+                                    <label >
+                                        <input class="form-control" name="click_count" th:value="${obj.click_count}" disabled type="number" min="0">
+                                    </label>
+                                </td>
+
+                            </tr>
+
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <div class="col-sm-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">组织建设</div>
+            <div class="panel-body bootstrap-table">
+                <div >
+                    <qx:btn  class="btn btn-primary" fa="fa fa-pencil" label="编辑" onclick="editData(this,organizationData)"></qx:btn>
+                </div>
+
+                <div class="fixed-table-container" style="padding: 10px  0;">
+                    <div class="fixed-table-header" ></div>
+                    <div class="fixed-table-body">
+                        <table  data-mobile-responsive="true" class="table table-hover table-striped" data-click-to-select="true">
+                            <tbody th:with="obj=${bigData.organizationData}">
+                            <tr>
+                                <td>会员人数</td>
+                                <td><label><input class="form-control" name="member_count" th:value="${obj.member_count}" disabled type="number" min="0"></label></td>
+                                <td>新增会员人数</td>
+                                <td><label><input class="form-control" name="addition_member_count" th:value="${obj.addition_member_count}" disabled  type="number" min="0"></label></td>
+                                <td>组织个数</td>
+                                <td><label><input class="form-control" name="org_count" th:value="${obj.org_count}" disabled  type="number" min="0"></label></td>
+                            </tr>
+                            <tr>
+                                <td>转会人数</td>
+                                <td><label><input class="form-control" name="transfer_member_count" th:value="${obj.transfer_member_count}" disabled type="number" min="0"></label></td>
+                                <td>新增企业建会人数</td>
+                                <td><label><input class="form-control" name="new_member_company_established" th:value="${obj.new_member_company_established}" disabled type="number" min="0"></label></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">惠普商城</div>
+            <div class="panel-body bootstrap-table">
+                <div >
+                    <qx:btn  class="btn btn-primary" fa="fa fa-pencil" label="编辑" onclick="editData(this,hpMallData)"></qx:btn>
+                </div>
+
+                <div class="fixed-table-container" style="padding: 10px  0;">
+                    <div class="fixed-table-header" ></div>
+                    <div class="fixed-table-body">
+                        <table  data-mobile-responsive="true" class="table table-hover table-striped" data-click-to-select="true">
+                            <tbody th:with="obj=${bigData.hpMallData}">
+                            <tr>
+                                <td>覆盖人数</td>
+                                <td><label><input class="form-control" name="cover_member_count" th:value="${obj.cover_member_count}" disabled type="number" min="0"></label></td>
+                                <td>进驻商户数量</td>
+                                <td><label><input class="form-control" name="locate_vendor" th:value="${obj.locate_vendor}" disabled  type="number" min="0"></label></td>
+                                <td>商品总数</td>
+                                <td><label><input class="form-control" name="product_count" th:value="${obj.product_count}" disabled  type="number" min="0"></label></td>
+                            </tr>
+                            <tr>
+                                <td>商城交易数量</td>
+                                <td><label><input class="form-control" name="trade_count" th:value="${obj.trade_count}" disabled type="number" min="0"></label></td>
+                                <td>交易总额(元)</td>
+                                <td><label><input class="form-control" name="total_amount" th:value="${obj.total_amount}" disabled type="number" min="0"></label></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">维权咨询</div>
+            <div class="panel-body bootstrap-table">
+                <div >
+                    <qx:btn  class="btn btn-primary" fa="fa fa-pencil" label="编辑" onclick="editData(this,seekLegalAdviceData)"></qx:btn>
+                </div>
+
+                <div class="fixed-table-container" style="padding: 10px  0;">
+                    <div class="fixed-table-header" ></div>
+                    <div class="fixed-table-body">
+                        <table  data-mobile-responsive="true" class="table table-hover table-striped" data-click-to-select="true">
+                            <tbody th:with="obj=${bigData.seekLegalAdviceData}">
+                            <tr>
+                                <td>处理中的案件</td>
+                                <td><label><input class="form-control" name="inProcess_count" th:value="${obj.inProcess_count}" disabled type="number" min="0"></label></td>
+                                <td>未解决的案件</td>
+                                <td><label><input class="form-control" name="toDo_count" th:value="${obj.toDo_count}" disabled  type="number" min="0"></label></td>
+                                <td>已帮助人数</td>
+                                <td><label><input class="form-control" name="total_count" th:value="${obj.total_count}" disabled  type="number" min="0"></label></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">困难帮扶</div>
+            <div class="panel-body bootstrap-table">
+                <div >
+                    <qx:btn  class="btn btn-primary" fa="fa fa-pencil" label="编辑" onclick="editData(this,helpData)"></qx:btn>
+                </div>
+
+                <div class="fixed-table-container" style="padding: 10px  0;">
+                    <div class="fixed-table-header" ></div>
+                    <div class="fixed-table-body">
+                        <table  data-mobile-responsive="true" class="table table-hover table-striped" data-click-to-select="true">
+                            <tbody th:with="obj=${bigData.helpData}">
+                            <tr>
+                                <td>困难职工总数</td>
+                                <td><label><input class="form-control" name="kunNan.total_count" th:value="${obj.kunNan.total_count}" disabled type="number" min="0"></label></td>
+                                <td>日人数</td>
+                                <td><label><input class="form-control" name="kunNan.daily_count" th:value="${obj.kunNan.daily_count}" disabled  type="number" min="0"></label></td>
+                                <td>周人数</td>
+                                <td><label><input class="form-control" name="kunNan.week_count" th:value="${obj.kunNan.week_count}" disabled  type="number" min="0"></label></td>
+                                <td>月人数</td>
+                                <td><label><input class="form-control" name="kunNan.month_count" th:value="${obj.kunNan.month_count}" disabled  type="number" min="0"></label></td>
+                            </tr>
+                            <tr>
+                                <td>帮扶金额(万)</td>
+                                <td><label><input class="form-control" name="bangFu.total_count" th:value="${obj.bangFu.total_count}" disabled type="number" min="0"></label></td>
+                                <td>日人数</td>
+                                <td><label><input class="form-control" name="bangFu.daily_count" th:value="${obj.bangFu.daily_count}" disabled  type="number" min="0"></label></td>
+                                <td>周人数</td>
+                                <td><label><input class="form-control" name="bangFu.week_count" th:value="${obj.bangFu.week_count}" disabled  type="number" min="0"></label></td>
+                                <td>月人数</td>
+                                <td><label><input class="form-control" name="bangFu.month_count" th:value="${obj.bangFu.month_count}" disabled  type="number" min="0"></label></td>
+                            </tr>
+                            <tr>
+                                <td>热线办理量</td>
+                                <td><label><input class="form-control" name="reXian.total_count" th:value="${obj.reXian.total_count}" disabled type="number" min="0"></label></td>
+                                <td>日人数</td>
+                                <td><label><input class="form-control" name="reXian.daily_count" th:value="${obj.reXian.daily_count}" disabled  type="number" min="0"></label></td>
+                                <td>周人数</td>
+                                <td><label><input class="form-control" name="reXian.week_count" th:value="${obj.reXian.week_count}" disabled  type="number" min="0"></label></td>
+                                <td>月人数</td>
+                                <td><label><input class="form-control" name="reXian.month_count" th:value="${obj.reXian.month_count}" disabled  type="number" min="0"></label></td>
+                            </tr>
+                            <tr>
+                                <td>医疗互助总人数</td>
+                                <td><label><input class="form-control" name="yiLiao.total_count" th:value="${obj.yiLiao.total_count}" disabled type="number" min="0"></label></td>
+                                <td>日人数</td>
+                                <td><label><input class="form-control" name="yiLiao.daily_count" th:value="${obj.yiLiao.daily_count}" disabled  type="number" min="0"></label></td>
+                                <td>周人数</td>
+                                <td><label><input class="form-control" name="yiLiao.week_count" th:value="${obj.yiLiao.week_count}" disabled  type="number" min="0"></label></td>
+                                <td>月人数</td>
+                                <td><label><input class="form-control" name="yiLiao.month_count" th:value="${obj.yiLiao.month_count}" disabled  type="number" min="0"></label></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-sm-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">活动互动</div>
+            <div class="panel-body bootstrap-table">
+                <div >
+                    <qx:btn  class="btn btn-primary" fa="fa fa-pencil" label="编辑" onclick="editData(this,hd)"></qx:btn>
+                </div>
+
+                <div class="fixed-table-container" style="padding: 10px  0;">
+                    <div class="fixed-table-header" ></div>
+                    <div class="fixed-table-body">
+                        <table  data-mobile-responsive="true" class="table table-hover table-striped" data-click-to-select="true">
+                            <tbody th:with="obj=${bigData.hd}">
+                            <tr>
+                                <td >活动总场次</td>
+                                <td colspan="2"><label><input class="form-control" name="hd.total_times" th:value="${obj.total_times}" disabled  type="number" min="0"></label></td>
+                                <td >参与总人数</td>
+                                <td colspan="2"><label><input class="form-control" name="hd.total_participation_number" th:value="${obj.total_participation_number}" disabled type="number" min="0"></label></td>
+
+                            </tr>
+                            <tr th:each="data,stat: ${obj.dataListSort}" hd_list>
+                                <td th:text="'TOP'+${stat.index+1}">top</td>
+                                <td ><label><input type="text"  class="form-control" name="hd.name" disabled min="0" th:value="${data.name}"></label></td>
+                                <td>活动场次</td>
+                                <td ><label><input type="number"  class="form-control" name="hd.times" disabled min="0" th:value="${data.times}"></label></td>
+                                <td>参与人数</td>
+                                <td ><label><input type="number" class="form-control" name="hd.members" disabled min="0" th:value="${data.members}"></label></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">教育培训</div>
+            <div class="panel-body bootstrap-table">
+                <div >
+                    <qx:btn  class="btn btn-primary" fa="fa fa-pencil" label="编辑" onclick="editData(this,px)"></qx:btn>
+                </div>
+
+                <div class="fixed-table-container" style="padding: 10px  0;">
+                    <div class="fixed-table-header" ></div>
+                    <div class="fixed-table-body">
+                        <table  data-mobile-responsive="true" class="table table-hover table-striped" data-click-to-select="true">
+                            <tbody th:with="obj=${bigData.px}">
+                            <tr>
+                                <td>月份</td>
+                                <td ><b>培训总次数</b></td>
+                                <td ><label><input class="form-control" name="px.total_times" th:value="${obj.total_times}" disabled  type="number" min="0"></label></td>
+                                <td ><b>培训总人数</b></td>
+                                <td ><label><input class="form-control" name="px.total_participation_number" th:value="${obj.total_participation_number}" disabled type="number" min="0"></label></td>
+
+                            </tr>
+                            <tr th:each="data,stat: ${obj.dataListSort}" px_list>
+                                <td th:text="${data.name}" tr_name></td>
+                                <td>培训场次</td>
+                                <td ><label><input type="number"  class="form-control" name="px.times" disabled min="0" th:value="${data.times}"></label></td>
+                                <td>参与人数</td>
+                                <td ><label><input type="number" class="form-control" name="px.members" disabled min="0" th:value="${data.members}"></label></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div td:include="fragment/fargment :: bootstrapTableJs"></div>
+</body>
+
+<js>
+
+    <script>
+        /**
+         * 设置工会新媒体数据
+         */
+        function editData(obj,type){
+            $(obj).parent().next().find('label input').removeAttr('disabled');
+            $(obj).removeClass("btn-primary").addClass('btn-danger').html('<i class="fa"></i>保存').find('i').addClass('fa-check');
+            $(obj).attr('onClick', 'save(this,'+type+')');
+
+        }
+        var NewMediaData = 1;
+
+        var  hd = 2;
+
+        var  px = 3;
+
+        var  organizationData = 4;
+
+        var  helpData = 5;
+
+        var  hpMallData = 6;
+
+        var  seekLegalAdviceData = 7;
+
+        function save(obj,type ){
+            $(obj).removeClass('btn-danger').addClass("btn-primary").html('<i class="fa"></i>编辑').find('i').addClass("fa-pencil");
+            $(obj).parent().next().find('label input').attr("disabled",'disabled');
+            $(obj).attr('onClick','editData(this,'+type+')');
+            var cityId= $('#cityId').val();
+            var json = {};
+            switch (type) {
+                case NewMediaData:
+                    json.app_signUp_count=$('[name="app_signUp_count"]:first').val();
+                    json.app_visit_count=$('[name="app_visit_count"]:first').val();
+                    json.click_count=$('[name="click_count"]:first').val();
+                    json.comment_count=$('[name="comment_count"]:first').val();
+                    json.publish_count=$('[name="publish_count"]:first').val();
+                    json.read_count=$('[name="read_count"]:first').val();
+                    json.website_view_count=$('[name="website_view_count"]:first').val();
+                    json.wechat_fans_count=$('[name="wechat_fans_count"]:first').val();
+                    break;
+
+                case organizationData:
+                    json.addition_member_count=$('[name="addition_member_count"]:first').val();
+                    json.member_count=$('[name="member_count"]:first').val();
+                    json.new_member_company_established=$('[name="new_member_company_established"]:first').val();
+                    json.org_count=$('[name="org_count"]:first').val();
+                    json.transfer_member_count=$('[name="transfer_member_count"]:first').val();
+                    break;
+
+                case hpMallData:
+                    json.cover_member_count=$('[name="cover_member_count"]:first').val();
+                    json.locate_vendor=$('[name="locate_vendor"]:first').val();
+                    json.product_count=$('[name="product_count"]:first').val();
+                    json.total_amount=$('[name="total_amount"]:first').val();
+                    json.trade_count=$('[name="trade_count"]:first').val();
+                    break;
+
+                case seekLegalAdviceData:
+                    json.inProcess_count=$('[name="inProcess_count"]:first').val();
+                    json.toDo_count=$('[name="toDo_count"]:first').val();
+                    json.total_count=$('[name="total_count"]:first').val();
+                    break;
+
+                case helpData:
+                    json = {
+                        "bangFu": {
+                            "daily_count": $('[name="bangFu.daily_count"]').val(),
+                            "month_count": $('[name="bangFu.month_count"]').val(),
+                            "total_count": $('[name="bangFu.total_count"]').val(),
+                            "week_count": $('[name="bangFu.week_count"]').val()
+                        },
+                        "kunNan": {
+                            "daily_count": $('[name="kunNan.daily_count"]').val(),
+                            "month_count": $('[name="kunNan.month_count"]').val(),
+                            "total_count": $('[name="kunNan.total_count"]').val(),
+                            "week_count": $('[name="kunNan.week_count"]').val()
+                        },
+                        "reXian": {
+                            "daily_count": $('[name="reXian.daily_count"]').val(),
+                            "month_count": $('[name="reXian.month_count"]').val(),
+                            "total_count": $('[name="reXian.total_count"]').val(),
+                            "week_count": $('[name="reXian.week_count"]').val(),
+                        },
+                        "yiLiao": {
+                            "daily_count": $('[name="yiLiao.daily_count"]').val(),
+                            "month_count": $('[name="yiLiao.month_count"]').val(),
+                            "total_count": $('[name="yiLiao.total_count"]').val(),
+                            "week_count": $('[name="yiLiao.week_count"]').val(),
+                        }
+                    };
+                    break;
+
+                case hd:
+                    json.total_participation_number=$('[name="hd.total_participation_number"]').val();
+                    json.name=$('[name="hd.name"]').val();
+                    json.total_times=$('[name="hd.total_times"]').val();
+                    json.dataListSort=[];
+                    $('[hd_list]').each(function(){
+                        var obj={
+                            times:$(this).find('[name="hd.times"]').val(),
+                            members:$(this).find('[name="hd.members"]').val(),
+                            name:$(this).find('[name="hd.name"]').val()
+                        };
+                        json.dataListSort.push(obj);
+                    });
+                    break;
+
+                case px:
+                    json.total_participation_number=$('[name="px.total_participation_number"]').val();
+                    json.total_times=$('[name="px.total_times"]').val();
+                    json.dataListSort=[];
+                    $('[px_list]').each(function(){
+                        var obj={
+                            times:$(this).find('[name="px.times"]').val(),
+                            members:$(this).find('[name="px.members"]').val(),
+                            name:$(this).find('[tr_name]').text()
+                        };
+                        json.dataListSort.push(obj);
+                    });
+                    break;
+
+
+            }
+            
+            
+            
+            
+            
+            App.loadingAjax({
+                data:{
+                    type:type,
+                    cityId:cityId,
+                    jsonString:JSON.stringify(json)
+                },
+                url:App.ctxPath+'bigDataMng/updateData',
+                type:'post',
+                success: function (res) {
+                    if (res.code = 200) {
+                        layer.msg("操作成功", {icon: 1}, function () {
+                            back();
+                        });
+                    } else {
+                        App.error("操作失败! " + res.message + "!");
+                    }
+                }, error: function (res) {
+                    App.info("服务器异常，请稍后重试");
+                }
+                
+            });
+        }
+
+
+
+    </script>
+
+</js>

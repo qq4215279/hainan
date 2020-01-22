@@ -1,0 +1,26 @@
+<title th:text="${course.title}" xmlns:th="http://www.springframework.org/schema/mvc">课程</title>
+<body xmlns:th="http://www.springframework.org/schema/mvc">
+<link rel="stylesheet" th:href="@{/static/css/series_course.css}"/>
+<section class="content">
+    <img class="cover" th:src="${course.cover}">
+    <h6 th:text="${course.title}"></h6>
+    <p th:utext="${course.content}"></p>
+</section>
+<section class="source-catalog">
+    <div class="catalog">
+        <img th:src="@{/static/image/class_catalog.png}" style="width: 20px;margin-top: 7px;">
+        <span>学习目录</span>
+    </div>
+    <a th:each="c : ${catalog}" class="source" th:href="${c.jumpUrl}">
+
+        <img th:if="${c.infoType==0}" th:src="@{/static/image/class_wb.png}" class="icon">
+        <img th:if="${c.infoType==1}" th:src="@{/static/image/class_yp.png}" class="icon sp">
+        <img th:if="${c.infoType==2}" th:src="@{/static/image/class_sp.png}" class="icon sp">
+        <span class="right">＞</span>
+        <p class="title" th:text="${c.title}"></p>
+        <p class="create-time" th:text="${c.createTime}"></p>
+    </a>
+
+</section>
+
+</body>

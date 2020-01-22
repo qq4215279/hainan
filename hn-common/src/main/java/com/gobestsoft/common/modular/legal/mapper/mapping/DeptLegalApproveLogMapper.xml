@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.legal.mapper.DeptLegalApproveLogMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.legal.model.DeptLegalApproveLog">
+			<id column="id" property="id" />
+			<result column="apply_id" property="applyID" />
+			<result column="status" property="status" />
+			<result column="check_uid" property="checkUid" />
+			<result column="check_time" property="checkTime" />
+			<result column="check_opinion" property="checkOpinion" />
+			<result column="next_dept_id" property="nextDeptId" />
+			<result column="flow_info" property="flowInfo" />
+	</resultMap>
+	
+	<sql id="columns">
+		dept_legal_approve_log.id,
+		dept_legal_approve_log.apply_id,
+		dept_legal_approve_log.status,
+		dept_legal_approve_log.check_uid,
+		dept_legal_approve_log.check_time,
+		dept_legal_approve_log.check_opinion,
+		dept_legal_approve_log.next_dept_id,
+		dept_legal_approve_log.flow_info
+	</sql>
+	
+	<!-- 查看流程：根据申请id，查询审核日志 -->
+	<select id="selectMapsByApplyId" resultType="map">
+		SELECT <include refid="columns"></include>,sys_dept.fullname FROM dept_legal_approve_log 
+		left join sys_user on dept_legal_approve_log.check_uid = sys_user.uid
+		left join sys_dept on sys_dept.id = sys_user.deptid
+		where dept_legal_approve_log.apply_id = #{id}
+		order by dept_legal_approve_log.check_time
+	</select>
+  
+</mapper>

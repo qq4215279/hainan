@@ -1,0 +1,62 @@
+package com.gobestsoft.api.modular.appuser.controller;
+
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.gobestsoft.api.modular.appuser.model.AppIntegralUpdateDto;
+import com.gobestsoft.api.modular.appuser.service.AppUserIntegralService;
+import com.gobestsoft.api.modular.basic.BaseController;
+import com.gobestsoft.api.modular.basic.BaseResult;
+import com.gobestsoft.common.modular.dao.mapper.AppIntegralUpdateMapper;
+import com.gobestsoft.core.util.ToolUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+@RestController
+public class AppUserIntegralController extends BaseController {
+
+    @Resource
+    private AppUserIntegralService appUserIntegralService;
+    @Resource
+    private AppIntegralUpdateMapper appIntegralUpdateMapper;
+
+    /**
+     * 积分保存：
+     * @return
+     */
+    @RequestMapping(value = "/updateInteger", method = RequestMethod.POST)
+    public BaseResult alterIntegral(AppIntegralUpdateDto dto) {
+        String auid = dto.getAuid();
+        String tid = dto.getTid();
+        Integer value = dto.getJifen();
+        Integer type = dto.getType();
+        if (ToolUtil.isEmpty( auid ) || StringUtils.isEmpty( tid ) || ToolUtil.isEmpty( value ) || ToolUtil.isEmpty( type )){
+            return fail("传入参数不完整！");
+        }
+
+        if(!ToolUtil.equals( getUserId(), auid )){
+            return fail("当前用户信息有误");
+        }
+
+        Wrapper wrapper = new EntityWrapper();
+        wrapper.eq("tid", dto.getTid());
+        int flag = this.appIntegralUpdateMapper.selectCount( wrapper );
+        if (flag > 0){
+            return fail("订单已存在,请勿重复提交！");
+        }
+        try {
+            this.appUserIntegralService.alterIntegral(dto);
+        }catch (Exception e){
+            e.printStackTrace();
+            return fail();
+
+        }
+        return success("成功");
+    }
+
+
+
+
+}

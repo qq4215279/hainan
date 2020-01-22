@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit"/>
+
+    <title>企业工作平台 - 注册</title>
+
+    <link rel="shortcut icon" th:href="@{/static/favicon.ico}">
+    <link th:href="@{/static/plugin/bootstrap-3.3.7/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/static/plugin/font-awesome-4.7.0/css/font-awesome.min.css}" rel="stylesheet">
+    <link th:href="@{/static/css/animate.css}" rel="stylesheet">
+    <link th:href="@{/static/css/style.css}" rel="stylesheet">
+    <link th:href="@{/static/css/login.css}" rel="stylesheet">
+    <link th:href="@{/static/css/company_login.css}" rel="stylesheet">
+    <style>
+        .rg {
+            display: inline-block;
+            width: 45%;
+            height: 35px;
+            text-align: center;
+            line-height: 35px;
+            color: #000;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .rg-active {
+            border-bottom: 2px solid #1ab394;
+            color: #1ab394;
+        }
+    </style>
+    <script>
+        if (window.top !== window.self) {
+            window.top.location = window.location;
+        }
+    </script>
+    <script th:src="@{/static/js/jquery-1.12.4.min.js}"></script>
+    <script th:src="@{/static/plugin/layer/layer.js}"></script>
+    <script th:src="@{/static/js/App.js}"></script>
+    <style>
+        .demo-class {
+            color: #000;
+        }
+    </style>
+</head>
+<body class="signin">
+<!--  class="gray-bg" -->
+
+<div class="middle-box text-center loginscreen  animated fadeInDown" style="width: 600px">
+    <div style="padding: 100px 0px;">
+        <div>
+            <h3 class="logo-name">海南</h3>
+        </div>
+        <br/>
+        <div style="background: rgba(255,255,255,0.5); padding: 20px;border-radius: 20px;">
+            <input type="hidden" id="btnType">
+            <input type="hidden" id="isClick">
+            <div>
+                <span class="rg rg-active" onclick="activationShow();">激活</span>
+                <!--<span id="activeItem" class="rg" onclick="registerShow();">注册</span>-->
+                <span id="activeItem" class="rg" onclick="App.error('暂时关闭注册功能，统一由上级工会导入组织')">注册</span>
+            </div>
+            <form class="m-t" role="form" method="post">
+                <input type="hidden" id="deptId">
+                <div class="form-group">
+                    <input type="text" name="unifycode" id="unifycode" tabindex="1" class="form-control input_control"
+                           placeholder="单位法人和其他组织统一社会信用代码" style="font-size:16px;" required="">
+                </div>
+                <div class="form-group">
+                    <input type="text" name="deptname" id="deptname" tabindex="1" class="form-control input_control"
+                           placeholder="单位名称" style="font-size:16px;" required="">
+                </div>
+                <div class="form-group" id="actcheck">
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <input type="text" name="username" id="name2" tabindex="1" class="form-control input_control"
+                                   placeholder="工会名称(作为登录账号使用)" style="font-size:16px;" required="">
+                        </div>
+                        <div class="col-sm-4">
+                            <input type="button" name="register-check" id="register-check"
+                                   onclick="doActivate()" tabindex="4"
+                                   class="btn btn-primary block full-width m-b" value="激活">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" style="display:none" id="showname">
+                    <input type="text" name="username" id="name1" tabindex="1" class="form-control input_control"
+                           placeholder="工会名称（账号）" style="font-size:16px;" required="">
+                </div>
+                <div class="form-group">
+                    <input type="email" name="email" id="email" tabindex="2" class="form-control input_control"
+                           placeholder="邮箱(找回密码用)" required="">
+                </div>
+                <div class="form-group">
+                    <input type="password" name="first_password" id="first_password"
+                          tabindex="3" class="form-control input_control"
+                           placeholder="输入密码"/>
+                </div>
+                <div style="text-align: left">
+<!--                    <p><i class="glyphicon glyphicon-info-sign"></i>请输入6-16位数字、字母或常用符号，字母区分大小写</p>-->
+<!--                    <p><i class="glyphicon glyphicon-info-sign"></i>必须包含数字和字母</p>-->
+                    <p><i class="glyphicon glyphicon-info-sign"></i>根据口令管理要求，请修改密码。新密码要求至少在8位以上</p>
+                    <p><i class="glyphicon glyphicon-info-sign"></i>密码由大小写字母和阿拉伯数字组合，不得有两位连续相同</p>
+                </div>
+                <div style="display: none" class="form-group" id="pwdStrength">
+                    <table border="0" cellpadding="0" cellspacing="0" style="width: 100%">
+                        <tr align="center">
+                            <td id="pwd_Weak" class="pwd pwd_c"></td>
+                            <td id="pwd_Medium" class="pwd pwd_c pwd_f">无</td>
+                            <td id="pwd_Strong" class="pwd pwd_c pwd_c_r"></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="form-group">
+                    <input type="password" name="confirm_password" id="confirm_password" tabindex="4"
+                           class="form-control input_control" placeholder="再次输入密码" required=""/>
+
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <input type="button" name="register-submit" id="register-submit"
+                                    tabindex="4" onclick="doRegister()"
+                                   class="btn btn-primary block full-width m-b" value="注册"
+                                   style="line-height: 4vh!important;">
+                        </div>
+                    </div>
+                    <div style="float: left">
+                        <a style="font-size: 14px;" th:href="@{/login}" class="hf-back"><i
+                                class="glyphicon glyphicon-menu-left"></i>返回登录</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+
+</div>
+<div class="signup-footer"
+     style="position: relative;;bottom: 0px; left: 0px; width: 100%; text-align: center; margin: 0;">
+    <p>
+        <img th:src="@{/static/img/gobestsoft_logo.png}" style="width: 50px; height: 25px;"> <span><a
+            href="http://www.gobestsoft.com" target="_blank">www.gobestsoft.com</a>
+				© 2017 | All Rights Reserved 上海建朗信息科技有限公司 沪ICP备12017260号-1 </span>
+    </p>
+</div>
+
+<script th:inline="javascript">
+    var ctxPath = /*[[@{/}]]*/ '';
+</script>
+<script>
+    function checkUnion() {
+        if (!$("#unifycode").val()) {
+            layer.msg("单位法人和其他组织统一社会信用代码不能为空.");
+            $("#unifycode").focus();
+            return false;
+        }
+
+        if ($("#unifycode").val().length < 18) {
+            layer.msg("单位法人和其他组织统一社会信用代码未满18位");
+            $("#unifycode").focus();
+            return false;
+        }
+
+        if (!$("#deptname").val()) {
+            layer.msg("单位名称不能为空.");
+            $("#deptname").focus();
+            return false;
+        }
+
+        if (!$("#name2").val()) {
+            layer.msg("工会名称不能为空.");
+            $("#name2").focus();
+            return false;
+        }
+
+        return true;
+    }
+
+    function checkForm() {
+        if (!$("#name1").val()) {
+            layer.msg("工会名称不能为空.");
+            $("#name1").focus();
+            return false;
+        }
+        if (!$("#email").val()) {
+            layer.msg("邮箱不能为空.");
+            $("#email").focus();
+            return false;
+        }
+        if (!$("#first_password").val()) {
+            layer.msg("密码不能为空.");
+            $("#first_password").focus();
+            return false;
+        }
+        if (!$("#confirm_password").val()) {
+            layer.msg("确认密码不能为空.");
+            $("#confirm_password").focus();
+            return false;
+        }
+        return true;
+    }
+
+    function checkMail() {
+        var temp = $("#email").val();
+        //对电子邮件的验证
+        var myreg = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        if (!myreg.test(temp)) {
+            layer.msg("邮箱格式不正确.");
+            $("#email").focus();
+            return false;
+        }
+        return true;
+    }
+
+    var isClick = false;
+    function doActivate() {
+        isClick = true;
+        if (!checkUnion()) {
+            return
+        }
+
+        var name = document.getElementById("name2").value;
+        var unifycode = document.getElementById("unifycode").value;
+        var deptname = document.getElementById("deptname").value;
+
+        //提交信息
+        App.loadingAjax({
+            url: ctxPath + "/activate",
+            type: "get",
+            data: {unifycode: unifycode, deptname: deptname, name: name},
+            success: function (result) {
+                if(result.code == 500){
+                    layer.msg(result.message, {icon: 5});
+                }
+                if (result.code == 200) {
+                    if (result.data.orgflg == 1) {
+                        var index1 = layer.open({
+                            type: 2,
+                            title: '组织工会详情',
+                            area: ['80%', '80%'], //宽高
+                            fix: false, //不固定
+                            maxmin: false,
+                            btn: ['确定'],
+                            btnAlign: 'c',
+                            content: ctxPath + 'orgDetail?unifycode=' + unifycode + "&deptname=" + deptname + "&name=" + name,
+                            yes: function () {
+                                layer.confirm('是否激活此工会?', {
+                                    icon: 3,
+                                    skin: "demo-class",
+                                    title: '提示',
+                                    btn: ['是', '否']
+                                }, function (index) {
+                                    $("#deptId").val(result.data.deptId);
+                                    layer.close(index);
+                                    layer.close(index1);
+                                });
+                            }
+                        });
+                    } else {
+                        layer.confirm('请核对您所激活的信息是否正确', {
+                            icon: 3,
+                            skin: "demo-class",
+                            title: '提示',
+                            btn: ['是', '否']
+                        }, function (index) {
+                            // $("#activeItem").click();
+                            layer.close(index);
+                        });
+                    }
+                }
+            }, error: function () {
+                layer.msg("激活失败,服务器异常");
+                $('#register-check').attr('onclick', 'doActivate();');
+            }
+        });
+
+    }
+
+
+    function registerShow() {
+        $("#deptId").val("");
+        $("#unifycode").hide();
+        $("#deptname").hide();
+        $("#actcheck").hide();
+        $("#showname").show();
+        $("#register-submit").val("注册");
+        $("#btnType").val("1");
+    }
+
+    function activationShow() {
+        $("#deptId").val("");
+        $("#unifycode").show();
+        $("#deptname").show();
+        $("#actcheck").show();
+        $("#showname").hide();
+        $("#register-submit").val("提交");
+        $("#btnType").val("0");
+    }
+
+
+    function doRegister() {
+        if($("#btnType").val() == "0"){
+            var deptId = $("#deptId").val();
+            if(!deptId){
+                layer.msg("请点击激活按钮，确认工会名称填写正确")
+                return false
+            }
+            if(!checkUnion()){
+                return
+            }
+        } else if($("#btnType").val() == "1"){
+            if (!checkForm()) {
+                return
+            }
+        }
+
+        if (!checkMail()) {
+            return
+        }
+
+        var name=$("#name1").val();
+        if(!name){
+            name=$("#name2").val();
+        }
+        var email = document.getElementById("email").value;
+        var password = document.getElementById("first_password").value;
+        var password2 = document.getElementById("confirm_password").value;
+
+        // 至少8位，且包含数字，大小写字母
+        let reg1 =  /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9]{8,}$/;
+        // 相邻两位不重复
+        let reg2 =  /^.*(.)\1{1}.*$/;
+
+        if(!reg1.test(password) || reg2.test(password)){
+            layer.msg('根据口令管理要求，请修改密码。新密码要求至少在8位以上，由大小写字母和阿拉伯数字组合，不得有两位连续相同。');
+            $("#first_password").focus();
+            return false;
+        }
+
+        if (password != password2) {
+            layer.msg('密码不一致！');
+            return false;
+        }
+        // if (password.length < 6) {
+        //     layer.msg('密码长度不能小于6位！');
+        //     $("#first_password").focus();
+        //     return false;
+        // }
+        // if (CheckStrength(password) < 2) {
+        //     layer.msg('密码必须包含数字字母！');
+        //     $("#first_password").focus();
+        //     return false;
+        // }
+
+        //提交信息
+        App.loadingAjax({
+            url: ctxPath + "/registerVail?deptid=" + $("#deptId").val(),
+            type: "post",
+            dataType: "json",
+            data: {name: name, email: email, password: password},
+            success: function (result) {
+                if (result.code == 200) {
+                    layer.msg("注册成功,即将跳转登录页", {time: 1200}, function () {
+                        window.location.href = ctxPath + "/login";
+                    });
+                } else {
+                    layer.msg("注册失败," + result.message);
+                    $('#register-submit').attr('onclick', 'doRegister();');
+                }
+            }, error: function () {
+                layer.msg("注册失败,服务器异常");
+                $('#register-submit').attr('onclick', 'doRegister();');
+            }
+        });
+
+        //密码强度检查
+        function CheckStrength(pwd) {
+            var m = 0;
+            if (/\d/.test(pwd)) {
+                m++;
+            }
+            if (/[A-Z]/.test(pwd)) {
+                m++;
+            }
+            if (/[a-z]/.test(pwd)) {
+                m++;
+            }
+            return m;
+        }
+
+
+        function CheckIntensity(pwd) {
+            if (pwd != "") {
+                $('#pwdStrength').css('display', 'block');
+            } else {
+                $('#pwdStrength').css('display', 'none');
+                return;
+            }
+            switch (CheckStrength(pwd)) {
+                case 1 :
+                    Wcolor = "pwd pwd_Weak_c";
+                    Mcolor = "pwd pwd_c";
+                    Scolor = "pwd pwd_c pwd_c_r";
+                    Color_Html = "弱";
+                    break;
+                case 2 :
+                    Wcolor = "pwd pwd_Medium_c";
+                    Mcolor = "pwd pwd_Medium_c";
+                    Scolor = "pwd pwd_c pwd_c_r";
+                    Color_Html = "中";
+                    break;
+                case 3 :
+                    Wcolor = "pwd pwd_Strong_c";
+                    Mcolor = "pwd pwd_Strong_c";
+                    Scolor = "pwd pwd_Strong_c pwd_Strong_c_r";
+                    Color_Html = "强";
+                    break;
+                default :
+                    Wcolor = "pwd pwd_c";
+                    Mcolor = "pwd pwd_c pwd_f";
+                    Scolor = "pwd pwd_c pwd_c_r";
+                    Color_Html = "无";
+                    break;
+            }
+            document.getElementById('pwd_Weak').className = Wcolor;
+            document.getElementById('pwd_Medium').className = Mcolor;
+            document.getElementById('pwd_Strong').className = Scolor;
+            document.getElementById('pwd_Medium').innerHTML = Color_Html;
+        }
+    }
+
+    $(function () {
+        $(".rg").click(function () {
+            // $(".rg").removeClass("rg-active");
+            // $(this).addClass("rg-active");
+        });
+
+        $("input[name='email']").focus(function(){
+            var btntype = $("#btnType").val();
+            if(btntype == "0"){
+                if(!isClick){
+                    $("input[name='email']").blur();
+                    layer.msg('请先点击激活按钮！');
+                    return false;
+                }
+            }
+        });
+    })
+    activationShow();
+
+</script>
+<style type="text/css">
+
+    .pwd {
+        width: 40px;
+        height: 20px;
+        line-height: 14px;
+        padding-top: 2px;
+    }
+
+    .pwd_f {
+        color: #BBBBBB;
+    }
+
+    .pwd_c {
+        background-color: #F3F3F3;
+        border-top: 1px solid #D0D0D0;
+        border-bottom: 1px solid #D0D0D0;
+        border-left: 1px solid #D0D0D0;
+    }
+
+    .pwd_Weak_c {
+        background-color: #FF4545;
+        border-top: 1px solid #BB2B2B;
+        border-bottom: 1px solid #BB2B2B;
+        border-left: 1px solid #BB2B2B;
+    }
+
+    .pwd_Medium_c {
+        background-color: #FFD35E;
+        border-top: 1px solid #E9AE10;
+        border-bottom: 1px solid #E9AE10;
+        border-left: 1px solid #E9AE10;
+    }
+
+    .pwd_Strong_c {
+        background-color: #3ABB1C;
+        border-top: 1px solid #267A12;
+        border-bottom: 1px solid #267A12;
+        border-left: 1px solid #267A12;
+    }
+
+    .pwd_c_r {
+        border-right: 1px solid #D0D0D0;
+    }
+
+    .pwd_Weak_c_r {
+        border-right: 1px solid #BB2B2B;
+    }
+
+    .pwd_Medium_c_r {
+        border-right: 1px solid #E9AE10;
+    }
+
+    .pwd_Strong_c_r {
+        border-right: 1px solid #267A12;
+    }
+</style>
+</body>
+</html>

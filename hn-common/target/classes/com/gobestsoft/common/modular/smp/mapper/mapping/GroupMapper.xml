@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.smp.mapper.GroupMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultBean" type="com.gobestsoft.common.modular.smp.model.SmpGroup">
+		<id column="id" property="id" />
+		<result column="auid" property="auid" />
+		<result column="type" property="type" />
+		<result column="group_name" property="groupName" />
+		<result column="introduce" property="introduce" />
+		<result column="display_type" property="displayType" />
+		<result column="org_id" property="orgId" />
+		<result column="max_member" property="maxMember" />
+		<result column="head_img" property="headImg" />
+		<result column="create_time" property="createTime" />
+		<result column="del_flg" property="delFlg" />
+		<result column="status" property="status" />
+	</resultMap>
+	
+	<!-- 通用版全部字段 -->
+	<sql id="columns">
+		smp_group.auid,
+		smp_group.type,
+		smp_group.group_name,
+		smp_group.introduce,
+		smp_group.display_type,
+		smp_group.org_id,
+		smp_group.max_member,
+		smp_group.head_img,
+		smp_group.create_time,
+		smp_group.del_flg,
+		smp_group.status
+	</sql>
+	
+	<!-- 插入全部字段 -->
+	<sql id="columnValues">
+		#{auid},
+		#{type},
+		#{groupName},
+		#{introduce},
+		#{displayType},
+		#{orgId},
+		#{maxMember},
+		#{headImg},
+		#{createTime},
+		#{delFlg},
+		#{status}
+	</sql>
+	
+	<!-- 更新全部字段 -->
+	<sql id="columnSets">
+		smp_group.auid=#{auid},
+		smp_group.type=#{type},
+		smp_group.group_name=#{groupName},
+		smp_group.introduce=#{introduce},
+		smp_group.display_type=#{displayType},
+		smp_group.org_id=#{orgId},
+		smp_group.max_member=#{maxMember},
+		smp_group.head_img=#{headImg},
+		smp_group.create_time=#{createTime},
+		smp_group.del_flg=#{delFlg},
+		smp_group.status=#{status}
+	</sql>
+	
+	<!-- 新增一条数据数据 -->
+	<insert id="insert" parameterType="com.gobestsoft.common.modular.smp.model.SmpGroup" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO smp_group (<include refid="columns"></include>)
+		VALUES (<include refid="columnValues"></include>)
+	</insert>
+	
+	<!-- 更新审核状态 -->
+   	<update id="updateStatus" >
+   		UPDATE smp_group
+		set smp_group.status = #{status}
+	 	where smp_group.id = #{id}
+   	</update>
+   	
+   	 <!-- 查询一条数据-->
+	<select id="selectById" resultMap="BaseResultBean">
+		SELECT 
+			 smp_group.id,
+			<include refid="columns"></include>
+		FROM smp_group
+		where smp_group.id = #{id}
+	</select>
+	
+	<!-- 多条件分页查询  -->
+    <select id="selectList" resultType="map">
+		SELECT 
+			 smp_group.id,
+			<include refid="columns"></include>
+		FROM smp_group left join sys_dept on smp_group.org_id=sys_dept.id 
+		where smp_group.del_flg = 0 and (sys_dept.id=#{orgId} or FIND_IN_SET(#{orgId},sys_dept.pids))
+			<if test="groupName != null and groupName != ''">
+				and smp_group.group_name like '%${groupName}%'
+			</if>
+        order by smp_group.status ,smp_group.create_time desc
+    </select>
+    
+	<!-- 删除一条数据 -->
+    <update id="remove">
+		UPDATE smp_group set smp_group.del_flg = 1 where smp_group.id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.cms.dao.RecommendDao">
+
+	<resultMap id="recommendMap"
+		type="com.gobestsoft.common.modular.cms.model.MineRecommend">
+		<id column="id" property="id" />
+		<result column="title" property="title" />
+		<result column="recommendation" property="recommendation" />
+		<result column="type" property="type" />
+		<result column="target" property="recommend_target" />
+		<result column="status" property="status" />
+		<result column="reason" property="reason" />
+		<result column="create_time" property="recommend_time" />
+		<result column="check_time" property="check_time" />
+		<association property="subscription" column="{name=title}"
+			select="getSubscription"
+			javaType="com.gobestsoft.common.modular.cms.model.MineRecommendSubscription"></association>
+	</resultMap>
+
+	<select id="getMineRecommend" resultMap="recommendMap">
+		select
+		id,auid,title,recommendation,type,target,status,reason,create_time,check_time,check_user
+		from my_recommend WHERE auid=#{auId} AND del_flag=0
+		ORDER BY
+		create_time DESC
+		LIMIT ${pageSize} OFFSET ${startIndex}
+	</select>
+
+	<insert id="addRecommend">
+		INSERT INTO my_recommend (auid, title,
+		recommendation, type, target, status,
+		create_time, del_flag) VALUES (#{auId}, #{title}, #{recommendation}, ${type},
+		#{target}, 0, #{createTime}, 0)
+	</insert>
+
+	<resultMap
+		type="com.gobestsoft.common.modular.cms.model.MineRecommendSubscription"
+		id="mineRecommendSubscriptionMap">
+		<id column="media_id" property="id" />
+		<result column="media_name" property="name" />
+		<result column="description" property="description" />
+		<result column="avatar_path" property="avatar" />
+	</resultMap>
+
+	<select id="getSubscription" resultMap="mineRecommendSubscriptionMap">
+		select
+		id AS media_id,media_name,description,avatar_path from cms_media WHERE
+		media_name=#{name}
+	</select>
+</mapper>

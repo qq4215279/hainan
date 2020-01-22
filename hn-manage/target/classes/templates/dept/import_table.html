@@ -1,0 +1,54 @@
+<div th:fragment="importTable">
+    <table id="importTable" data-mobile-responsive="true" data-click-to-select="true">
+    </table>
+
+</div>
+
+<script th:fragment="importTableJs">
+    var Import = {
+        tableId: "importTable"
+    };
+    /**
+     * 初始化表格的列
+     */
+    Import.initColumn = function () {
+        return [
+            {title: '导入时间', field: 'createTime', visible: true, align: 'center', valign: 'middle', sortable: false},
+            {title: '状态', field: 'statusDesc', visible: true, align: 'center', valign: 'middle', sortable: false, formatter: function (value, row, index) {
+                    if (row.status == 0 ) {
+                        return value+'<i  class="fa fa-spinner fa-spin"/>';
+                    }
+                    return value;
+                }},
+            {title: '备注', field: 'remark', visible: true, align: 'center', valign: 'middle', sortable: false},
+            {
+                title: '查看', field: 'downLink', align: 'center', valign: 'middle',
+                formatter: function (value, row, index) {
+                    if (row.status == 1 && row.downLink) {
+                        return '<a href="' + row.downLink + '" >下载查看</a>';
+                    }
+                    return "";
+                }
+            }
+        ]
+    };
+
+    /**
+     * 更新方法
+     */
+    Import.refresh = function () {
+        if (Import.timer) {
+            clearTimeout(Import.timer);
+        }
+        Import.table.refresh({query: {type: importType}});
+        Import.timer = setTimeout(Import.refresh, 10000);
+    };
+
+    $(function () {
+        var defaultColunms = Import.initColumn();
+        var table = new BSTable(Import.tableId, "dept/importLogs", defaultColunms);
+        table.setPaginationType("server");
+        table.setQueryParams({type: importType});
+        Import.table = table.init();
+    });
+</script>

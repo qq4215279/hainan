@@ -1,0 +1,143 @@
+<css xmlns:th="http://www.thymeleaf.org">
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body xmlns:th="http://www.thymeleaf.org">
+    <div class="form-horizontal">
+        <div class="row">
+            <div class="col-sm-3">
+                <search:datetime id="begDate" label="发布时间" name="begDate"
+                                 format="yyyy-MM-dd HH:mm:ss"></search:datetime>
+            </div>
+            <div class="col-sm-3" style="margin-left: -30px">
+                <search:datetime id="endDate" label="至" name="endDate"
+                                 format="yyyy-MM-dd HH:mm:ss"></search:datetime>
+            </div>
+            <div class="col-sm-3">
+                <search:select label="信息状态" name="status"
+                               code="lib_opinion_status" id="status"></search:select>
+            </div>
+            <div class="col-sm-3">
+                <search:select label="建言类型" name="type"
+                               code="lib_opinion_type" id="type"></search:select>
+            </div>
+            <div class="col-sm-3">
+                <qx:btn id="btn1" class="btn btn-primary" fa="fa fa-search" label="查询" onclick="Opinion.search()"></qx:btn>
+            </div>
+        </div>
+    </div>
+
+    <table id="OpinionTable" data-mobile-responsive="true" data-click-to-select="true">
+    </table>
+
+</body>
+
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script type="text/javascript">
+        var area = ['100%', '100%'];
+        /**
+         * 初始化表格对象
+         */
+        var Opinion = {
+            id: "OpinionTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            baseUrl: App.ctxPath + 'opinion',
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        Opinion.initColumn = function () {
+            return [
+                {field: 'selectItem', radio: true},
+                {title: '用户昵称', field: 'nick_name', visible: true, align: 'center', valign: 'middle'},
+                {title: '检验内容', field: 'content_desc', visible: true, align: 'center', valign: 'middle'},
+                {title: '联系人/联系方式', field: 'contact', visible: true, align: 'center', valign: 'middle'},
+                {title: '建言类型', field: 'type_name', visible: true, align: 'center', valign: 'middle'},
+                {title: '审核状态', field: 'status_name', visible: true, align: 'center', valign: 'middle'},
+                {title: '创建时间', field: 'create_time', align: 'center', valign: 'middle'},
+                {
+                    title: '操作', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        return '<a href="javascript:Opinion.detail(' + row.id + ')">审阅</a>&nbsp;&nbsp;<a href="javascript:Opinion.log(' + row.id + ')">流程</a>';
+                    }
+                }
+            ];
+        }
+
+        /**
+         * 检查是否选中
+         */
+        Opinion.check = function () {
+            var selected = $('#' + this.id).bootstrapTable('getSelections');
+            if (selected.length == 0) {
+                App.info("请先选中表格中的某一记录！");
+                return false;
+            } else {
+                Opinion.seItem = selected;
+                return true;
+            }
+        };
+
+        /**
+         * 查看
+         */
+        Opinion.detail = function (id) {
+            var index = layer.open({
+                type: 2,
+                title: '查看详情',
+                area: ['100%', '100%'], //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: this.baseUrl + '/detail?id=' + id
+            });
+            Opinion.layerIndex = index;
+        };
+
+        /**
+         * 流程
+         */
+        Opinion.log = function (id) {
+            var index = layer.open({
+                type: 2,
+                title: '查看流程',
+                area: area, //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: this.baseUrl + '/log/' + id
+            });
+            Opinion.layerIndex = index;
+        };
+
+        /**
+         * 查询表单提交参数对象
+         */
+        Opinion.formParams = function () {
+            var queryData = {};
+            queryData['name'] = $("#name").val();
+            queryData['begDate'] = $("#begDate").val();
+            queryData['endDate'] = $("#endDate").val();
+            queryData['type'] = $("#type").val();
+            queryData['status'] = $("#status").val();
+            return queryData;
+        };
+
+        /**
+         * 查询列表
+         */
+        Opinion.search = function () {
+            Opinion.table.refresh({query: Opinion.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = Opinion.initColumn();
+            var table = new BSTable(Opinion.id,  "opinion/list", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(Opinion.formParams());
+            Opinion.table = table.init();
+        });
+    </script>
+
+</js>

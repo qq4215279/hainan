@@ -1,0 +1,338 @@
+package com.gobestsoft.company.modular.system.controller;
+
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.gobestsoft.common.constant.RoleConstants;
+import com.gobestsoft.common.modular.dept.mapper.DeptOrganizationMapper;
+import com.gobestsoft.common.modular.dept.model.DeptOrganization;
+import com.gobestsoft.common.modular.system.dao.UserMgrDao;
+import com.gobestsoft.common.modular.system.mapper.DeptMapper;
+import com.gobestsoft.common.modular.system.mapper.SysMailMapper;
+import com.gobestsoft.common.modular.system.mapper.UserMapper;
+import com.gobestsoft.common.modular.system.model.Dept;
+import com.gobestsoft.common.modular.system.model.SysMail;
+import com.gobestsoft.common.modular.system.model.User;
+import com.gobestsoft.core.util.*;
+import com.gobestsoft.mail.MailUtil;
+import com.gobestsoft.mamage.basic.BaseController;
+import com.gobestsoft.mamage.basic.tips.Tip;
+import com.gobestsoft.mamage.constant.state.ManagerStatus;
+import com.gobestsoft.mamage.exception.BizExceptionEnum;
+import com.gobestsoft.mamage.moudle.dept.CompanyOrganizationService;
+import com.gobestsoft.mamage.moudle.system.factory.UserFactory;
+import com.gobestsoft.mamage.moudle.system.transfer.UserDto;
+import com.google.code.kaptcha.Constants;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+
+import javax.annotation.Resource;
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * create by gutongwei
+ * on 2018/8/7 上午9:54
+ * 用户登录模块
+ */
+@Controller
+public class WorkLoginController extends BaseController {
+
+    private String PREFIX = "/dept/company/organization/authen/";
+
+    @Resource
+    UserMgrDao managerDao;
+    @Resource
+    UserMapper userMapper;
+    @Resource
+    DeptOrganizationMapper deptOrganizationMapper;
+    @Resource
+    CompanyOrganizationService companyOrganizationService;
+
+    @Resource
+    DeptMapper deptMapper;
+
+    @Resource
+    TemplateEngine templateEngine;
+
+    @Resource
+    MailUtil mailUtil;
+
+    @Resource
+    SysMailMapper sysMailMapper;
+
+    /**
+     * 登录页
+     *
+     * @return
+     */
+    @RequestMapping(value = "/login")
+    public String login(Model model) {
+        Object tip = getSessionAttribute(LOGIN_TIP);
+        if (tip != null && StringUtils.isNotEmpty(tip.toString())) {
+            model.addAttribute(LOGIN_TIP, tip);
+        }
+        model.addAttribute("isKaptcha", manageProperties.getKaptchaOpen());
+        addSessionAttribute(LOGIN_TIP, null);
+        return "login";
+    }
+
+
+    /**
+     * 点击登录执行的动作
+     */
+    @RequestMapping(value = "/loginVail", method = RequestMethod.POST)
+    public String loginVail(Model model) {
+
+        String username = getPara("username");
+        String password = getPara("password");
+        String remember = getPara("remember");
+
+        //验证验证码是否正确
+        if (manageProperties.getKaptchaOpen()) {
+            String kaptcha = getPara("kaptcha");
+            String code = (String) getSession().getAttribute(Constants.KAPTCHA_SESSION_KEY);
+            if (!code.equals(kaptcha)) {
+                addSessionAttribute(LOGIN_TIP, "验证码错误");
+                return REDIRECT + "/login";
+            }
+        }
+
+        User user = userService.user(username, password, "1");
+        if (user == null) {
+            addSessionAttribute(LOGIN_TIP, "账号或密码错误");
+            return REDIRECT + "/login";
+        }
+
+        // 弱口令校验
+        if(userService.getIsWeak(password)){
+            model.addAttribute("account",username);
+            model.addAttribute("oldPwd",password);
+            return "/user_chpwd_page";
+        }
+
+        cacheLoginUser(userService.getLoginUser(user), "on".equals(remember));
+        return REDIRECT + "/";
+
+    }
+
+    /**
+     * 注册
+     */
+    @RequestMapping("/register")
+    public String register() {
+        return "register";
+    }
+
+    /**
+     * 点击注册操作
+     */
+    @RequestMapping(value = "/registerVail", method = RequestMethod.POST)
+    @ResponseBody
+    public Tip register(@RequestParam("deptid") String deptid) {
+
+        String username = getPara("name");
+        String email = getPara("email");
+        String password = getPara("password");
+        // 判断账号是否重复
+        User theUser = managerDao.getByAccount(username, "1");
+        if (theUser != null) {
+            return new Tip(BizExceptionEnum.USER_ALREADY_REG.getCode(), BizExceptionEnum.USER_ALREADY_REG.getMessage(), null);
+        }
+
+        UserDto user = new UserDto();
+        user.setAccount(username);
+        user.setName(username);
+        user.setEmail(email);
+        // 完善账号信息
+        user.setSalt(UUIDUtil.getCharAndNumr(5));
+        user.setPassword(MD5Util.encrypt(password + user.getSalt()));
+        user.setStatus(ManagerStatus.OK.getCode());
+        user.setCreatetime(DateUtil.getAllTime());
+        user.setUserType("1");
+
+        String roleIds = "";
+        if (StringUtils.isNotEmpty(deptid)) {
+            Dept dept = deptMapper.selectById(deptid);
+            user.setDeptid(Integer.valueOf(deptid));
+            user.setOrgid(Integer.valueOf(deptid));
+            roleIds = "69";
+            if (dept.getLevel() < 8) {
+                //去掉申请建会菜单角色，新增我的工会菜单角色及会员管理、会员转出审核、法人资格登记角色等
+                Integer[] roleMenu = RoleConstants.MY_COMPANY_LEVEL_1_2_3_ROLE_MENU;
+                for (Integer roleid : roleMenu) {
+                    roleIds += "," + roleid;
+                }
+            }
+            user.setRoleid(roleIds);
+        } else {
+            user.setDeptid(null);
+            user.setRoleid(roleIds);
+        }
+        User inserUser = UserFactory.createUser(user);
+        inserUser.setUserType("1");
+        this.userMapper.insert(inserUser);
+        deptOrganizationMapper.updateEmailByUserName(username, email);
+        return success();
+    }
+
+    /**
+     * 激活操作
+     */
+    @RequestMapping(value = "/activate", method = RequestMethod.GET)
+    @ResponseBody
+    public Tip getActivateInfo() {
+        String unifycode = getPara("unifycode");
+        String deptname = getPara("deptname");
+        String name = getPara("name");
+        List<DeptOrganization> result = deptOrganizationMapper.selectList(getEntityWrapper().eq("unit_name", deptname)
+                .eq("unit_org_code", unifycode)
+                .eq("union_name", name));
+
+        int orgflg = 0;
+        //判断是否已经建会
+        if (result.size() > 0) {
+            orgflg = 1;
+        }
+
+        //判断是否已经激活
+        int count = userMapper.selectCount(new EntityWrapper().eq("account", name));
+        if (count > 0) {
+            return new Tip(500, "账号已存在!", null);
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("orgflg", orgflg);
+        if (result.size() > 0) {
+            map.put("deptId", result.get(0).getDeptId());
+        }
+        return new Tip(200, null, map);
+    }
+
+    /**
+     * 组织工会详情
+     *
+     * @param unifycode 组织机构代码
+     * @param deptname  单位名称
+     * @param name      工会名称
+     * @return
+     */
+    @RequestMapping("/orgDetail")
+    public String getDetail(@RequestParam("unifycode") String unifycode,
+                            @RequestParam("name") String name,
+                            @RequestParam("deptname") String deptname, Model model) {
+        DeptOrganization dept = new DeptOrganization();
+        dept.setUnitOrgCode(unifycode);
+        dept.setUnitName(deptname);
+        dept.setUnionName(name);
+        DeptOrganization deptOrganization = deptOrganizationMapper.selectOne(dept);
+        model.addAttribute("deptOrganization", deptOrganization);
+        model.addAttribute("showCancel", false);
+        companyOrganizationService.bindDictNameToDeptOrganization(deptOrganization);
+        return PREFIX + "organization_detail";
+    }
+
+    /**
+     * 获取工会组织的Wrapper对象
+     *
+     * @return
+     */
+    private EntityWrapper<DeptOrganization> getEntityWrapper() {
+        return new EntityWrapper<>();
+    }
+
+    /**
+     * 忘记密码
+     */
+    @RequestMapping("/forget")
+    public String getForgetPwd() {
+        return "forget";
+    }
+
+
+    /**
+     * 发送邮箱验证码
+     */
+    @RequestMapping("/getEmailCode")
+    @ResponseBody
+    public Tip getMailCode(@RequestParam("sendto") String sendto, @RequestParam("account") String account) throws MessagingException {
+
+        SysMail mail = new SysMail();
+        String timeTemp = DateUtil.getAllTime();
+        int verCode = NumUtil.nextInt(1000, 10000);
+
+        Context context = new Context();
+        context.setVariable("id", verCode);
+        String emailContent = templateEngine.process("mail", context);
+        //发送邮件
+        mailUtil.sendHtmlMail(sendto, "海南工会云--找回密码", emailContent);
+
+        mail.setAccount(account);
+        mail.setVerification(String.valueOf(verCode));
+        mail.setCreateTime(timeTemp);
+        //插入记录表
+        sysMailMapper.insert(mail);
+
+        return success();
+    }
+
+    /**
+     * 校验验证码
+     */
+    @RequestMapping("/getDefaultKaptcha")
+    @ResponseBody
+    public Tip getDefaultKaptcha(@RequestParam(value = "code", required = false) String code, HttpServletRequest request) {
+
+        HttpSession session = request.getSession();
+        String codestr = (String) session.getAttribute("KAPTCHA_SESSION_KEY");
+        if (!ToolUtil.equals(code, codestr)) {
+            return new Tip(203, "图片中的数字输入错误，请重新输入", null);
+        }
+        return success();
+    }
+
+    /**
+     * 修改密码
+     */
+    @RequestMapping(value = "/getResetPwd", method = RequestMethod.POST)
+    @ResponseBody
+    public Tip getResetPwd() {
+
+        String account = getPara("account");
+        String password = getPara("password");
+        String vercode = getPara("vercode");
+
+        //判断账号是否存在
+        int count = userMapper.selectCount(new EntityWrapper().eq("account", account));
+        if (count == 0) {
+            return new Tip(BizExceptionEnum.USER_NOT_EXISTED.getCode(), BizExceptionEnum.USER_NOT_EXISTED.getMessage(), null);
+        }
+
+        //判断验证码是否正确
+        List<SysMail> listInfo = sysMailMapper.selectList(new EntityWrapper<SysMail>().eq("account", account).orderBy("create_time", false));
+        if (listInfo.size() > 0) {
+            String oldcode = listInfo.get(0).getVerification();
+            if (!ToolUtil.equals(vercode, oldcode)) {
+                return new Tip(403, "输入的验证码有误", null);
+            }
+        }
+
+        User user = new User();
+        //修改账号
+        user.setSalt(UUIDUtil.getCharAndNumr(5));
+        user.setPassword(MD5Util.encrypt(password + user.getSalt()));
+        com.baomidou.mybatisplus.mapper.Wrapper wrapper = new EntityWrapper().eq("account", account);
+        userMapper.update(user, wrapper);
+
+        return success();
+    }
+
+}

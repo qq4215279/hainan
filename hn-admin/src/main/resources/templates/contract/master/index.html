@@ -1,0 +1,174 @@
+<css xmlns:th="http://www.thymeleaf.org">
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body xmlns:th="http://www.thymeleaf.org">
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <search:input id="name" label="合同名称" name="name" value="" type="text"></search:input>
+                            </div>
+                            <div class="col-sm-3">
+                                <qx:btn class="btn btn-primary" fa="fa fa-search" label="查询" onclick="Contract.search()"></qx:btn>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12" role="group">
+                        <qx:btn class="btn btn-primary" fa="fa fa-plus" label="新增" onclick="Contract.add()"></qx:btn>
+                        <qx:btn class="btn btn-primary" fa="fa fa-edit" label="修改" onclick="Contract.edit()"></qx:btn>
+                    </div>
+                    <table id="ContractTable" data-mobile-responsive="true" data-click-to-select="true">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+        let area = ['40%', '40%'];
+        /**
+         * 初始化表格对象
+         */
+        var Contract = {
+            id: "ContractTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1,
+            baseUrl: App.ctxPath + 'contract/master'
+        };
+
+        /**
+         * 初始化表格的列
+         *
+         */
+        Contract.initColumn = function () {
+            return [
+                {field: 'selectItem', radio: true},
+                {title: 'id', field: 'id', visible: false, align: 'center', valign: 'middle'},
+                {title: '母版名称', field: 'name', visible: true, align: 'center', valign: 'middle'},
+                {title: '模板编号', field: 'code', visible: true, align: 'center', valign: 'middle'},
+                {title: '创建工会', field: 'createUnion', align: 'center', valign: 'middle'},
+                {title: '创建人', field: 'createUser', align: 'center', valign: 'middle'},
+                {title: '创建时间', field: 'createTime', align: 'center', valign: 'middle',formatter: initCreateTimeField},
+                {title: '操作', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        return '<a href="' + row.filePath + '" target="_blank">下载合同</a> || <a href="javascript:Contract.delete(' + row.id +  ')">删除</a>';
+                    }
+                }
+            ];
+        }
+
+        /**
+         * 初始化列表的创建时间类型的字段
+         */
+        function initCreateTimeField(value, row, index){
+            if(row.createTime){
+                return returnTimeStr(row.createTime);
+            }
+        }
+
+        /**
+         * 返回组装好的日期字符串
+         */
+        function returnTimeStr(time) {
+            return time.substring(0,4)+"-"+time.substring(4,6)+"-"+time.substring(6,8)+" "+time.substring(8,10)+":"+time.substring(10,12)+":"+time.substring(12,14);
+        }
+
+        /**
+         * 检查是否选中
+         */
+        Contract.check = function () {
+            let selected = $('#' + this.id).bootstrapTable('getSelections');
+            if (selected.length === 0) {
+                App.info("请先选中表格中的某一记录！");
+                return false;
+            } else {
+                Contract.seItem = selected[0];
+                return true;
+            }
+        };
+
+        /**
+         * 添加
+         */
+        Contract.add = function () {
+            let index = layer.open({
+                type: 2,
+                title: '添加',
+                area: area, //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: Contract.baseUrl + '/add'
+            });
+            this.layerIndex = index;
+        };
+
+        /**
+         * 编辑
+         */
+        Contract.edit = function () {
+            if(this.check()){
+                let index = layer.open({
+                    type: 2,
+                    title: '编辑',
+                    area: area, //宽高
+                    fix: false, //不固定
+                    maxmin: true,
+                    content: Contract.baseUrl + '/edit?id='+Contract.seItem.id
+                });
+                this.layerIndex = index;
+            }
+        };
+
+
+        /**
+         * 删除
+         */
+        Contract.delete = function (id) {
+            let fun = function () {
+                let ajax = new $ax(Contract.baseUrl + "/delete", function (data) {
+                    App.success("操作成功!");
+                    Contract.table.refresh();
+                }, function (data) {
+                    App.error("操作成功!" + data.responseJSON.message + "!");
+                });
+
+                ajax.set('id', id);
+                ajax.start();
+            };
+            App.confirm("确定要删除吗？", fun);
+        };
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        Contract.formParams = function () {
+            let queryData = {};
+            queryData['name'] = $("#name").val();
+            return queryData;
+        }
+
+        /**
+         * 查询列表
+         */
+        Contract.search = function () {
+            Contract.table.refresh({query: Contract.formParams()});
+        };
+
+        $(function () {
+            let defaultColunms = Contract.initColumn();
+            let table = new BSTable(Contract.id, "contract/master/list", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(Contract.formParams());
+            Contract.table = table.init();
+        });
+    </script>
+</js>
+</body>

@@ -1,0 +1,36 @@
+<body>
+<div class="container">
+    <div class="row form-horizontal" id="ChangeForm">
+        <div class="row">
+            <br/>
+                <div class="row">
+
+                    <div class="col-sm-8">
+                        <form:text id="title" label="法律问题标题" name="title"
+                                   must="true"></form:text>
+                    </div>
+                </div>
+            <br/>
+                <div class="row">
+                    <div class="col-sm-8">
+                        <form:area id="content" label="法律问题描述" name="content" must="true"
+                        ></form:area>
+                    </div>
+                </div>
+
+            <br/>
+                <div class="row text-center">
+                    <qx:btn id="save" class="btn btn-success" onclick="ChangeDlg.addSubmit(1)"
+                            fa="fa fa-eraser" label="保存"></qx:btn>
+                    <qx:btn id="close" class="btn btn-danger" onclick="ChangeDlg.close()"
+                            fa="fa fa-eraser" label="取消"></qx:btn>
+                </div>
+                <br/>
+            </div>
+
+    </div>
+</div>
+</body>
+<js>
+    <script th:src="@{/static/modular/law/problem/problem_add.js}"></script>
+</js>

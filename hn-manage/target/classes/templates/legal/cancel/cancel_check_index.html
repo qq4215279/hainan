@@ -1,0 +1,28 @@
+<css>
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+	<div class="form-horizontal">
+		 <div class="row">
+               <div class="col-sm-3">
+               		<search:input id="name" label="法定代表人" name="name" value=""
+                                              type="text"></search:input>
+               </div>
+               <div class="col-sm-3">
+               		<search:input id="agentName" label="经办人" name="agentName" value=""
+                                              type="text"></search:input>
+               </div>
+               <div class="col-sm-1">
+                      <qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="LegalCancel.search()"></qx:btn>
+               </div>
+         </div>
+		<div class="hidden-xs" id="LegalCancelTableToolbar" role="group">
+		</div>
+		<table id="LegalCancelTable" data-mobile-responsive="true" data-click-to-select="true">
+		</table>
+	</div>
+</body>
+<js>
+	<div th:include="fragment/fargment :: bootstrapTableJs"></div>
+	<script th:src="@{/static/modular/legal/cancel/cancel_check_index.js}"></script>
+</js>

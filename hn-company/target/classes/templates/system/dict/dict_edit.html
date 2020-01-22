@@ -1,0 +1,62 @@
+<body>
+<div class="form-horizontal">
+    <input type="hidden" id="id" th:value="${dict.id}">
+    <div class="row">
+        <div class="col-sm-5">
+            <search:input label="字典名称" name="dictName" value="${dict.name}"
+                          placeholder="字典名称" type="text"></search:input>
+        </div>
+        <div class="col-sm-5">
+            <search:input label="字典识别码" name="groupCode" value="${dict.groupCode}"
+                          placeholder="字典识别码" type="text"></search:input>
+        </div>
+        <div class="col-sm-2">
+            <qx:btn class="btn btn-primary" fa="fa fa-plus" label="增加" onclick="DictInfoDlg.addItem()"></qx:btn>
+        </div>
+    </div>
+    <div id="itemsArea">
+        <div th:each="item : ${subDicts}" class="form-group" name="dictItem" th:id="${item.id}">
+            <label class="col-sm-3 control-label"></label> <label
+                class="col-sm-1 control-label">值</label>
+            <div class="col-sm-2">
+                <input class="form-control" type="text" name="itemNum" th:value="${item.code}">
+            </div>
+            <label class="col-sm-1 control-label">名称</label>
+            <div class="col-sm-3">
+                <input class="form-control" type="text" name="itemName" th:value="${item.name}">
+            </div>
+            <div class="col-sm-2">
+                <button class="btn btn-default"  type="button" onclick="DictInfoDlg.deleteItem(event)"><i
+                        class="fa remove"></i>删除
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="row text-center">
+        <qx:btn id="ensure" class="btn btn-primary" fa="fa fa-check" label="保存"
+                onclick="DictInfoDlg.addSubmit()"></qx:btn>
+        <qx:btn id="cancel" class="btn btn-default" fa="fa fa-eraser" label="取消" onclick="DictInfoDlg.close()"></qx:btn>
+    </div>
+</div>
+</body>
+<js>
+    <script type="text/template" id="itemTemplate">
+        <div class="form-group" name="dictItem" id="dictItem">
+            <label class="col-sm-3 control-label"></label>
+            <label class="col-sm-1 control-label">值</label>
+            <div class="col-sm-2">
+                <input class="form-control" type="text" name="itemNum">
+            </div>
+            <label class="col-sm-1 control-label">名称</label>
+            <div class="col-sm-3">
+                <input class="form-control" type="text" name="itemName">
+            </div>
+            <div class="col-sm-2">
+                <button class="btn btn-default" id="" type="button" onclick="DictInfoDlg.deleteItem(event)"><i
+                        class="fa remove"></i>删除
+                </button>
+            </div>
+        </div>
+    </script>
+    <script th:src="@{/static/modular/system/dict/dict_info.js}"></script>
+</js>

@@ -1,0 +1,106 @@
+<!-- 添加下级工会界面 -->
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal" id="deptInfoForm">
+            <input type="hidden" id="id" value="${dept.id}">
+            <input id="pid" value="${dept.pid}" type="hidden"/>
+            <input id="deptType" value="${dept.deptType}" type="hidden"/>
+            <div class="col-sm-12">
+                    <#input id="simplename" name="工会简称" mustFlg="true" underline="true"/>
+                    <#input id="fullname" name="工会全称" mustFlg="true" underline="true" />
+                    <#input id="addr" name="单位名称" mustFlg="false" underline="true"/>
+                    <#input id="sort" type="number" min="0" name="序号" mustFlg="true" underline="true" value="0"/>
+            </div>
+            <div class="row btn-group-m-t" style="text-align: center;">
+                <div class="col-sm-12">
+                    <#button btnCss="info" name="提交" id="ensure" icon="fa-check" clickFun="DeptInfoDlg.editSubmit()"/>
+                    <#button btnCss="danger" name="取消" id="cancel" icon="fa-eraser" clickFun="DeptInfoDlg.close()"/>
+                </div>
+            </div>
+    </div>
+</div>
+<script type="text/javascript">
+/**r
+ * 初始化部门详情对话框
+ */
+var DeptInfoDlg = {
+    deptInfoData : {},
+    zTreeInstance : null,
+    validateFields: {
+        simplename: {
+            validators: {
+                notEmpty: {
+                    message: '工会简称不能为空'
+                }
+            }
+        },
+        fullname: {
+            validators: {
+                notEmpty: {
+                    message: '工会全称不能为空'
+                }
+            }
+        },
+        sort: {
+            validators: {
+                notEmpty: {
+                    message: '序号不能为空'
+                }
+            }
+        }
+    }
+};
+/**
+ * 验证数据是否为空
+ */
+DeptInfoDlg.validate = function () {
+    $('#deptInfoForm').data("bootstrapValidator").resetForm();
+    $('#deptInfoForm').bootstrapValidator('validate');
+    return $("#deptInfoForm").data('bootstrapValidator').isValid();
+};
+/**
+ * 设置对话框中的数据
+ * param key 数据的名称
+ * param val 数据的具体值
+ */
+DeptInfoDlg.set = function(key, val) {
+    this.deptInfoData[key] = (typeof value == "undefined") ? $("#" + key).val() : value;
+    return this;
+}
+/**
+ * 收集数据
+ */
+DeptInfoDlg.collectData = function() {
+    this.set('id').set('simplename').set('fullname').set('sort').set('pid')
+    	.set('addr').set('deptType');
+}
+DeptInfoDlg.editSubmit = function(){
+	this.deptInfoData = {};
+    this.collectData();
+    if (!this.validate()) {
+    	errorFocus();
+        return;
+    }
+    //提交信息
+    var ajax = new $ax(Feng.ctxPath + "/dept/easyAdd", function(data){
+    	parent.initZtreeByJsonData(data.id);
+        DeptInfoDlg.close();
+        Feng.success("添加成功!");
+    },function(data){
+        Feng.error("添加失败!");
+    });
+    ajax.set(this.deptInfoData);
+    ajax.start();
+    DeptInfoDlg.close();
+};
+/**
+ * 关闭此对话框
+ */
+DeptInfoDlg.close = function() {
+	var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+    parent.layer.close(index);
+}
+$(function(){
+	Feng.initValidator("deptInfoForm", DeptInfoDlg.validateFields);
+})
+</script>

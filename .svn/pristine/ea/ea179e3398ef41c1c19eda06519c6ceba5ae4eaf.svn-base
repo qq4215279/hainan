@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.appuser.dao.AppUserCancellationMapper">
+
+    <resultMap type="com.gobestsoft.common.modular.appuser.model.AppUserCancellation"
+               id="AppUserCancellation">
+        <id column="auid" property="auid"/>
+        <result column="account" property="account"/>
+        <result column="nick_name" property="nickname"/>
+        <result column="type" property="type"/>
+        <result column="reason" property="reason"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <select id="getDictionarieName" resultType="java.lang.String">
+        SELECT name from sys_dict where group_code='lib_delete_account' and code=#{type}
+    </select>
+
+</mapper>

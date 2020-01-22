@@ -1,0 +1,294 @@
+<css>
+    <div th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<style>
+textarea.form-control {
+	    height: 300px;
+	}
+
+</style>
+<body>
+<div class="container">
+    <div class="form-horizontal">
+        <div class="row">
+            <div th:if = "${type == 1}" class="col-sm-4">
+                <search:select label="类型" name="category" id="category"
+                               code="lib_legal_advice"></search:select>
+            </div>
+            <div th:if = "${type == 2}" class="col-sm-4">
+                <search:select label="类型" name="category" id="category"
+                               code="lib_law_question"></search:select>
+            </div>
+
+            <div class="col-sm-4">
+
+                <div class="input-group">
+                    <div class="input-group-btn">
+
+                        <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+
+                            回复状态
+                        </button>
+                    </div>
+                    <select class="form-control" id="status">
+
+                        <option value="">请选择</option>
+                        <option value="0">未回复</option>
+                        <option value="1">已回复</option>
+
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="col-sm-4">
+                <qx:btn id="btn1" class="btn btn-primary" fa="fa fa-search" label="查询" onclick="Consultation.search()"></qx:btn>
+            </div>
+        </div>
+        <div class="row text-center">
+            
+        </div>
+    </div>
+    <table id="consultationTable" data-mobile-responsive="true" data-click-to-select="true">
+    </table>
+</div>
+
+<div id="detail" class="form-horizontal" style="display: none;width:600px;">
+	<form class="form-horizontal" id="add-form">
+		<div class="row" style="margin-left:0;margin-right:0;">
+			<div class="col-sm-10">
+				<input type="hidden" id="id" name="id">
+			    <form:text label="类型" id="category" name="category" disabled="true"></form:text>
+<!-- 			    <form:text label="问题类型" id="category" name="category" disabled="true" th:if="${type == 2}"></form:text> -->
+			    <form:area label="回复内容" name="content" id="content" row="10"></form:area>
+		    </div>
+	    </div>
+	    <div class="row text-center" style="margin-left:0;margin-right:0;">
+	        <qx:btn fa="fa fa-check" label="提交" permission=""
+	                onclick="Consultation.submit()"></qx:btn>
+	        <qx:btn fa="fa fa-back" label="转办" permission=""
+	                onclick="Consultation.transfer()"></qx:btn>
+	        <qx:btn fa="fa fa-eraser" label="取消" permission=""
+	                onclick="Consultation.close1()"></qx:btn>
+	    </div>
+    </form>
+</div>
+
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+	<script th:src="@{/static/js/jquery.formHelp.js}"></script>
+    <script th:inline="javascript">
+    	
+        /**
+         * Banner初始化
+         */
+        var Consultation = {
+            id: "consultationTable",	//表格id
+            table: null,
+            validateFields: {
+            	content: {
+                    validators: {
+                        notEmpty: {
+                        	message: '回复内容不能为空'
+                        }
+                    }
+                }
+            }
+        };
+        App.initValidator("add-form", Consultation.validateFields);
+        
+        
+        /**
+         * 验证数据是否为空
+         */
+         Consultation.validate = function () {
+            //$('#articleForm').data("bootstrapValidator").resetForm();
+            $('#add-form').bootstrapValidator('validate');
+            return $("#add-form").data('bootstrapValidator').isValid();
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        Consultation.initColumn = function () {
+            return [
+                {
+                    title: '内容',
+                    field: 'content',
+                    visible: true,
+                    align: 'center',
+                    valign: 'middle',
+                    sortable: false,
+                    formatter: function (value, row, index) {
+                        if (value.length > 30) {
+                            return '<a title="'+value+'">'+value.substring(0, 29) + "..."+'</a>';
+                        }
+                        return '<a title="'+value+'">'+value+'</a>';
+                    }
+                },
+                {title: '状态', field: 'statusDesc', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {
+                    title: '提问时间',
+                    field: 'create_time',
+                    visible: true,
+                    align: 'center',
+                    valign: 'middle',
+                    sortable: false
+                },
+                {
+                    title: '类型',
+                    field: 'categoryName',
+                    visible: true,
+                    align: 'center',
+                    valign: 'middle',
+                    sortable: false
+                },
+                {title: '用户昵称', field: 'nick_name', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {title: '回复人', field: 'replyName', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {title: '回复时间', field: 'reply_time', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {
+                    title: '操作',
+                    visible: true,
+                    align: 'center',
+                    valign: 'middle',
+                    sortable: false,
+                    formatter: function (value, row, index) {
+                    	var s = row.s;
+                    	var status = row.status;
+                    	if(status == 0 && s == 0) {
+                    		return "<a href='javascript:void(0);' onclick=\"Consultation.detail('"+row.id+"','"+row.categoryName+"')\">回复</a>&nbsp;&nbsp;<a href='javascript:void(0);' onclick=\"Consultation.log('"+row.id+"')\">日志流程</a>"
+//                         	return '<a href="javascript:void(0);" onclick="Consultation.detail('+row.id+'\',\''+row.category+')">回复</a>';
+                    	}else{
+//                     		if(status == 1) {
+//                         	   return "<a href='javascript:void(0);' onclick=\"Consultation.detail1('"+row.id+"','"+row.categoryName+"')\">查看</a><a href='javascript:void(0);' onclick=\"Consultation.detail1('"+row.id+"','"+row.categoryName+"')\">日志流程</a>";
+//                     		}else {
+                        	   return "<a href='javascript:void(0);' onclick=\"Consultation.log('"+row.id+"')\">日志流程</a>";
+//                     		}
+//                         	return "<a href='javascript:void(0);' onclick=\"Consultation.detail1('"+row.id+"','"+row.categoryName+"')\">查看</a>";
+                    	}
+                    }
+                },
+            ]
+        };
+        
+        /**
+         * 关闭回复对话框
+         */
+         Consultation.close1 = function() {
+            layer.close(window.Consultation.layerIndex1);
+        }
+        
+        
+        //弹出回复层
+        Consultation.detail=function(id,cate){
+        	$("#id").val(id);
+        	$("input[ name='category']").val(cate);
+        	var index = layer.open({
+        	  type: 2,
+        	  title: '回复',
+        	  closeBtn: 1,
+        	  area: ['600px','500px'],
+        	  skin: 'white', //没有背景色
+        	  shadeClose: true,
+        	  content: $('#detail')
+        	});
+        	this.layerIndex1 = index;
+        }
+		
+        
+        //转办页面
+	     Consultation.transfer = function () {
+	        var index = layer.open({
+	            type: 1,
+	            title: '转办页面',
+	            area: ['60%', '70%'], //宽高
+	            fix: false, //不固定
+	            maxmin: true,
+	            content: App.ctxPath + 'law/transferWeb?id=' +$("#id").val(),
+	           	end:function(){
+	           	
+	           	}
+	        });
+	        this.layerIndex = index;
+	    };
+       
+        /**
+        	 * 提交回复
+         */
+         Consultation.submit = function () {
+        	 if (!this.validate()) {
+                 errorFocus();
+                 return;
+             }
+            //使用serializeJson方法的时候引用jquery.formHelp.js文件
+            var parameter = $("#add-form").serializeJson();
+            App.loadingAjax({
+                url: App.ctxPath + "law/reply",
+                type:"POST",
+//                 contentType:"application/json",
+                data: {id:$("#id").val(),content:$("#content").val()}, //JSON.stringify(parameter),
+//                 dataType:'json',
+                success: function (data) {
+                    if (data.code = 200) {
+                        layer.msg("操作成功", {icon: 1});
+                        Consultation.close1();
+                        Consultation.search();
+                    } else {
+                        App.error("操作失败! " + data.message + "!");
+                    }
+                    
+                }, error: function (data) {
+                    App.error("操作失败! ");
+                }
+
+            });
+        }
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        Consultation.formParams = function () {
+            var queryData = {};
+            queryData['category'] = $("#category").val();
+            queryData['status'] = $("#status").val();
+            return queryData;
+        }
+
+        /**
+         * 查询资讯列表
+         */
+        Consultation.search = function () {
+            Consultation.table.refresh({query: Consultation.formParams()});
+        };
+		
+        /**
+         * 点击查看流程
+         */
+         Consultation.log = function (id) {
+            var index = layer.open({
+                type: 2,
+                title: '查看流程',
+                area: ['100%', '100%'], //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: App.ctxPath + 'law/log?id='+id
+            });
+            this.layerIndex = index;
+        }
+
+        
+        $(function () {
+            var defaultColunms = Consultation.initColumn();
+            var table = new BSTable(Consultation.id, "law/consultationListNull?type="+ [[${type}]], defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(Consultation.formParams());
+            Consultation.table = table.init();
+        });
+
+    </script>
+</js>
+
+</body>

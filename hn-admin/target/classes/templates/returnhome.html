@@ -1,0 +1,294 @@
+<body xmlns:th="http://www.thymeleaf.org">
+<css>
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+    <link th:href="@{/static/assets/css/paper-dashboard.css}" rel="stylesheet"/>
+    <link th:href="@{/static/css/iconfont.css}" rel="stylesheet">
+    <link th:href="@{/static/css/layui.css}" rel="stylesheet">
+
+    <style type="text/css">
+        .print{
+            float:left;
+            width:75px;
+            height:30px;
+            border-radius: 5px;
+            background: #1E90FF;
+            color: white !important;
+            font-size: 16px;
+            cursor: pointer;
+            text-align:center;
+            line-height:30px
+        }
+
+        .print:hover{
+            color:red
+        }
+
+        table tr td,th{
+
+            color:#000;
+        }
+
+        .header #totalcnt:after{
+            content: "人";
+        }
+    </style>
+</css>
+<div class="row">
+    <div class="col-sm-12"></div>
+    <div class="content">
+        <div class="">
+
+        </div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card ">
+                        <div class="header">
+                            <h4 class="title">海南省总工会及下级工会“暖心返乡路” 农民工春节返乡购票补贴行动线上申请统计表</h4>
+                            <h4 class="title" style="padding-top: 20px">“暖心返乡路” 农民工春节返乡购票补贴行动线上申请人数：&nbsp;&nbsp;&nbsp;
+                                <span id="totalcnt" style="font-size: 16px; font-weight: 600; color: red" th:text="${totalcnt}">
+                                </span>
+                            </h4>
+                            <p class="category"></p>
+                        </div>
+                        <div class="content">
+                            <div id="szgzUnderUnionsTop10" class="ct-chart" style="height:600px !important;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="windth:450px">
+                <div class="col-md-12">
+                    <div class="card ">
+                        <div class="header">
+                            <h4 class="title">各级工会“暖心返乡路” 农民工春节返乡购票补贴行动线上申请人数统计前十</h4>
+                            <p class="category"></p>
+                        </div>
+                        <div class="content">
+                            <div id="szghRehomeTop10" class="ct-chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script th:src="@{/static/assets/js/chartist.min.js}"></script>
+    <script th:src="@{/static/assets/js/bootstrap-notify.js}"></script>
+    <script th:src="@{/static/assets/js/paper-dashboard.js}"></script>
+    <script th:src="@{/static/plugin/echarts/echarts.min.js}"></script>
+    <script th:src="@{/static/js/jquery.jqprint-0.3.js}"></script>
+    <script th:src="@{/static/js/layui.all.js}"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            getStatistics();
+
+        });
+
+
+        /**
+         * 获取统计数据
+         */
+        function getStatistics() {
+
+            App.loadingAjax({
+                url: App.ctxPath + "returnhome/getRehomeStatistics",
+                success: function (data) {
+                    var result = data.data;
+                    szgzUnderUnionsTop10(result.szgzUnderUnionsTop10);
+                    szghRehomeTop10(result.szghRehomeTop10);
+                }
+            })
+
+
+        }
+
+
+        /**
+         * 省总工会直属工会返乡统计
+         * @param data
+         */
+        function szgzUnderUnionsTop10(data) {
+            var szgzUnderUnionsTop10 = echarts.init(document.getElementById('szgzUnderUnionsTop10'));
+            var values=data.fullname;
+            var option = {
+                title: {
+                    text: '',
+                    subtext: ''
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    y:'-7.5',
+                    data: ['省总下级工会返乡统计']
+                },
+                toolbox: {
+                    y:'-7.5',
+                    show: true,
+                    feature: {
+                        mark: {show: true},
+                        dataView: {show: true, readOnly: false},
+                        magicType: {show: true, type: ['line', 'bar']},
+                        restore: {show: true}
+                    }
+                },
+                calculable: true,
+                xAxis: [
+                    {
+                        type: 'value',
+                        boundaryGap: [0, 0.01]
+                    }
+                ],
+                grid:{x:'22%',y:'5%',right:'15%',bottom:'9%',containLable:true},//修改样式
+                yAxis: [
+                    {
+                        type: 'category',
+                        data: values,
+                        axisLabel:{
+                            interval:0,//横轴信息全部显示
+                            // rotate: 30,//30度角倾斜显示
+                            formatter:function(values)
+                            {
+                                var ret = "";//拼接加\n返回的类目项
+                                var formatvalue = "...";
+                                var maxLength = 16;//每项显示文字个数
+                                var valLength = values.length;//X轴类目项的文字个数
+                                if(valLength > maxLength){
+                                    ret = values.substring(0,16) + "...";
+                                    return ret;
+                                }
+                                else {
+                                    return values;
+                                }
+                            }
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '返乡人数',
+                        type: 'bar',
+                        color: ['#ae81ff'],
+                        data: data.count,
+                        itemStyle: {
+                            normal: {
+                                label: {
+                                    show: true, //开启显示
+                                    position: 'right', //在上方显示
+                                    textStyle: { //数值样式
+                                        color: ['#ae81ff'],
+                                        fontSize: 15
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            };
+            szgzUnderUnionsTop10.setOption(option);
+        }
+
+
+
+        /**
+         * 各级工会返乡统计
+         * @param data
+         */
+        function szghRehomeTop10(data) {
+            var szghRehomeTop10 = echarts.init(document.getElementById('szghRehomeTop10'));
+            var values=data.fullname;
+            var option = {
+                title: {
+                    text: '',
+                    subtext: ''
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    y:'-7.5',
+                    data: ['各级工会返乡统计']
+                },
+                toolbox: {
+                    y:'-7.5',
+                    show: true,
+                    feature: {
+                        mark: {show: true},
+                        dataView: {show: true, readOnly: false},
+                        magicType: {show: true, type: ['line', 'bar']},
+                        restore: {show: true}
+                    }
+                },
+                calculable: true,
+                xAxis: [
+                    {
+                        type: 'value',
+                        boundaryGap: [0, 0.01]
+                    }
+                ],
+                grid:{x:'22%',y:'5%',right:'15%',bottom:'9%',containLable:true},//修改样式
+                yAxis: [
+                    {
+                        type: 'category',
+                        data: values,
+                        axisLabel:{
+                            interval:0,//横轴信息全部显示
+                            // rotate: 30,//30度角倾斜显示
+                            formatter:function(values)
+                            {
+                                var ret = "";//拼接加\n返回的类目项
+                                var formatvalue = "...";
+                                var maxLength = 16;//每项显示文字个数
+                                var valLength = values.length;//X轴类目项的文字个数
+                                if(valLength > maxLength){
+                                    ret = values.substring(0,16) + "...";
+                                    return ret;
+                                }
+                                else {
+                                    return values;
+                                }
+                            }
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '返乡人数',
+                        type: 'bar',
+                        color: ['#ae81ff'],
+                        data: data.count,
+                        itemStyle: {
+                            normal: {
+                                label: {
+                                    show: true, //开启显示
+                                    position: 'right', //在上方显示
+                                    textStyle: { //数值样式
+                                        color: ['#ae81ff'],
+                                        fontSize: 15
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            };
+            szghRehomeTop10.setOption(option);
+        }
+
+
+
+        function dateFormat(dateStr){
+            return dateStr.substr(4,2)+'月'+dateStr.substr(6,2)+'日';
+        }
+
+
+    </script>
+    <script th:src="@{http://www.jq22.com/jquery/jquery-migrate-1.2.1.min.js}"></script>
+</js>
+
+</body>

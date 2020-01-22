@@ -1,0 +1,44 @@
+<title th:text="${title}" xmlns:th="http://www.springframework.org/schema/mvc"></title>
+<body xmlns:th="http://www.springframework.org/schema/mvc">
+<link rel="stylesheet" th:href="@{/static/css/article.h5.css}"/>
+<div id="article" style="margin: -10px">
+    <a id="active">
+        <image th:src="@{/static/image/pfhd.png}" width="100%" height="100%"></image>
+    </a>
+</div>
+<script th:src="@{/static/js/jquery-1.11.0.min.js}"></script>
+<script th:src="@{/static/js/jquery.lazyload.min.js?v=1.9.1}"></script>
+<script th:src="@{/static/js/app.js}"></script>
+
+
+<script th:inline="javascript">
+    var cxtPath = [[${apiPath}]];
+</script>
+
+<script>
+
+    var images = document.getElementsByTagName("img");
+    //修改所有图片为默认
+    for (var i = 0; i < images.length; i++) {
+        var image = images[i];
+        var date_src = image.getAttribute("src");
+        image.setAttribute("data-original", date_src);
+        image.setAttribute("src", ctxPath + "static/image/image-default.png");
+    }
+
+    $(function () {
+
+        $("img").lazyload({effect: "fadeIn"});
+
+        $("#active").click(function () {
+            app.getToken(function () {
+                window.location.href = "https://ks.wjx.top/jq/33059744.aspx"
+            })
+        })
+
+    })
+
+
+
+</script>
+</body>

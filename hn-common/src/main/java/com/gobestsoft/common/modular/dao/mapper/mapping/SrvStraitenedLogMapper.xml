@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dao.mapper.SrvStraitenedLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.dao.model.SrvLawSupportLogPojo">
+        <id column="id" property="id"/>
+        <result column="type" property="type"/>
+        <result column="straitened_id" property="straitenedId"/>
+        <result column="status" property="status"/>
+        <result column="comment" property="comment"/>
+        <result column="create_uid" property="createUid"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user_type" property="createUserType"/>
+        <result column="check_date" property="checkDate"/>
+        <result column="check_uid" property="checkUid"/>
+        <result column="check_dept_id" property="checkDeptId"/>
+        <result column="phone" property="phone"/>
+    </resultMap>
+    
+    <sql id="commonColumns">
+           srv_straitened_log.id,
+           srv_straitened_log.type,
+           srv_straitened_log.straitened_id,
+           srv_straitened_log.status,
+           srv_straitened_log.comment,
+           srv_straitened_log.create_uid,
+           srv_straitened_log.create_time,
+           srv_straitened_log.create_user_type,
+           srv_straitened_log.check_date,
+           srv_straitened_log.check_uid,
+           srv_straitened_log.check_dept_id
+    </sql>
+    
+    <resultMap type="com.gobestsoft.common.modular.model.LogModel"
+		id="logModelMap">
+		<result column="status" property="status" />
+		<result column="comment" property="comment" />
+		<result column="content" property="content" />
+		<result column="fullname" property="fullname" />
+		<result column="check_date" property="checkTime" />
+		<result column="create_time" property="createTime" />
+		<result column="name" property="name" />
+		<result column="account" property="account" />
+	</resultMap>
+	
+	<!-- 根据困难帮扶申请id和日志类型,查询审核日志  -->
+    <select id="selectListMapById" resultMap="logModelMap">
+          SELECT 
+          (
+		   CASE
+		   WHEN #{type} = 1 THEN
+			 srv_straitened.`name`
+		   ELSE
+			 srv_straitened_first.`name`
+		   END
+	       ) AS name,
+          sys_dept.fullname,
+          sys_user.account,
+          ifnull(sys_user.phone,dept_organization.union_leader_phone) as phone,
+          <include refid="commonColumns"></include>
+          FROM srv_straitened_log
+          LEFT JOIN sys_dept ON srv_straitened_log.check_dept_id = sys_dept.id
+          LEFT JOIN dept_organization on dept_organization.dept_id = sys_dept.id
+          LEFT JOIN sys_user ON srv_straitened_log.check_uid = sys_user.uid
+          LEFT JOIN srv_straitened ON srv_straitened_log.straitened_id = srv_straitened.id
+          LEFT JOIN srv_straitened_first ON srv_straitened_log.straitened_id = srv_straitened_first.id 
+          WHERE srv_straitened_log.straitened_id = #{straitenedId} AND type = #{type}
+          order by srv_straitened_log.create_time ASC
+    </select>
+
+
+    <!-- 根据困难帮扶申请id和日志类型,查询审核日志 ,用于填充帮扶表格数据 -->
+    <select id="selectListMapRealById" resultMap="logModelMap">
+        SELECT
+        srv_straitened.`name` AS name,
+        sys_dept.fullname,
+        sys_user.account,
+        <include refid="commonColumns"></include>
+        FROM srv_straitened_log
+        LEFT JOIN sys_dept ON srv_straitened_log.check_dept_id = sys_dept.id
+        LEFT JOIN sys_user ON srv_straitened_log.check_uid = sys_user.uid
+        LEFT JOIN srv_straitened ON srv_straitened_log.straitened_id = srv_straitened.id
+        LEFT JOIN srv_straitened_first ON srv_straitened_log.straitened_id = srv_straitened_first.id
+        WHERE srv_straitened_log.straitened_id = #{straitenedId} AND type = 1
+        and srv_straitened_log.status in (2,3)
+        order by srv_straitened_log.create_time ASC
+    </select>
+</mapper>

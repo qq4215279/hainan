@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.legal.mapper.DeptLegalApplyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.legal.model.DeptLegalApply">
+        <id column="id" property="id" />
+        <result column="dept_id" property="deptId" />
+        <result column="name" property="name" />
+        <result column="sex" property="sex" />
+        <result column="nation" property="nation" />
+        <result column="birthday" property="birthday" />
+        <result column="education" property="education" />
+        <result column="political_outlook" property="politicalOutlook" />
+        <result column="native_place" property="nativePlace" />
+        <result column="work_position" property="workPosition" />
+        <result column="tnure_start_date" property="tnureStartDate" />
+        <result column="tnure_end_data" property="tnureEndData" />
+        <result column="part_time_job" property="partTimeJob" />
+        <result column="certificate_no" property="certificateNo" />
+        <result column="other_position" property="otherPosition" />
+        <result column="join_time" property="joinTime" />
+        <result column="income_accumulative_last_year" property="incomeAccumulativeLastYear" />
+        <result column="income_annual_dues" property="incomeAnnualDues" />
+        <result column="income_trade_union_funds" property="incomeTradeUnionFunds" />
+        <result column="income_other" property="incomeOther" />
+        <result column="capital_total" property="capitalTotal" />
+        <result column="capital_fixed_funds" property="capitalFixedFunds" />
+        <result column="capital_working" property="capitalWorking" />
+        <result column="capital_other" property="capitalOther" />
+        <result column="place_total" property="placeTotal" />
+        <result column="place_office_area" property="placeOfficeArea" />
+        <result column="place_activity" property="placeActivity" />
+        <result column="place_other" property="placeOther" />
+        <result column="ability_to_bear" property="abilityToBear" />
+        <result column="dept_name" property="deptName" />
+        <result column="unit_tel" property="unitTel" />
+        <result column="unit_address" property="unitAddress" />
+        <result column="unit_zip_code" property="unitZipCode" />
+        <result column="createunion_time" property="createunionTime" />
+        <result column="election_date" property="electionDate" />
+        <result column="approve_no" property="approveNo" />
+        <result column="unit_number" property="unitNumber" />
+        <result column="membership" property="membership" />
+        <result column="cadres_number" property="cadresNumber" />
+        <result column="chairman_name" property="chairmanName" />
+        <result column="chairman_session" property="chairmanSession" />
+        <result column="chairman_mobile" property="chairmanMobile" />
+        <result column="cer_time" property="cerTime" />
+        <result column="cer_no" property="cerNo" />
+        <result column="agent_name" property="agentName" />
+        <result column="agent_certificate_no" property="agentCertificateNo" />
+        <result column="cancellation_reason" property="cancellationReason" />
+        <result column="cacellation_basis" property="cacellationBasis" />
+        <result column="p_dept_fullname" property="pDeptFullname" />
+        <result column="assets_handing" property="assetsHanding" />
+        <result column="loss_natice" property="lossNatice" />
+        <result column="loss_reason" property="lossReason" />
+        <result column="type" property="type" />
+        <result column="status" property="status" />
+        <result column="create_uid" property="createUid" />
+        <result column="create_time" property="createTime" />
+        <result column="debt_handing" property="debtHanding" />
+        <result column="legal_mobile" property="legalMobile" />
+		<result column="office_term" property="officeTerm" />
+		<result column="certificate_number" property="certificateNumber" />
+		<result column="person_certificate_number" property="personCertificateNumber" />
+		<result column="change_reason" property="changeReason" />
+		<result column="del_flg" property="delFlg" />
+    </resultMap>
+    
+    <sql id="columns">
+    	dept_legal_apply.id,
+		dept_legal_apply.dept_id,
+		dept_legal_apply.name,
+		dept_legal_apply.sex,
+		dept_legal_apply.nation,
+		dept_legal_apply.birthday,
+		dept_legal_apply.education,
+		dept_legal_apply.political_outlook,
+		dept_legal_apply.native_place,
+		dept_legal_apply.work_position,
+		dept_legal_apply.tnure_start_date,
+		dept_legal_apply.tnure_end_data,
+		dept_legal_apply.part_time_job,
+		dept_legal_apply.certificate_no,
+		dept_legal_apply.other_position,
+		dept_legal_apply.join_time,
+		dept_legal_apply.income_accumulative_last_year,
+		dept_legal_apply.income_annual_dues,
+		dept_legal_apply.income_trade_union_funds,
+		dept_legal_apply.income_other,
+		dept_legal_apply.capital_total,
+		dept_legal_apply.capital_fixed_funds,
+		dept_legal_apply.capital_working,
+		dept_legal_apply.capital_other,
+		dept_legal_apply.place_total,
+		dept_legal_apply.place_office_area,
+		dept_legal_apply.place_activity,
+		dept_legal_apply.place_other,
+		dept_legal_apply.ability_to_bear,
+		dept_legal_apply.dept_name,
+		dept_legal_apply.unit_tel,
+		dept_legal_apply.unit_address,
+		dept_legal_apply.unit_zip_code,
+		dept_legal_apply.createunion_time,
+		dept_legal_apply.election_date,
+		dept_legal_apply.approve_no,
+		dept_legal_apply.unit_number,
+		dept_legal_apply.membership,
+		dept_legal_apply.cadres_number,
+		dept_legal_apply.chairman_name,
+		dept_legal_apply.chairman_session,
+		dept_legal_apply.chairman_mobile,
+		dept_legal_apply.cer_time,
+		dept_legal_apply.cer_no,
+		dept_legal_apply.agent_name,
+		dept_legal_apply.agent_certificate_no,
+		dept_legal_apply.agent_mobile,
+		dept_legal_apply.cancellation_reason,
+		dept_legal_apply.cacellation_basis,
+		dept_legal_apply.p_dept_fullname,
+		dept_legal_apply.assets_handing,
+		dept_legal_apply.loss_natice,
+		dept_legal_apply.loss_reason,
+		dept_legal_apply.type,
+		dept_legal_apply.status,
+		dept_legal_apply.create_uid,
+		dept_legal_apply.create_time,
+		dept_legal_apply.debt_handing,
+		dept_legal_apply.legal_mobile,
+		dept_legal_apply.office_term,tnure_start_date,
+		dept_legal_apply.certificate_number,
+		dept_legal_apply.person_certificate_number,
+		dept_legal_apply.change_reason,
+		dept_legal_apply.del_flg
+    </sql>
+    
+	
+	
+	<select id="selectApplyByStatus" resultMap="BaseResultMap">
+
+		select
+		<include refid="columns"></include> from dept_legal_apply
+		where dept_legal_apply.dept_id=#{dept_id}
+		and (
+		dept_legal_apply.status in
+		<foreach collection="list" item="status" open="(" close=")" separator=",">
+
+			#{status}
+
+		</foreach>
+		or dept_legal_apply.status is null
+
+		)
+		and
+		dept_legal_apply.del_flg=0
+		and
+		dept_legal_apply.type=#{type}
+		order by dept_legal_apply.status
+
+
+	</select>
+	
+    <!--可作为法人资格申请、变更、注销、遗失补办多条件分页查询   -->
+    <select id="selectApplyPageByCondition" resultMap="BaseResultMap">
+    	select <include refid="columns"></include> from dept_legal_apply where dept_legal_apply.del_flg = '0'
+    		<if test="uid != null and uid != ''">
+	    		 and dept_legal_apply.create_uid = #{uid}
+	    	</if>
+	    	<if test="name != null and name != ''">
+	    		and dept_legal_apply.name like  CONCAT('%',#{name},'%')
+	    	</if>
+			<if test="deptName != null and deptName != ''">
+				and dept_legal_apply.dept_name like  CONCAT('%',#{deptName},'%')
+			</if>
+	    	<if test="agentName != null and agentName != ''">
+	    		and dept_legal_apply.agent_name like  CONCAT('%',#{agentName},'%')
+	    	</if>
+			<if test="type != null and type != ''">
+				and dept_legal_apply.type = #{type}
+			</if>
+    	order by dept_legal_apply.status,dept_legal_apply.create_time
+    </select>
+    
+
+	<!-- 审核页多条件分页查询   -->
+    <select id="selectApplyCheckPageByCondition" resultType="map">
+		select <include refid="columns"></include>,PP.bool from dept_legal_apply join (
+			select dept_legal_approve_log.apply_id,
+			(CASE WHEN (dept_legal_approve_log.next_dept_id = #{orgId}) THEN '1' ELSE '0' end ) as bool
+			from ( select apply_id,max(check_time) as max_time from dept_legal_approve_log where dept_legal_approve_log.apply_id in (
+				select DISTINCT(dept_legal_approve_log.apply_id) from dept_legal_approve_log 
+				left join dept_legal_apply on dept_legal_apply.id = dept_legal_approve_log.apply_id
+				where dept_legal_approve_log.next_dept_id = #{orgId} AND dept_legal_apply.type = #{type}
+			) GROUP BY apply_id 
+			)P left join dept_legal_approve_log on dept_legal_approve_log.apply_id=P.apply_id and dept_legal_approve_log.check_time=P.max_time
+		)PP on PP.apply_id = dept_legal_apply.id where dept_legal_apply.del_flg = '0'
+			<if test="name != null and name != ''">
+	    		and dept_legal_apply.name like  CONCAT('%',#{name},'%')
+	    	</if>
+			<if test="deptName != null and deptName != ''">
+				and dept_legal_apply.dept_name like  CONCAT('%',#{deptName},'%')
+			</if>
+	    	<if test="agentName != null and agentName != ''">
+	    		and dept_legal_apply.agent_name like  CONCAT('%',#{agentName},'%')
+	    	</if>
+    	order by PP.bool desc,dept_legal_apply.create_time
+    </select>
+
+</mapper>

@@ -1,0 +1,120 @@
+<css>
+    <div th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="container">
+    <div class="form-horizontal">
+        <div class="row">
+            <div class="col-sm-4">
+                <search:input label="单位名称" name="query_name" value=""
+                              placeholder="单位名称" type="text"></search:input>
+            </div>
+
+            <div class="col-sm-2">
+                <qx:btn id="sure" class="btn btn-primary" fa="fa fa-search" label="搜索"
+                        onclick="ObjBanner.search()"></qx:btn>
+            </div>
+        </div>
+    </div>
+
+    <div id="ObjBannerTableToolbar">
+    </div>
+    <table id="ObjBannerTable" data-mobile-responsive="true" data-click-to-select="true">
+    </table>
+
+</div>
+
+</body>
+
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script type="text/javascript">
+        /**
+         * Banner初始化
+         */
+        var ObjBanner = {
+            id: "ObjBannerTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        ObjBanner.initColumn = function () {
+            return [
+                // {field: 'selectItem', checkbox: true},
+                {title: '未创建公会的单位名称', field: 'unit_name', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {title: '会员申请人数', field: 'dept_count', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {title: '操作', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        return "<a href='javascript:ObjBanner.openEdit("+row.id+")'>工会已创建，进行转办</a>"
+                    }
+                }
+            ]
+        };
+
+
+
+
+
+        /**
+         * 打开修改的窗口
+         */
+        ObjBanner.openEdit = function (id) {
+                var index = layer.open({
+                    type: 2,
+                    title: '选择已有的工会',
+                    area: ['300px', '450px'], //宽高
+                    fix: true, //固定
+                    maxmin: true,
+                    content: App.ctxPath + 'deptMemApply/edit?id=' + id
+                });
+                // layer.full(index);
+                this.layerIndex = index;
+        };
+
+        /**
+         * 检查是否选中
+         */
+        ObjBanner.check = function () {
+            var selected = $('#' + this.id).bootstrapTable('getSelections');
+            if (selected.length == 0) {
+                App.info("请先选中表格中的某一记录！");
+                return false;
+            } else {
+                ObjBanner.seItem = selected[0];
+                return true;
+            }
+
+        };
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        ObjBanner.formParams = function () {
+            var queryData = {};
+            queryData['query_name'] = $('[name="query_name"]').val();
+            return queryData;
+        }
+
+        /**
+         * 查询资讯列表
+         */
+        ObjBanner.search = function () {
+
+            ObjBanner.table.refresh({query: ObjBanner.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = ObjBanner.initColumn();
+            var table = new BSTable(ObjBanner.id, "deptMemApply/list", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(ObjBanner.formParams());
+            ObjBanner.table = table.init();
+        });
+    </script>
+
+</js>

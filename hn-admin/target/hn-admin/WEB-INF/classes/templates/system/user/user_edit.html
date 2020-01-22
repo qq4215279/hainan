@@ -1,0 +1,64 @@
+<css xmlns:form="http://www.w3.org/1999/html" xmlns:form="http://www.w3.org/1999/html">
+    <div  th:include="fragment/fargment :: treeCss"></div>
+    <link th:href="@{/static/plugin/webuploader/webuploader.css}" rel="stylesheet">
+</css>
+<body>
+<div class="form-horizontal row" id="userInfoForm">
+    <input type="hidden" id="tempType" value="edit">
+    <input type="hidden" id="id" th:value="${user.id}">
+    <input type="hidden" id="sexValue" th:value="${user.sex}">
+    <input type="hidden" id="isResponsibleValue" th:value="${user.isResponsible}">
+    <div class="row">
+        <div class="col-sm-offset-2 col-sm-8">
+            <form:text id="account" label="账户" name="account" must="true" value="${user.account}"
+                       line="true"></form:text>
+            <form:select id="sex" label="性别" name="sex" code="lib_sex"></form:select>
+            <form:text id="email" label="邮箱" name="email" value="${user.email}" line="true"></form:text>
+            <form:text id="name" label="姓名" name="name" value="${user.name}" must="true" line="true"></form:text>
+            <form:text id="phone" label="电话" name="phone" value="${user.phone}" line="true"></form:text>
+            <form:text id="duty" label="职务" name="duty" value="${user.duty}" line="true"></form:text>
+            <form:text id="dutyOfWork" label="工作职责" name="dutyOfWork" value="${user.dutyOfWork}"
+                       line="true"></form:text>
+            <form:check id="userType" label="基层平台管理员" name="userType" value="${user.userType}"></form:check>
+            <form:select id="isResponsible" label="是否为部门负责人" name="isResponsible"
+                         code="lib_is_not"></form:select>
+            <!-- 这是角色选择的下拉框 -->
+            <div class="form-group">
+                <label class="col-sm-3 control-label">角色</label>
+                <div class="col-sm-9">
+                    <div id="roleContent" class="menuContent">
+                        <ul id="roleTreeDemo" class="ztree tree-box"
+                            style="width: 249px !important;"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row text-center">
+        <qx:btn id="ensure" class="btn btn-primary" fa="fa fa-check" onclick="UserInfoDlg.editSubmit()"
+                label="提交"></qx:btn>
+        <qx:btn id="ensure" class="btn btn-default" fa="fa fa-eraser" onclick="UserInfoDlg.close()"
+                label="取消"></qx:btn>
+    </div>
+</div>
+</body>
+<js>
+    <script th:src="@{/static/plugin/webuploader/webuploader.min.js}"></script>
+    <script th:src="@{/static/js/web-upload-object.js}"></script>
+    <div th:include="fragment/fargment :: treeJs"></div>
+    <script th:src="@{/static/modular/system/user/user_info.js}"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('#phone').autoNumeric('init', {vMin: '0', vMax: '99999999999', mDec: '0', aSep: ''});
+            // $('#roleContent').css('display','none');
+            // $('#roleDiv').css('display','none');
+
+            var userType = $("#userType").val();
+            if(userType == 1 && userType != ""){
+                $("input[name='userType']").attr("checked", true);
+            }
+
+        })
+
+    </script>
+</js>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.cms.dao.ArticleTypeDao">
+
+	<!-- 对应selectByCondition方法，条件查询，无分页（状态，标题，开始日期，结束日期） -->
+	<resultMap type="com.gobestsoft.common.modular.cms.model.ArticleType" id="BaseResultMap">
+       <result property="articleType" column="article_type" /> 
+       <result property="articleTypeName" column="article_type_name" /> 
+   	</resultMap>
+   	
+   	<select id="selectAll" resultMap="BaseResultMap" >
+   		SELECT * FROM mst_article_type
+   	</select>
+	
+
+
+	
+</mapper>

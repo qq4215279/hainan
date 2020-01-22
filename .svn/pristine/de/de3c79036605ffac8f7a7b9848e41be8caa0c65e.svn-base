@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>修改密码</title>
+    <!--    <script src="../../static/js/jquery-1.12.4.min.js"></script>-->
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <div id="modifyPassword" class="form-horizontal">
+            <span class="box_login_account_null" id="tip" th:text="${tip}"></span>
+        <input type="text" label="旧密码" name="oldPwd" id="oldPwd" value=""/>
+            <span class="box_login_account_null" id="old"></span>
+        <input type="password" label="新密码" name="newPwd" id="newPwd" value=""/>
+            <span class="box_login_account_null" id="msg"></span>
+        <input type="password" label="确认新密" name="rePwd" id="rePwd" value=""/>
+            <span class="box_login_account_null" id="reNew" ></span>
+        <!--        <qx:btn id="sure" class="btn btn-primary" fa="fa fa-eraser" label="确认"></qx:btn>-->
+        <button id="sure" class="btn btn-primary" fa="fa fa-eraser">确认</button>
+    </div>
+</div>
+
+</body>
+<script>
+    $(function () {
+
+        let ctxPath = "/" + location.pathname.split("/")[1];
+
+        function checkOldPwd() {
+            var oldPwd = $("#oldPwd").val();
+            if (oldPwd == ''){
+                $("#old").html("旧密码不能为空");
+                return false;
+            }else {
+                return true;
+            }
+        }
+        function checkNewPwd(){
+            var newPwd = $("#newPwd").val();
+            var chars = newPwd.split('');
+            for (var i = 0; i < newPwd.length - 1; i++) {
+                if (chars[i] == chars[i + 1]){
+                    return false;   //任何相邻两位不能相同
+                }
+            }
+            return true
+        }
+        function checkRePwd() {
+            var newPwd = $("#newPwd").val();
+            var rePwd = $("#rePwd").val();
+            if (rePwd !== newPwd){
+                $("#reNew").html("两次密码不一样");
+                return false;
+            }else {
+                return true;
+            }
+        }
+
+        $("#oldPwd").blur(checkOldPwd);
+        $("#newPwd").blur(checkNewPwd);
+        $("#rePwd").blur(checkRePwd);
+
+        var oldPwd = $("#oldPwd").val();
+        var newPwd = $("#newPwd").val();
+        var rePwd = $("#rePwd").val();
+
+        $("#sure").click(function () {
+            if (checkOldPwd() && checkNewPwd() && checkRePwd()){
+                $.post(ctxPath + "changePwd",{oldPwd:oldPwd,newPwd:newPwd,rePwd:rePwd},function (data) {
+                    if (data.code == 200){
+                        var path = location.pathname;
+                        App.success("修改成功，请重新登录!", function () {
+                            parent.window.location.href = path;
+                        })
+
+                    }else {
+                        location.href = ctxPath + "/user_chpwd";
+                    }
+                })
+            }
+            return false;
+        })
+
+
+    })
+
+</script>
+</html>

@@ -1,0 +1,340 @@
+@layout("/common/_container.html"){
+<div class="row">
+	<div class="col-sm-12">
+		<div class="ibox float-e-margins">
+			<div class="ibox-title">
+				<h5>邮件管理</h5>
+			</div>
+			<input type="hidden" id="searchType" value="1"> <input
+				type="hidden" id="activeType" value="type1">
+			<div class="ibox-content">
+				<div class="row row-lg">
+					<div class="col-sm-12">
+						<div class="row">
+							<div class="col-sm-2">
+								<div>
+									<a class="btn btn-danger" href="javascript:Mail.openAdd()"><i
+										class="fa fa-file-text-o" aria-hidden="true"></i>&nbsp; 写信</a>
+								</div>
+								<!--                         <button type="button" class="btn btn-success" onclick="Mail.openAdd()" style="width: 200px;">写信</button> -->
+								<ul class="nav nav-pills nav-stacked">
+									<li role="presentation" class="active" id="type1"><a
+										href="javascript: Mail.setType(1)" style="outline: none;"><i
+											class="fa fa-envelope-o" aria-hidden="true"></i>&nbsp; 收件箱</a></li>
+									<li role="presentation" id="type2"><a
+										href="javascript:Mail.setType(2)" style="outline: none;"><i
+											class="fa fa-send-o" aria-hidden="true"></i>&nbsp; 已发送</a></li>
+									<li role="presentation" id="type3"><a
+										href="javascript:Mail.setType(3)" style="outline: none;"><i
+											class="fa fa-remove" aria-hidden="true"></i>&nbsp; 已删除</a></li>
+									<li role="presentation" id="type4"><a
+										href="javascript:Mail.setType(4)" style="outline: none;"><i
+											class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp; 草稿箱</a></li>
+								</ul>
+							</div>
+							<div class="col-sm-10">
+								<div class="col-sm-12">
+									<div class="col-sm-3">
+										<input type="text" class="form-control" placeholder="邮件检索"
+											id="content">
+									</div>
+									<div class="col-sm-3">
+										<input type="text" class="form-control layer-date"
+											placeholder="开始日期"
+											onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})"
+											id="startDate" />
+									</div>
+									<div class="col-sm-3">
+										<input type="text" class="form-control layer-date"
+											placeholder="结束日期"
+											onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})"
+											id="endDate" />
+									</div>
+									<div class="col-sm-3">
+										<#button name="搜索" icon="fa-search" clickFun="Mail.search()" />
+										<#button name="重置" icon="fa-repeat" clickFun="Mail.clear()" />
+									</div>
+								</div>
+								<div class="col-sm-12">
+									<#table id="MailTable" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+
+/**
+ * 咨询初始化
+ */
+var Mail = {
+    id: "MailTable",	//表格id
+    seItem: null,		//选中的条目
+    table: null,
+    layerIndex: -1
+};
+
+/**
+ * 初始化表格的列
+ */
+ Mail.initColumn = function () {
+    return [
+        {field: 'selectItem', radio: true},
+        {title: '发件人', field: 'sendName', align: 'center', valign: 'middle'}, 
+        {title: '收件人', field: 'rec_id', align: 'center', valign: 'middle', visible:false}, 
+        {title: '主题', field: 'subject', align: 'center', valign: 'middle',
+        	formatter: function (value, row, index) {
+        		if (row.is_draft!='1'){
+	        		var e = '<a href='+'javascript:Mail.openDetail('+'"'+row.mail_id+'"'+')'+'>'+row.subject+'</a>';
+	            	return e ;
+        		}else{
+        			var e = '<a href='+'javascript:Mail.openEdit('+'"'+row.mail_id+'"'+')'+'>'+row.subject+'</a>';
+	            	return e ;
+        		}
+        	}
+        	},
+        {title: '时间',field: 'creat_time' ,align: 'center', valign: 'middle'},
+        {title: '状态',field: 'status', align: 'center', valign: 'middle',
+        	formatter: function (value, row, index) {
+        		if (row.status=='0'){
+	        		var e = '<i class="fa fa-envelope-o" aria-hidden="true"></i>';
+	            	return e ;
+        		}else{
+        			var e = '<i class="fa fa-envelope-open-o" aria-hidden="true"></i>';
+	            	return e ;
+        		}
+        	}},
+        {title: '操作', field: 'opt', align: 'center', valign: 'middle',
+        	formatter: function (value, row, index) {
+        		if ($("#searchType").val()==3){
+        			var e = '<a href="javascript:Mail.openBack()">恢复</a>';
+	                return e ;
+        		}else if (row.is_draft!='1'){
+        			var e = '<a href="javascript:Mail.openDelete()">删除</a>';
+        			return e ;
+        		}else{
+        			var e = '<a href="javascript:Mail.openTrueDelete()">删除</a>';
+	            	return e ;
+        		}
+            }}
+        ];
+};
+
+/**
+ * 重置检索条件
+ */
+ Mail.clear = function () {
+	 $("#content").val('');
+	 $("#startDate").val('');
+	 $("#endDate").val('');
+};
+
+/**
+ * 打开添加的窗口
+ */
+ Mail.openAdd = function () {
+
+    var index = layer.open({
+        type: 2,
+        title: '写信',
+        area: ['100%', '100%'], //宽高
+        fix: true, //不固定
+        maxmin: true,
+        content: Feng.ctxPath + '/mail/mail_add'
+    });
+    layer.full(index);  
+    this.layerIndex = index;
+};
+
+
+/**
+ * 打开邮件详情
+ */
+ Mail.openDetail = function (mailId) {
+        var index = layer.open({
+            type: 2,
+            title: '邮件信息',
+            area: ['100%', '100%'], //宽高
+            fix: false, //不固定
+            maxmin: true,
+            content: Feng.ctxPath + '/mail/mail_detail/' + mailId+'_'+$("#searchType").val()
+        });
+        layer.full(index); 
+        this.layerIndex = index;
+};
+
+/**
+ * 打开草稿邮件修改
+ */
+ Mail.openEdit = function (mailId) {
+        var index = layer.open({
+            type: 2,
+            title: '邮件信息',
+            area: ['100%', '100%'], //宽高
+            fix: false, //不固定
+            maxmin: true,
+            content: Feng.ctxPath + '/mail/mail_edit/' + mailId
+        });
+        layer.full(index); 
+        this.layerIndex = index;
+};
+
+/**
+ * 设置检索类型
+ */
+  Mail.setType = function (type) {
+ 	 $("#searchType").val(type);
+ 	 $("#"+$("#activeType").val()).removeClass('active');
+ 	 if (type==1){
+ 		 $('#MailTable').bootstrapTable('showColumn', 'sendName');
+         $('#MailTable').bootstrapTable('hideColumn', 'rec_id');
+         $('#MailTable').bootstrapTable('showColumn', 'status');
+         $('#MailTable').bootstrapTable('showColumn', 'opt');
+         $("#activeType").val("type1");
+         $("#type1").addClass('active');
+ 	 }else if (type==2){
+ 		$('#MailTable').bootstrapTable('hideColumn', 'sendName');
+        $('#MailTable').bootstrapTable('showColumn', 'rec_id');
+        $('#MailTable').bootstrapTable('hideColumn', 'status');
+        $('#MailTable').bootstrapTable('showColumn', 'opt');
+        $("#activeType").val("type2");
+        $("#type2").addClass('active');
+ 	 }else if (type==3){
+ 		$('#MailTable').bootstrapTable('showColumn', 'sendName');
+        $('#MailTable').bootstrapTable('hideColumn', 'rec_id');
+        $('#MailTable').bootstrapTable('hideColumn', 'status');
+        $('#MailTable').bootstrapTable('showColumn', 'opt');
+        $("#activeType").val("type3");
+        $("#type3").addClass('active');
+ 	 }else if (type==4){
+ 		$('#MailTable').bootstrapTable('hideColumn', 'sendName');
+        $('#MailTable').bootstrapTable('hideColumn', 'rec_id');
+        $('#MailTable').bootstrapTable('hideColumn', 'status');
+        $('#MailTable').bootstrapTable('showColumn', 'opt');
+        $("#activeType").val("type4");
+        $("#type4").addClass('active');
+ 	 }
+ 	 Mail.search();
+ };
+
+/**
+ * 检查是否选中  xxxxxx
+ */
+ Mail.check = function () {
+    var selected = $('#' + this.id).bootstrapTable('getSelections');
+    if(selected.length == 0){
+        Feng.info("请先选中表格中的某一记录！");
+        return false;
+    }else{
+    	Mail.seItem = selected[0];
+        return true;
+    }
+};
+/**
+ * 删除邮件
+ */
+ Mail.openDelete = function () {
+    if (this.check()) {
+        var operationDelete = function(){
+        	if ($("#searchType").val()==2){
+            var ajax = new $ax(Feng.ctxPath + "/mail/deleteDetail", function () {
+                Feng.success("删除成功!");
+                Mail.table.refresh();
+            }, function (data) {
+                Feng.error("删除失败!" + data.responseJSON.message + "!");
+            });
+        	}else{
+        		 var ajax = new $ax(Feng.ctxPath + "/mail/delete", function () {
+                     Feng.success("删除成功!");
+                     Mail.table.refresh();
+                 }, function (data) {
+                     Feng.error("删除失败!" + data.responseJSON.message + "!");
+                 });
+        	}
+            ajax.set("mailId",Mail.seItem.mail_id);
+            ajax.start();
+        };
+
+        Feng.confirm("是否刪除所选邮件?", operationDelete);
+    }
+};
+
+/**
+ * 删除草稿
+ */
+ Mail.openTrueDelete = function () {
+    if (this.check()) {
+        var operationDelete = function(){
+            var ajax = new $ax(Feng.ctxPath + "/mail/deleteDraft", function () {
+                Feng.success("删除成功!");
+                Mail.table.refresh();
+            }, function (data) {
+                Feng.error("删除失败!" + data.responseJSON.message + "!");
+            });
+            ajax.set("mailId",Mail.seItem.mail_id);
+            ajax.start();
+        };
+
+        Feng.confirm("是否刪除所选草稿?", operationDelete);
+    }
+};
+
+/**
+ * 恢复邮件
+ */
+ Mail.openBack = function () {
+    if (this.check()) {
+        var operationBack = function(){
+            var ajax = new $ax(Feng.ctxPath + "/mail/back", function () {
+                Feng.success("恢复成功!");
+                Mail.table.refresh();
+            }, function (data) {
+                Feng.error("恢复失败!" + data.responseJSON.message + "!");
+            });
+            ajax.set("mailId",Mail.seItem.mail_id);
+            ajax.start();
+        };
+
+        Feng.confirm("是否恢复所选邮件?", operationBack);
+    }
+};
+
+/**
+ * 查询表单提交参数对象 
+ * 
+ */
+Mail.formParams = function() {
+    var queryData = {};
+    queryData['searchType'] = $("#searchType").val();
+    queryData['content'] = $("#content").val();
+    queryData['startDate'] = $("#startDate").val();
+    queryData['endDate'] = $("#endDate").val();
+
+    return queryData;
+}
+
+/**
+ * 查询企业信息列表
+ */
+Mail.search = function () {
+
+    Mail.table.refresh({query: Mail.formParams()});
+};
+
+$(function () {
+    var defaultColunms = Mail.initColumn();
+    var table = new BSTable(Mail.id, "/mail/list", defaultColunms);
+    
+    table.setPaginationType("server");
+    table.setShowColumns(false);
+    table.setQueryParams(Mail.formParams());
+    Mail.table = table.init();
+    
+});
+
+</script>
+@}

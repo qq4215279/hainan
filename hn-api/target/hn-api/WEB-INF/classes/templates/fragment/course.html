@@ -1,0 +1,48 @@
+<article th:fragment="images" class="attachment">
+    <img th:each="attach : ${attachment}" th:src="${attach.access}">
+</article>
+
+<article th:fragment="mp3" class="attachment">
+    <script th:src="@{/static/music/APlayer.min.js}"></script>
+
+    <div th:each="attach : ${attachment}" class="aplayer music"
+         th:attr="data-title=${attach.title},data-author=${attach.author},data-url=${attach.access},data-pic=${attach.cover}"></div>
+    <script>
+        // 音频文件初期化
+        function audioInit() {
+            var elements = document.getElementsByClassName("aplayer");
+            for (var i = 0; i < elements.length; i++) {
+                var element = elements[i];
+                new APlayer({
+                    element: element,
+                    narrow: false,
+                    autoplay: true,
+                    showlrc: false,
+                    mutex: true,
+                    theme: '#e6d0b2',
+                    preload: 'metadata',
+                    mode: 'circulation',
+                    music: {
+                        title: $(element).data("title"),
+                        author: $(element).data("author"),
+                        url: $(element).data("url"),
+                        pic: $(element).data("pic")
+                    }
+                });
+            }
+
+        }
+
+        audioInit();
+    </script>
+</article>
+
+
+<article th:fragment="mp4" class="attachment">
+    <video th:each="attach,stat : ${attachment}" class="mp4"  th:id="'video' + ${stat.index}"  controls
+           preload="auto"
+           th:poster="${attach.cover}" data-setup="{}">
+        <source th:src="${attach.access}" type="video/mp4">
+    </video>
+
+</article>

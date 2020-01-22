@@ -1,0 +1,50 @@
+package com.gobestsoft.common.modular.dao.model;
+
+import com.baomidou.mybatisplus.activerecord.Model;
+import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotations.TableName;
+import lombok.Data;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+
+@TableName("survey_question")
+@Data
+public class SurveyQuestionPojo extends Model<SurveyQuestionPojo> {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    protected Serializable pkVal() {
+        return this.id;
+    }
+
+    private Integer id;
+
+    private Integer surveyId;
+
+    private String title;
+
+    private String description;
+
+    private Integer type;
+
+    private String option;
+
+    @TableField(exist=false)
+    private List<Map<String, String>> options;
+
+    private Integer page;
+
+    private Integer position;
+
+    private Integer isMust;
+
+    private String correctAnswer;
+
+}

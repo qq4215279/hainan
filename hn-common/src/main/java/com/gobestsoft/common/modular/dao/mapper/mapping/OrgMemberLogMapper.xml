@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dao.mapper.OrgMemberLogMapper">
+  <resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.dao.model.OrgMemberLogPojo">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="ouid" jdbcType="VARCHAR" property="ouid" />
+    <result column="org_id" jdbcType="INTEGER" property="orgId" />
+    <result column="entry_date" jdbcType="VARCHAR" property="entryDate" />
+    <result column="member_code" jdbcType="VARCHAR" property="memberCode" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="sex" jdbcType="VARCHAR" property="sex" />
+    <result column="birthday" jdbcType="VARCHAR" property="birthday" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="nation" jdbcType="VARCHAR" property="nation" />
+    <result column="education" jdbcType="VARCHAR" property="education" />
+    <result column="degree" jdbcType="VARCHAR" property="degree" />
+    <result column="identification_type" jdbcType="VARCHAR" property="identificationType" />
+    <result column="identification_num" jdbcType="VARCHAR" property="identificationNum" />
+    <result column="political_status" jdbcType="VARCHAR" property="politicalStatus" />
+    <result column="domicile_code" jdbcType="VARCHAR" property="domicileCode" />
+    <result column="domicile_detail" jdbcType="VARCHAR" property="domicileDetail" />
+    <result column="present_address_code" jdbcType="VARCHAR" property="presentAddressCode" />
+    <result column="present_address_detail" jdbcType="VARCHAR" property="presentAddressDetail" />
+    <result column="unit_name" jdbcType="VARCHAR" property="unitName" />
+    <result column="position" jdbcType="VARCHAR" property="position" />
+    <result column="is_model" jdbcType="VARCHAR" property="isModel" />
+    <result column="curriculum_vitae" jdbcType="VARCHAR" property="curriculumVitae" />
+    <result column="specialty" jdbcType="VARCHAR" property="specialty" />
+    <result column="create_time" jdbcType="VARCHAR" property="createTime" />
+    <result column="create_user_id" jdbcType="VARCHAR" property="createUserId" />
+  </resultMap>
+</mapper>

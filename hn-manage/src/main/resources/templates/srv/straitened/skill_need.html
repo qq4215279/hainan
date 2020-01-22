@@ -1,0 +1,145 @@
+<body>
+<css>
+    <div th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<div class="container">
+    <div class="form-horizontal">
+        <div class="row">
+            <div class="col-sm-6" style="width: 40%;">
+                <search:input label="姓名" name="keyword" value=""
+                              placeholder="姓名" type="text"></search:input>
+            </div>
+            <div class="col-sm-6" style="width: 40%;">
+                <search:input label="手机" name="mobile" value=""
+                              placeholder="手机" type="text"></search:input>
+            </div>
+            <div class="row text-center" style="float:left;margin-left: 20px;" >
+                <qx:btn class="btn btn-primary" fa="fa fa-search" label="搜索" onclick="OptAppVersion.search()"></qx:btn>
+            </div>
+        </div>
+
+    </div>
+    <div id="OptAppVersionTableToolbar">
+        <qx:btn class="btn btn-primary" fa="fa fa-plus" label="新增" onclick="OptAppVersion.openAdd()"></qx:btn>
+    </div>
+    <table id="OptAppVersionTable" data-mobile-responsive="true" data-click-to-select="true">
+    </table>
+</div>
+</body>
+
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+
+        var OptAppVersion = {
+            id: "OptAppVersionTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        OptAppVersion.initColumn = function () {
+            return [
+                {field: 'selectItem', radio: true},
+                {title: '姓名', field: 'name', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {title: '电话', field: 'mobile', align: 'center', valign: 'middle'},
+                {title: '身份证号', field: 'id_num', align: 'center', valign: 'middle'},
+                /*{
+                    title: '身份证号', field: 'idNum', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        var str = row.description;
+                        if (typeof str == "undefined") {
+                            return "--";
+                        } else {
+                            return cutstr(str, 40);
+                        }
+                    }
+                },*/
+                {
+                    title: '技能需求', field: 'skill_need', align: 'center', valign: 'middle'
+                },
+                {
+                    title: '是否回复', field: 'reply_status', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        var str = row.description;
+                        if(value=='0'){
+                            return "未回复";
+                        }else{
+                            return "已回复";
+                        }
+                    }
+                },
+                {
+                    title: '创建时间', field: 'create_time', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        return value.substring(0,4)+"-"+value.substring(4,6)+"-"+value.substring(6,8)+"&nbsp;&nbsp;"+value.substring(8,10)+":"+value.substring(10,12)+":"+value.substring(12,14);
+                    }
+                }
+            ]
+        };
+
+        OptAppVersion.formParams = function () {
+            var queryData = {};
+            queryData['name'] = $("#keyword").val();
+            queryData['mobile'] = $("#mobile").val();
+            return queryData;
+        }
+
+        /**
+         * 初始化加载
+         */
+        $(function () {
+            var defaultColunms = OptAppVersion.initColumn();
+            var table = new BSTable(OptAppVersion.id, "srv/straitened/getlist", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(OptAppVersion.formParams());
+            OptAppVersion.table = table.init();
+        });
+
+        /**
+         * 查询
+         */
+        OptAppVersion.search = function () {
+            OptAppVersion.table.refresh({
+                query: OptAppVersion.formParams()
+            });
+        };
+
+        /**
+         * 查看详情
+         */
+        OptAppVersion.openDetail = function () {
+            if (this.check()) {
+                var index = layer.open({
+                    type: 2,
+                    title: '版本详情',
+                    area: ['50%', '100%'], //宽高
+                    fix: true, //不固定
+                    maxmin: false,
+                    content: App.ctxPath + 'srv/straitened/detail' + this.seItem.id
+                });
+                this.layerIndex = index;
+            }
+        };
+
+        /**
+         * 新增
+         */
+        OptAppVersion.openAdd = function () {
+            var index = layer.open({
+                type: 2,
+                title: '添加职工技能',
+                area: ['45%', '90%'], //宽高
+                fix: true, //不固定
+                maxmin: false,
+                content: App.ctxPath + 'srv/straitened/openSkillNeed'
+            });
+            this.layerIndex = index;
+        };
+
+    </script>
+
+</js>

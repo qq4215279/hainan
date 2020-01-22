@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.system.mapper.DeptMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.system.model.Dept">
+		<id column="id" property="id" />
+		<result column="sort" property="sort"/>
+		<result column="pid" property="pid" />
+		<result column="pids" property="pids" />
+		<result column="simplename" property="simplename" />
+		<result column="fullname" property="fullname" />
+		<result column="tips" property="tips" />
+		<result column="level" property="level"/>
+		<result column="addr" property="addr"/>
+		<result column="dept_type" property="deptType"/>
+		<result column="dept_no" property="deptNo" />
+		<result column="p_dept_no" property="pDeptNo"/>
+		<result column="p_dept_name" property="pDeptName" />
+		<result column="pic_name" property="picName" />
+		<result column="chairman" property="chairman" />
+		<result column="establish_date" property="establishDate"/>
+		<result column="org_type" property="orgType"/>
+		<result column="special_flg" property="specialFlg"/>
+		<result column="root_flg" property="rootFlg"/>
+	</resultMap>
+
+	<select id="selectSonDeptIdByPid" resultType="string">
+		select id from sys_dept where pids like '%,${pid}%'
+	</select>
+
+	<select id="selectSecondDeptIds" resultType="java.lang.Integer">
+		SELECT
+			id
+		from
+			sys_dept
+		WHERE
+			pid = 1
+	</select>
+
+	<select id="selectSecondDeptIdByDeptId" resultType="java.lang.Integer">
+		SELECT
+			SUBSTRING_INDEX(SUBSTRING_INDEX(pids,',',3),',',-1) AS secondDeptId
+		FROM
+			sys_dept
+		WHERE
+			id = #{deptId}
+	</select>
+
+	<select id="selectSimplenameByLogFullname" resultType="java.lang.String">
+		SELECT
+			simplename
+		FROM
+			sys_dept
+		WHERE
+			id = (SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(pids,',',3),',',-1) AS pid
+					FROM sys_dept WHERE simplename like concat('%',#{LogFullname},'%'))
+	</select>
+
+	<select id="selectSimplenameByLogDeptId" resultType="java.lang.String">
+		SELECT
+			simplename
+		FROM
+			sys_dept
+		WHERE
+			id = (SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(pids,',',3),',',-1) AS pid
+					FROM sys_dept WHERE id = #{deptid} )
+	</select>
+
+	<select id="selectSimplenameByDeptId" resultType="java.lang.String">
+		select
+			simplename
+		from
+			sys_dept
+		where
+			id = #{deptid}
+	</select>
+
+	<select id="selectSimplenameByUid" resultType="java.lang.String">
+		SELECT
+			d1.simplename
+		FROM
+			sys_user s1 LEFT JOIN sys_dept d1 ON s1.deptid = d1.id
+		where
+			s1.uid = #{uid};
+	</select>
+
+
+
+</mapper>
+ 

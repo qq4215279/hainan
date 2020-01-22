@@ -1,0 +1,30 @@
+package com.gobestsoft.rabbitmq.processor;
+
+
+import lombok.Data;
+
+import java.io.InputStream;
+
+/**
+ * 会员导入的队列对象
+ */
+@Data
+public class MemberImportProcessor extends  AbstractProcessor{
+
+
+    private static final long serialVersionUID = 5519735700173005335L;
+
+    private String uploadFileName;
+    private String fileUploadPath;
+    private InputStream is;
+    private String createUid;
+    private Integer deptId;
+
+    public MemberImportProcessor(String uploadFileName, String fileUploadPath, InputStream is, String createUid, Integer deptId) {
+        this.uploadFileName = uploadFileName;
+        this.fileUploadPath = fileUploadPath;
+        this.is = is;
+        this.createUid = createUid;
+        this.deptId = deptId;
+    }
+}

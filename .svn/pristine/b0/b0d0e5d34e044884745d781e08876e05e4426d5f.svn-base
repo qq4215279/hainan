@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.cms.dao.ActivityDao">
+
+	<resultMap type="com.gobestsoft.common.modular.cms.model.Activity"
+		id="activityMap">
+		<id column="id" property="id" />
+		<result column="title" property="title" />
+		<result column="start_time" property="start_time" />
+		<result column="end_time" property="end_time" />
+		<result column="cover_path" property="cover" />
+	</resultMap>
+
+	<select id="getSpecialActivities" resultMap="activityMap">
+		SELECT
+		id,title,start_time,cover_path,link_url,end_time
+		FROM
+		cms_ad WHERE type=2
+		ORDER BY START_TIME
+		DESC
+		<if test="startIndex!=-1 and pageSize!=-1">
+			LIMIT ${pageSize} OFFSET
+			${startIndex}
+		</if>
+	</select>
+
+	<update id="shareActivity">
+		UPDATE cms_thematic_activity SET
+		share_num=share_num+1 where id=${id}
+	</update>
+
+
+	<select id="getNotExpiredActivities" resultMap="activityMap">
+		SELECT
+		id,title,start_time,cover,jump_url,end_time
+		FROM
+		cms_thematic_activity
+		WHERE
+		cms_thematic_activity.district_code=#{cityCode}
+		AND end_time &gt;= #{today}
+		order by start_time
+		desc
+	</select>
+</mapper>

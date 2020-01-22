@@ -1,0 +1,18 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "com.gobestsoft.admin.config.properties.AdminProperties",
+      "name": "admin",
+      "type": "com.gobestsoft.admin.config.properties.AdminProperties"
+    }
+  ],
+  "properties": [
+    {
+      "sourceType": "com.gobestsoft.admin.config.properties.AdminProperties",
+      "name": "admin.php-site",
+      "description": "PHP站点",
+      "type": "java.lang.String"
+    }
+  ]
+}

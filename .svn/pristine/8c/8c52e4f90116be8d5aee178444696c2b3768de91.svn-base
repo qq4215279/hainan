@@ -1,0 +1,752 @@
+package com.gobestsoft.mamage.moudle.system.service;
+
+import com.gobestsoft.common.constant.model.OrganizationRankData;
+import com.gobestsoft.common.modular.bigdata.dao.model.LastYearMonthStatistics;
+import com.gobestsoft.common.modular.model.ObjectMap;
+import com.gobestsoft.common.modular.system.dao.BlackboardDao;
+import com.gobestsoft.core.reids.RedisUtils;
+import com.gobestsoft.core.util.DateUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+@Service
+public class BlackboardService {
+
+    @Resource
+    BlackboardDao bbDao;
+
+    @Resource
+    BlackboardDao blackboardDao;
+
+    @Autowired
+    private RedisUtils redisUtils;
+
+    /**
+     * 工会会员人数统计
+     *
+     * @return
+     */
+    public Map<String, Object> memberStatistics() {
+        return blackboardDao.memberStatistics();
+    }
+
+
+    private final String REDIS_BASE_KEY = "blackboard:";
+
+
+    @Autowired
+    private LastYearMonthStatisticsService lastYearMonthStatisticsService;
+
+    /**
+     * 近一年各月注册和入会人员统计
+     *
+     * @return
+     */
+    public Map<String, Object> lastYearMonthStatistics() {
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> registerMember = blackboardDao.registerMember();
+        result.put("registerCount", registerMember.get("registerCount"));
+        result.put("memberCount", registerMember.get("memberCount"));
+        result.put("bindUserCount", registerMember.get("bindUserCount"));
+
+
+        Calendar date = Calendar.getInstance();
+        lastYearMonthStatisticsService.setEndDate(DateUtil.format(date.getTime(), "yyyyMMdd"));
+
+        date.add(Calendar.MONTH, -11);
+        lastYearMonthStatisticsService.setStartDate(DateUtil.format(date.getTime(), "yyyyMMdd"));
+
+        SortedMap<String, LastYearMonthStatistics> map = lastYearMonthStatisticsService.monthSort();
+
+
+        List<Object> months = new ArrayList<>();
+        List<Object> register = new ArrayList<>();
+        List<Object> member = new ArrayList<>();
+        List<Object> bindUser = new ArrayList<>();
+
+
+        Iterator<Map.Entry<String, LastYearMonthStatistics>> it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, LastYearMonthStatistics> entry = it.next();
+            months.add(DateUtil.parseAndFormat(entry.getKey(), "yyyyMM", "yyyy-MM"));
+            register.add(entry.getValue().getRegisterCount());
+            member.add(entry.getValue().getMemberCount());
+            bindUser.add(entry.getValue().getBindUserCount());
+        }
+
+        result.put("months", months);
+        result.put("register", register);
+        result.put("member", member);
+        result.put("bindUser", bindUser);
+        return result;
+    }
+
+    /**
+     * 会员总量排名前十工会统计
+     *
+     * @return
+     */
+    public Map<String, Object> memberTop10Statistics() {
+        //缓存今天
+        String day = DateUtil.getDays();
+        String cacheKey = REDIS_BASE_KEY + "memberTop10:" + day;
+
+        Map<String, Object> result = (Map<String, Object>) redisUtils.get(cacheKey);
+        if (result == null) {
+            result = new HashMap<>();
+            List<Map<String, Object>> memberTop10Statistics = blackboardDao.memberTop10Statistics();
+            List<Object> organization = new ArrayList<>();
+            List<Object> count = new ArrayList<>();
+            List<Object> men = new ArrayList<>();
+            List<Object> women = new ArrayList<>();
+            memberTop10Statistics.forEach(m -> {
+                organization.add(m.get("fullname"));
+                count.add(m.get("memberCount"));
+                men.add(m.get("men"));
+                women.add(m.get("women"));
+            });
+            result.put("organization", organization);
+            result.put("count", count);
+            result.put("men", men);
+            result.put("women", women);
+
+            redisUtils.set(cacheKey, result);
+        }
+        return result;
+    }
+
+    /**
+     * 省总工会直属前十
+     *
+     * @return
+     */
+    public Map<String, Object> provincialUnionsTop10() {
+        //缓存今天
+        String day = DateUtil.getDays();
+        String cacheKey = REDIS_BASE_KEY + "provincialUnionsTop10:" + day;
+
+        Map<String, Object> result = (Map<String, Object>) redisUtils.get(cacheKey);
+
+        if (result == null) {
+            result = new HashMap<>();
+            List<OrganizationRankData> provincialUnionsTop10 = blackboardDao.provincialUnionsTop10();
+            List<Integer> idlist = new ArrayList<>();
+            provincialUnionsTop10.forEach(pu -> {
+                idlist.add(pu.getId());
+            });
+            List<Map<String, Object>> list = blackboardDao.selectByMember(idlist);
+            List<Object> organization = new ArrayList<>();
+            List<Object> count = new ArrayList<>();
+            list.forEach(l -> {
+                organization.add(l.get("fullname"));
+                count.add(l.get("cnt"));
+            });
+            result.put("organization", organization);
+            result.put("count", count);
+            redisUtils.set(cacheKey, result);
+        }
+        return result;
+    }
+
+    public Map<String, Object> provincialUnionsMore() {
+        //缓存今天
+        String day = DateUtil.getDays();
+        String cacheKey = REDIS_BASE_KEY + "provincialUnionsMore:" + day;
+
+        Map<String, Object> result = (Map<String, Object>) redisUtils.get(cacheKey);
+
+        if (result == null) {
+            result = new HashMap<>();
+            List<OrganizationRankData> provincialUnionsTop10 = blackboardDao.provincialUnionsTop10();
+            List<Integer> idlist = new ArrayList<>();
+            provincialUnionsTop10.forEach(pu -> {
+                idlist.add(pu.getId());
+            });
+            List<Map<String, Object>> list = blackboardDao.selectByMemberMore(idlist);
+            List<Object> organization = new ArrayList<>();
+            List<Object> count = new ArrayList<>();
+            list.forEach(l -> {
+                organization.add(l.get("fullname"));
+                count.add(l.get("cnt"));
+            });
+            result.put("organization", organization);
+            result.put("count", count);
+            redisUtils.set(cacheKey, result);
+        }
+        return result;
+
+    }
+
+    /**
+     * 基层企业工会前十统计
+     *
+     * @return
+     */
+    public Map<String, Object> grassrootsEnterprisesTop10() {
+        //缓存今天
+        String day = DateUtil.getDays();
+        String cacheKey = REDIS_BASE_KEY + "grassrootsEnterprisesTop10:" + day;
+
+        Map<String, Object> result = (Map<String, Object>) redisUtils.get(cacheKey);
+
+        if (result == null) {
+            result = new HashMap<>();
+            List<Map<String, Object>> grassrootsEnterprisesTop10 = blackboardDao.grassrootsEnterprisesTop10();
+            List<Object> organization = new ArrayList<>();
+            List<Object> count = new ArrayList<>();
+            List<Object> men = new ArrayList<>();
+            List<Object> women = new ArrayList<>();
+            grassrootsEnterprisesTop10.forEach(g -> {
+                organization.add(g.get("fullname"));
+                count.add(g.get("memberCount"));
+                men.add(g.get("men"));
+                women.add(g.get("women"));
+            });
+            result.put("organization", organization);
+            result.put("count", count);
+            result.put("men", men);
+            result.put("women", women);
+
+            redisUtils.set(cacheKey, result);
+        }
+        return result;
+    }
+
+    /**
+     * 每月新增组织数
+     *
+     * @return
+     */
+    public List<Map<String, Object>> organizationalRank() {
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, String>> selectMonths = new ArrayList<>();
+        Calendar date = Calendar.getInstance();
+        Map<String, String> m = new HashMap<>();
+        m.put("month", DateUtil.format(date.getTime(), "yyyy-MM"));
+        date.set(Calendar.DAY_OF_MONTH, 1);
+        m.put("startTime", DateUtil.format(date.getTime(), "yyyyMMdd") + "000000");
+        date.set(Calendar.DAY_OF_MONTH, date.getActualMaximum(Calendar.DAY_OF_MONTH));
+        m.put("endTime", DateUtil.format(date.getTime(), "yyyyMMdd") + "235959");
+        selectMonths.add(m);
+        for (int i = 1; i < 12; i++) {
+            m = new HashMap<>();
+            date.add(Calendar.MONTH, -1);
+            m.put("month", DateUtil.format(date.getTime(), "yyyy-MM"));
+            date.set(Calendar.DAY_OF_MONTH, 1);
+            m.put("startTime", DateUtil.format(date.getTime(), "yyyyMMdd") + "000000");
+            date.set(Calendar.DAY_OF_MONTH, date.getActualMaximum(Calendar.DAY_OF_MONTH));
+            m.put("endTime", DateUtil.format(date.getTime(), "yyyyMMdd") + "235959");
+            selectMonths.add(m);
+        }
+//        List<Map<String,Object>> results=new ArrayList<>();
+//        List<Map<String,Object>> organizationalRanks=new ArrayList<>();
+//        List<Object> organization = new ArrayList<>();
+//        List<Object> month=new ArrayList<>();
+//        List<Object> counts = new ArrayList<>();
+        List<Map<String, Object>> results = new ArrayList<>();
+        List<OrganizationRankData> pids = blackboardDao.organizationalRank(selectMonths);
+        pids.forEach(p -> {
+            Map<String, Object> ms = new HashMap<>();
+            Integer count = blackboardDao.organizationalRanks(p.getId());
+//            month.add(p.getMonth());
+//            counts.add(count);
+//            organization.add(p.getName());
+            ms.put("month", p.getMonth());
+            ms.put("count", count);
+            ms.put("organization", p.getName());
+            results.add(ms);
+        });
+
+        List<OrganizationRankData> pids2 = blackboardDao.organizationalRank2(selectMonths);
+
+//        result.put("month",month);
+//        result.put("organization", organization);
+//        result.put("count", counts);
+//        results.add(result);
+
+        return results;
+    }
+
+    /**
+     * 每月组织数排行
+     *
+     * @return
+     */
+    public List<Map<String, Object>> organizationalRank2() {
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, String>> selectMonths = new ArrayList<>();
+        Calendar date = Calendar.getInstance();
+        Map<String, String> m = new HashMap<>();
+        m.put("month", DateUtil.format(date.getTime(), "yyyy-MM"));
+        date.set(Calendar.DAY_OF_MONTH, 1);
+        m.put("startTime", DateUtil.format(date.getTime(), "yyyyMMdd") + "000000");
+        date.set(Calendar.DAY_OF_MONTH, date.getActualMaximum(Calendar.DAY_OF_MONTH));
+        m.put("endTime", DateUtil.format(date.getTime(), "yyyyMMdd") + "235959");
+        selectMonths.add(m);
+        for (int i = 1; i < 12; i++) {
+            m = new HashMap<>();
+            date.add(Calendar.MONTH, -1);
+            m.put("month", DateUtil.format(date.getTime(), "yyyy-MM"));
+            date.set(Calendar.DAY_OF_MONTH, 1);
+            m.put("startTime", DateUtil.format(date.getTime(), "yyyyMMdd") + "000000");
+            date.set(Calendar.DAY_OF_MONTH, date.getActualMaximum(Calendar.DAY_OF_MONTH));
+            m.put("endTime", DateUtil.format(date.getTime(), "yyyyMMdd") + "235959");
+            selectMonths.add(m);
+        }
+//        List<Map<String,Object>> results=new ArrayList<>();
+//        List<Map<String,Object>> organizationalRanks=new ArrayList<>();
+//        List<Object> organization = new ArrayList<>();
+//        List<Object> month=new ArrayList<>();
+//        List<Object> counts = new ArrayList<>();
+        List<Map<String, Object>> results = new ArrayList<>();
+        List<OrganizationRankData> pids2 = blackboardDao.organizationalRank2(selectMonths);
+        pids2.forEach(p -> {
+            Map<String, Object> ms = new HashMap<>();
+            Integer count = blackboardDao.organizationalRanks(p.getId());
+//            month.add(p.getMonth());
+//            counts.add(count);
+//            organization.add(p.getName());
+            ms.put("month", p.getMonth());
+            ms.put("count", count);
+            ms.put("organization", p.getName());
+            results.add(ms);
+        });
+
+//        result.put("month",month);
+//        result.put("organization", organization);
+//        result.put("count", counts);
+//        results.add(result);
+        return results;
+    }
+
+    /**
+     * 会员数
+     *
+     * @return
+     */
+    public Map<String, Object> memmberRank() {
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, String>> selectMonths = new ArrayList<>();
+        Calendar date = Calendar.getInstance();
+        Map<String, String> m = new HashMap<>();
+        m.put("month", DateUtil.format(date.getTime(), "yyyy-MM"));
+        date.set(Calendar.DAY_OF_MONTH, 1);
+        m.put("startTime", DateUtil.format(date.getTime(), "yyyyMMdd") + "000000");
+        date.set(Calendar.DAY_OF_MONTH, date.getActualMaximum(Calendar.DAY_OF_MONTH));
+        m.put("endTime", DateUtil.format(date.getTime(), "yyyyMMdd") + "235959");
+        selectMonths.add(m);
+        for (int i = 1; i < 12; i++) {
+            m = new HashMap<>();
+            date.add(Calendar.MONTH, -1);
+            m.put("month", DateUtil.format(date.getTime(), "yyyy-MM"));
+            date.set(Calendar.DAY_OF_MONTH, 1);
+            m.put("startTime", DateUtil.format(date.getTime(), "yyyyMMdd") + "000000");
+            date.set(Calendar.DAY_OF_MONTH, date.getActualMaximum(Calendar.DAY_OF_MONTH));
+            m.put("endTime", DateUtil.format(date.getTime(), "yyyyMMdd") + "235959");
+            selectMonths.add(m);
+        }
+        List<Object> months = new ArrayList<>();
+        List<Object> member = new ArrayList<>();
+        List<Map<String, Object>> memberRank = blackboardDao.memberRank(selectMonths);
+        memberRank.forEach(mr -> {
+            months.add(mr.get("month"));
+            member.add(mr.get("memberCount"));
+        });
+        result.put("months", months);
+        result.put("memberCount", member);
+        return result;
+    }
+
+    /**
+     * 近一月入会人数排名前五工会统计
+     *
+     * @return
+     */
+    public Map<String, Object> joinOrganizationTop5() {
+        //缓存今天
+        String today = DateUtil.getDays();
+        String cacheKey = REDIS_BASE_KEY + "joinOrganizationTop5:" + today;
+
+        Map<String, Object> result = (Map<String, Object>) redisUtils.get(cacheKey);
+
+        if (result == null) {
+            result = new HashMap<>();
+            Calendar now = Calendar.getInstance();
+            String endTime = DateUtil.format(now.getTime(), "yyyyMMdd") + "235959";
+            now.add(Calendar.DAY_OF_MONTH, -30);
+            String startTime = DateUtil.format(now.getTime(), "yyyyMMdd") + "000000";
+            List<Map<String, Object>> joinOrganizationTop5 = blackboardDao.joinOrganizationTop5(startTime, endTime);
+
+            Collections.sort(joinOrganizationTop5, new Comparator<Map<String, Object>>() {
+                @Override
+                public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                    Long value1 = (Long) o1.get("memberCount");
+                    Long value2 = (Long) o2.get("memberCount");
+                    if (value1 == null) value1 = 0l;
+                    if (value2 == null) value2 = 0l;
+                    return (int) (value1 - value2);
+                }
+            });
+
+            List<Object> organizationInfo = new ArrayList<>();
+            List<Integer> member = new ArrayList<>();
+
+            joinOrganizationTop5.forEach(m -> {
+                organizationInfo.add(m.get("fullname"));
+                member.add(Integer.valueOf(m.get("memberCount").toString()));
+            });
+
+            result.put("organization", organizationInfo);
+            result.put("member", member);
+
+            redisUtils.set(cacheKey, result);
+        }
+        return result;
+    }
+
+    /**
+     * 获取工会会员数量
+     *
+     * @param deptId
+     * @return
+     */
+    public Integer getMemberCountByDeptId(Integer deptId) {
+        return bbDao.getMemberCountByDeptId(deptId);
+    }
+
+    /**
+     * 获取工会会员卡数量
+     *
+     * @param deptId
+     * @return
+     */
+    public Integer getMemberCardCountByDeptId(Integer deptId) {
+        return bbDao.getMemberCardCountByDeptId(deptId);
+    }
+
+    /**
+     * 获取下级工会数量
+     *
+     * @param deptId
+     * @return
+     */
+    public Integer getSubordinateDeptCount(Integer deptId) {
+
+        return bbDao.getSubordinateDeptCount(deptId);
+    }
+
+    /**
+     * 获取会员人数（含下级工会）
+     *
+     * @param deptId
+     * @return
+     */
+    public Integer getMemberCountAndSubordinateByDeptId(Integer deptId) {
+        return bbDao.getMemberCountAndSubordinateByDeptId(deptId);
+    }
+
+    /**
+     * 分组查询民族人数
+     *
+     * @return
+     */
+    public List<Map<String, Object>> getMemberInfoByNation() {
+
+        List<Map<String, Object>> memberInfoByNation = bbDao.getMemberInfoByNation();
+
+        Collections.sort(memberInfoByNation, new Comparator<Map<String, Object>>() {
+            @Override
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                Long value1 = (Long) o1.get("value");
+                Long value2 = (Long) o2.get("value");
+                if (value1 == null) value1 = 0l;
+                if (value2 == null) value2 = 0l;
+                return (int) (value2 - value1);
+            }
+        });
+
+        return memberInfoByNation;
+    }
+
+    /**
+     * 分组查询学历人数
+     *
+     * @return
+     */
+    public List<Map<String, Object>> getMemberInfoByEducation() {
+        return bbDao.getMemberInfoByEducation();
+    }
+
+    /**
+     * 分组查询学历人数
+     *
+     * @return
+     */
+    public List<Map<String, Object>> getMemberInfoByFarmer() {
+        return bbDao.getMemberInfoByFarmer();
+    }
+
+    /**
+     * 分组查询并处理户籍人数
+     *
+     * @return
+     */
+    public ObjectMap getMemberInfoByDoclie() {
+        //匹配可能存在的机关
+        final String citys[] = {
+                "海口", "三亚", "三沙", "儋州",
+
+                "五指山", "文昌", "琼海", "万宁", "东方",
+
+                "定安", "屯昌", "澄迈", "临高",
+
+                "白沙", "昌江", "乐东", "陵水", "保亭", "琼中",
+                //其他省份
+                "北京", "天津", "上海", "重庆", "河北", "山西",
+                "辽宁", "吉林", "黑龙江", "江苏省", "浙江",
+                "安徽", "福建", "江西", "山东", "河南", "湖北",
+                "湖南", "广东", "四川", "贵州", "云南",
+                "陕西", "甘肃", "青海", "蒙古", "广西", "西藏",
+                "宁夏", "新疆", "香港", "澳门", "台湾"
+
+        };
+
+        List<Map<String, Object>> list = bbDao.getMemberInfoByDocile();
+        List<String> legend = new ArrayList<>();
+        List<Map<String, Object>> list_temp = new ArrayList<>();
+        long total = 0;
+        long normal = 0;
+        for (Map m : list) {
+            try {
+                total += Integer.parseInt(m.get("value") + "");
+            } catch (Exception e) {
+
+            }
+        }
+        for (String city : citys) {
+            long count = 0;
+            for (Map m : list) {
+                String name = m.get("name").toString();
+                if (name.contains(city)) {
+                    try {
+                        count += Integer.parseInt(m.get("value") + "");
+                        normal += Integer.parseInt(m.get("value") + "");
+                    } catch (Exception e) {
+
+                    }
+                }
+            }
+            if (count > 0) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("name", city);
+                map.put("value", count);
+                list_temp.add(map);
+                legend.add(city);
+            }
+        }
+
+
+        ObjectMap data = ObjectMap.getInstance();
+
+        Collections.sort(list_temp, new Comparator<Map<String, Object>>() {
+            @Override
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+
+                Long value1 = (Long) o1.get("value");
+                Long value2 = (Long) o2.get("value");
+                if (value1 == null) value1 = 0l;
+                if (value2 == null) value2 = 0l;
+                return (int) (value2 - value1);
+            }
+        });
+
+        if (total - normal > 0) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("name", "其他");
+            map.put("value", total - normal);
+            legend.add("其他");
+        }
+
+        data.put("list", list_temp);
+        data.put("legend", legend);
+
+        return data;
+    }
+
+    /**
+     * 查询会员年龄分布
+     *
+     * @return
+     */
+    public ObjectMap getMemberInfoByAge() {
+        ObjectMap map = ObjectMap.getInstance();
+
+
+        List<String> legend = new ArrayList<>();
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        legend.add("16-20岁");
+        Map<String, Object> memberInfoByAge = bbDao.getMemberInfoByAge(getDateSubYear(20), getDateSubYear(16));
+        memberInfoByAge.put("name", "16-20岁");
+        list.add(memberInfoByAge);
+        legend.add("20-30岁");
+        Map<String, Object> memberInfoByAge2 = bbDao.getMemberInfoByAge(getDateSubYear(30), getDateSubYear(20));
+        memberInfoByAge2.put("name", "20-30岁");
+        list.add(memberInfoByAge2);
+        legend.add("30-40岁");
+        Map<String, Object> memberInfoByAge3 = bbDao.getMemberInfoByAge(getDateSubYear(40), getDateSubYear(30));
+        memberInfoByAge3.put("name", "30-40岁");
+        list.add(memberInfoByAge3);
+        legend.add("40-50岁");
+        Map<String, Object> memberInfoByAge4 = bbDao.getMemberInfoByAge(getDateSubYear(50), getDateSubYear(40));
+        memberInfoByAge4.put("name", "40-50岁");
+        list.add(memberInfoByAge4);
+        legend.add("50-60岁");
+        Map<String, Object> memberInfoByAge5 = bbDao.getMemberInfoByAge(getDateSubYear(60), getDateSubYear(50));
+        memberInfoByAge5.put("name", "50-60岁");
+        list.add(memberInfoByAge5);
+        legend.add("60岁以上");
+        Map<String, Object> memberInfoByAge6 = bbDao.getMemberInfoByAge(null, getDateSubYear(60));
+        memberInfoByAge6.put("name", "60岁以上");
+        list.add(memberInfoByAge6);
+        map.put("legend", legend);
+        map.put("list", list);
+
+        return map;
+
+
+    }
+
+    /**
+     * 获取指定年份以前的日期
+     *
+     * @param year
+     * @return
+     */
+    public String getDateSubYear(int year) {
+        SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
+        Calendar instance = Calendar.getInstance();
+        instance.add(Calendar.YEAR, -year);
+        return sf.format(instance.getTime());
+
+    }
+
+    /**
+     * 各级工会返乡统计
+     *
+     * @return
+     */
+    public Map<String, Object> szghRehomeUnionsTop10() {
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, Object>> listInfo = blackboardDao.szghRehomeUnionsTop10();
+        Collections.sort(listInfo, new Comparator<Map<String, Object>>() {
+            @Override
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                Long value1 = (Long) o1.get("cnt");
+                Long value2 = (Long) o2.get("cnt");
+                if (value1 == null) value1 = 0l;
+                if (value2 == null) value2 = 0l;
+                return (int) (value1 - value2);
+            }
+        });
+        List<Object> fullname = new ArrayList<>();
+        List<Object> count = new ArrayList<>();
+        listInfo.forEach(l -> {
+            fullname.add(l.get("simplename"));
+            count.add(l.get("cnt"));
+        });
+        result.put("fullname", fullname);
+        result.put("count", count);
+        return result;
+    }
+
+    /**
+     * 省总工会直属工会返乡统计
+     */
+    public Map<String, Object> szgzUnderUnionsTop10() {
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, Object>> top10Info = blackboardDao.szgzUnderUnionsTop10();
+        Collections.sort(top10Info, new Comparator<Map<String, Object>>() {
+            @Override
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                Long value1 = (Long) o1.get("cnt");
+                Long value2 = (Long) o2.get("cnt");
+                if (value1 == null) value1 = 0l;
+                if (value2 == null) value2 = 0l;
+                return (int) (value1 - value2);
+            }
+        });
+        List<Object> fullname = new ArrayList<>();
+        List<Object> count = new ArrayList<>();
+        top10Info.forEach(l -> {
+            fullname.add(l.get("fullname"));
+            count.add(l.get("cnt"));
+        });
+        result.put("fullname", fullname);
+        result.put("count", count);
+        return result;
+    }
+
+    /**
+     * 省总工会直属工会下级各市县返乡统计
+     */
+    public Map<String, Object> szghAllRehomeStat(String deptId) {
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, Object>> top10Info = blackboardDao.szghAllRehomeStat(deptId);
+
+        if (top10Info.size() == 0) {
+            result.put("cntFlg", 0);
+            return result;
+        }
+        Collections.sort(top10Info, new Comparator<Map<String, Object>>() {
+            @Override
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                Long value1 = (Long) o1.get("cnt");
+                Long value2 = (Long) o2.get("cnt");
+                if (value1 == null) value1 = 0l;
+                if (value2 == null) value2 = 0l;
+                return (int) (value1 - value2);
+            }
+        });
+        List<Object> fullname = new ArrayList<>();
+        List<Object> count = new ArrayList<>();
+        top10Info.forEach(l -> {
+            fullname.add(l.get("fullname"));
+            count.add(l.get("cnt"));
+        });
+
+        result.put("fullname", fullname);
+        result.put("count", count);
+
+        return result;
+    }
+
+    /**
+     * 返乡总人数
+     */
+    public Integer getTotalCnt() {
+
+        return blackboardDao.getTotalCnt();
+    }
+
+    /**
+     * 各级工会返乡总人数
+     */
+    public Integer getAllTotalCnt(String deptId) {
+
+        return blackboardDao.getAllTotalCnt(deptId);
+    }
+
+    /**
+     * 各级工会返乡工会数
+     */
+    public Integer getUnionbyCnt(String deptId) {
+
+        return blackboardDao.getUnionbyCnt(deptId);
+    }
+
+}

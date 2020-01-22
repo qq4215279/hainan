@@ -1,0 +1,91 @@
+api:
+  fileUploadPath: /share_server/upload
+  salt: Gobest_zghn_As
+  apiWebSite: http://ghypt.hnszgh.org:9081/hn-api
+  reviewBaseUrl: ${api.apiWebSite}/show-page/show-article/
+  courseUrl: ${api.apiWebSite}/show-page/course/
+  h5Parameter: ?token={0}&deviceId={1}
+  openSign: false
+  apkDownload: http://ghypt.hnszgh.org:9082/hngh-0927.apk
+  appStoreLink: http://itunes.apple.com/us/app/id1436667548?mt=8
+  upperIntegral: 10
+  matrixLogo: matrix_log.png
+  phpSite: http://we.gobestsoft.com/hnapp/
+  mobileMostTime: 20
+  downloadUrl: ${api.apiWebSite}/show-page/download
+  writeLogs: false
+
+uploadSite:
+  address: http://ghypt.hnszgh.org:9082/ #图片资源路径
+
+server:
+  port: 10002
+  contextPath: /hn-api
+
+mybatis-plus:
+  mapper-locations: classpath*:com/gobestsoft/common/**/mapping/*.xml
+  typeAliasesPackage: com.gobestsoft.common.modular.*.model
+  global-config:
+    id-type: 0
+    db-column-underline: false
+    refresh-mapper: true
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+    lazyLoadingEnabled: true #mybatis lazy loading
+    multipleResultSetsEnabled: true
+    call-setters-on-nulls: true
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #open for debug
+
+spring:
+  jmx:
+    default-domain: hn-api
+  datasource:
+    url : jdbc:mysql://192.168.37.20:3306/hn_app?autoReconnect=true&useUnicode=true&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&characterEncoding=utf8&transformedBitIsBoolean=true&failOverReadOnly=false
+    username : admin
+    password : Gobest123$%^
+
+  aop:
+    proxy-target-class: true
+  http:
+      multipart.maxFileSize: 100Mb #max file size of upload
+      multipart.maxRequestSize: 100Mb #max file size of request
+  redis:
+      database: 0
+      host: 192.168.37.13
+      port: 6379
+      password: Gobest123$%^
+      pool.max-active: 8
+      pool.max-wait: -1
+      timeout: 0
+  resources:
+     static-locations: classpath:/static/
+     chain:
+       cache: false
+  rabbitmq:
+      host: 192.168.37.15
+      port: 5672
+      username: admin
+      password: admin
+  thymeleaf:
+      mode: LEGACYHTML5
+      encoding: UTF-8
+      cache: false
+      check-template-location: true
+      enabled: true
+      prefix: classpath:/templates/
+  mail:
+    protocol: smtp
+    host: smtp.qq.com
+    port: 25
+    username: 353478929@qq.com
+    password: anykvrzsbjxfbiac
+    default-encoding: utf-8
+logging:
+  level.root: info
+  level.com.gobestsoft: error
+  path: /logs/ #Save path of log
+  file: hn-api #File name of save log
+jpush:
+  masterSecret: 1
+  appKey: 1

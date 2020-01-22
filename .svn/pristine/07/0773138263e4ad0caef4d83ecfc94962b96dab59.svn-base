@@ -1,0 +1,27 @@
+<css>
+	<div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+	<div class="form-horizontal">
+		<div class="row">
+			<div class="col-sm-3">
+                <search:input label="申请用户" name="name" value=""
+                              placeholder="" type="text"></search:input>
+			</div>
+			<div class="col-sm-3">
+				<search:select label="审批状态" name="status" 
+                               code="common_approve_status"></search:select>
+			</div>
+            <qx:btn id="btn1" class="btn btn-info" fa="fa fa-search" label="搜索"  onclick="IndexPage.search()"
+                    permission=""></qx:btn>
+		</div>
+		<div class="hidden-xs" id="OrgMemberTableToolbar" role="group">
+		</div>
+		<table id="OrgMemberTable" data-mobile-responsive="true" data-click-to-select="true">
+		</table>
+	</div>
+</body>
+<js>
+	<div th:include="fragment/fargment :: bootstrapTableJs"></div>
+	<script th:src="@{/static/modular/dept/company/member/admission/index.js}"></script>
+</js>

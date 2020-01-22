@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.cms.dao.NewsDao">
+
+
+	<resultMap id="newsTapesMap"
+		type="com.gobestsoft.common.modular.cms.model.NewsTape">
+		<id column="id" property="id" />
+		<result column="title" property="title" />
+		<result column="cover_path" property="cover_url" />
+		<result column="media_name" property="create_by" />
+		<result column="play_url" property="tape_url" />
+		<result column="play_time" property="tape_time" />
+		<result column="create_time" property="create_time" />
+	</resultMap>
+
+
+	<select id="getNewsTape" resultMap="newsTapesMap">
+		SELECT
+		T1.id,T1.title,T1.cover_path,T3.media_name,T1.create_time,T1.jump_url As play_url,T2.play_time
+		FROM cms_article AS T1
+		LEFT JOIN cms_article_upload_media AS T2 ON T1.ID=T2.article_id
+		LEFT JOIN cms_media AS T3 ON T1.media_id=T3.id
+		WHERE T1.info_type=1 AND T1.status=1 AND T1.del_flg=0
+		ORDER BY T1.create_time
+		 LIMIT ${pageSize} OFFSET ${startIndex}
+	</select>
+	
+	
+</mapper>

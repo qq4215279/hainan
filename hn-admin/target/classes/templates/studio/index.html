@@ -1,0 +1,182 @@
+<css >
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="form-horizontal">
+    <div class="row">
+        <div class="col-sm-6">
+            <search:input label="工作室名称" name="name" value=""
+                          placeholder="工作室名称" type="text"></search:input>
+        </div>
+        <div class="col-sm-6">
+            <qx:btn id="btn1" class="btn btn-primary" fa="fa fa-search" label="查询" onclick="Studio.search()"></qx:btn>
+        </div>
+    </div>
+</div>
+
+<div id="studioTableToolbar">
+    <qx:btn class="btn btn-primary" fa="fa fa-add" label="添加" onclick="Studio.add()"></qx:btn>
+    <qx:btn class="btn btn-primary" fa="fa fa-remove" label="删除" onclick="Studio.doDelete()"></qx:btn>
+</div>
+
+<table id="studioTable" data-mobile-responsive="true" data-click-to-select="true">
+</table>
+
+</body>
+
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script type="text/javascript">
+        /**
+         * 初始化表格对象
+         */
+        var Studio = {
+            id: "studioTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        Studio.initColumn = function () {
+            return [
+                {field: 'selectItem', checkbox: true},
+                {title: '工作室名称', field: 'name', visible: true, align: 'center', valign: 'middle'},
+                {
+                    title: '创建人',
+                    field: 'create_user',
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: function (value, row, index) {
+                        if (value == null || value == '') {
+                            return "海南工会";
+                        }
+                        return value;
+                    }
+                },
+                {title: '创建时间', field: 'create_time', align: 'center', valign: 'middle'},
+                {
+                    title: '操作', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        return '<a href="javascript:Studio.detail(' + row.id + ')">查看工作室</a>&nbsp;&nbsp;<a href="javascript:Studio.honor(' + row.id + ')">工作室荣誉</a>';
+                    }
+                }
+            ];
+        }
+
+        /**
+         * 检查是否选中
+         */
+        Studio.check = function () {
+            var selected = $('#' + this.id).bootstrapTable('getSelections');
+            if (selected.length == 0) {
+                App.info("请先选中表格中的某一记录！");
+                return false;
+            } else {
+                Studio.seItem = selected;
+                return true;
+            }
+        };
+
+        /**
+         * 跳转至查看详情页面
+         */
+        Studio.detail = function (id) {
+            var index = layer.open({
+                type: 2,
+                title: '查看详情',
+                area: ['100%', '100%'], //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: App.ctxPath + 'studio/studio?id=' + id
+            });
+        };
+
+        /**
+         * 跳转至查看详情页面
+         */
+        Studio.add = function () {
+            var index = layer.open({
+                type: 2,
+                title: '新增',
+                area: ['100%', '100%'], //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: App.ctxPath + 'studio/studio?id='
+            });
+        };
+
+        /**
+         * 工作室荣誉
+         */
+        Studio.honor = function (id) {
+            var index = layer.open({
+                type: 2,
+                title: '工作室荣誉',
+                area: ['100%', '100%'], //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: App.ctxPath + 'studio/honors?studioId=' + id
+            });
+        }
+
+        /**
+         * 点击删除
+         */
+        Studio.doDelete = function () {
+            if (this.check()) {
+                var ids = "";
+                for (i = 0; i < Studio.seItem.length; i++) {
+                    ids += Studio.seItem[i].id + ",";
+                }
+                ids = ids.substring(0, ids.length - 1);
+                App.confirm("确定要删除吗？", function () {
+                    App.loadingAjax({
+                        url: App.ctxPath + "studio/deleteStudio",
+                        type: "POST",
+                        data: {ids: ids},
+                        success: function (data) {
+                            if (data.code = 200) {
+                                layer.msg("删除成功", {icon: 1}, function () {
+                                    Studio.search();
+                                });
+                            } else {
+                                App.error("删除失败！");
+                            }
+                        }, error: function (data) {
+                            App.error("服务器异常，请稍后重试！");
+                        }
+                    });
+                });
+            }
+        };
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        Studio.formParams = function () {
+            var queryData = {};
+            queryData['name'] = $("#name").val();
+            return queryData;
+        }
+
+        /**
+         * 查询列表
+         */
+        Studio.search = function () {
+            Studio.table.refresh({query: Studio.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = Studio.initColumn();
+            var table = new BSTable(Studio.id,  "studio/list", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(Studio.formParams());
+            Studio.table = table.init();
+        });
+    </script>
+
+</js>

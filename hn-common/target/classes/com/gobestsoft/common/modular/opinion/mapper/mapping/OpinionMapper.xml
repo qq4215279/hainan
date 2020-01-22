@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.opinion.mapper.OpinionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.opinion.model.Opinion">
+        <id column="id" property="id"/>
+        <result column="auid" property="auid"/>
+        <result column="content" property="content"/>
+        <result column="contact" property="contact"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <select id="selectByCondition" resultType="java.util.Map">
+        SELECT T1.*,T2.nick_name FROM app_opinion AS T1
+        INNER JOIN app_user AS T2 ON T1.auid=T2.auid
+        INNER join app_opinion_log T3 on T1.id=T3.opinion_id
+        <where>
+            <if test="startTime !=null and startTime !='' ">
+                AND T1.create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime !=null and endTime !='' ">
+                AND T1.create_time &lt;=#{endTime}
+            </if>
+            <if test="type != null">
+                AND T1.type =#{type}
+            </if>
+            <if test="status !=null">
+                AND T1.status =#{status}
+            </if>
+            <if test="orgId !=null">
+                AND T3.org_id =#{orgId}
+            </if>
+        </where>
+        ORDER BY T1.create_time DESC
+    </select>
+
+
+</mapper>

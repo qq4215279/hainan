@@ -1,0 +1,451 @@
+package com.gobestsoft.mamage.moudle.law.controller;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.plugins.Page;
+import com.gobestsoft.common.constant.CacheConstant;
+import com.gobestsoft.common.constant.UploadConstants;
+import com.gobestsoft.common.modular.dao.mapper.SrvLawSupportMapper;
+import com.gobestsoft.common.modular.dao.mapper.SrvStraitenedMapper;
+import com.gobestsoft.common.modular.dao.model.SrvLawSupportPojo;
+import com.gobestsoft.common.modular.model.LogModel;
+import com.gobestsoft.common.modular.system.model.Dict;
+import com.gobestsoft.core.util.*;
+import com.gobestsoft.mamage.basic.BaseController;
+import com.gobestsoft.mamage.basic.tips.Tip;
+import com.gobestsoft.mamage.constant.factory.ConstantFactory;
+import com.gobestsoft.mamage.exception.BizExceptionEnum;
+import com.gobestsoft.mamage.exception.BusinessException;
+import com.gobestsoft.mamage.model.LoginUser;
+import com.gobestsoft.mamage.moudle.app.service.MessageService;
+import com.gobestsoft.mamage.moudle.law.service.LawSupportService;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+@Controller
+@RequestMapping("/law/support")
+public class LawSupportController extends BaseController {
+	
+	private String PREFIX = "/law/support/";
+	
+	@Resource
+	LawSupportService supportService;
+	@Autowired
+	MessageService messageService;
+
+	@Autowired
+	private SrvStraitenedMapper srvStraitenedMapper;
+
+	@Resource
+	private ConstantFactory constantFactory;
+
+	@Autowired
+	private SrvLawSupportMapper srvLawSupportMapper;
+
+
+	/**
+	 * 跳转法律援助首页
+	 * @return
+	 */
+	@RequestMapping("")
+	public String index(Model model){
+		model.addAttribute("deptIdInfo", getLoginUser().getDeptId());
+		return PREFIX + "support";
+	}
+
+
+	/**
+	 * 跳转法律援助首页
+	 * @return
+	 */
+	@RequestMapping("/all")
+	public String indexAll(Model model){
+		model.addAttribute("deptIdInfo", getLoginUser().getDeptId());
+		return PREFIX + "support_all";
+	}
+
+	/**
+	 * 获取法律援助管理列表
+	 * @param name
+	 * @param status
+	 * @return
+	 */
+	@RequestMapping("/list")
+    @ResponseBody
+    public Object list(
+    		@RequestParam(required = false) String name, 
+    		@RequestParam(required = false) String status,
+    		@RequestParam(required = false) Integer type, 
+    		@RequestParam(required = false) String workUnit,
+			@RequestParam(required = false) String examine) {
+		Page<Map<String, Object>> page = defaultPage();
+		List<Map<String, Object>> result = this.supportService.selectByCondition(page, name, status, type, workUnit, examine, getLoginUser().getDeptId(),getLoginUser().getDept().getLevel());
+		page.setRecords(result);
+		return super.packForBT(page);
+	}
+
+	/**
+	 * 获取法律援助管理列表
+	 * @param name
+	 * @param status
+	 * @return
+	 */
+	@RequestMapping("/listAll")
+	@ResponseBody
+	public Object listAll(
+			@RequestParam(required = false) String name,
+			@RequestParam(required = false) String status,
+			@RequestParam(required = false) Integer type,
+			@RequestParam(required = false) String workUnit,
+            @RequestParam(required = false) String examine) {
+		Page<Map<String, Object>> page = defaultPage();
+		List<Map<String, Object>> result = this.supportService.selectByCondition(page, name, status, type, workUnit, examine, null, getLoginUser().getDept().getLevel());
+		page.setRecords(result);
+		return super.packForBT(page);
+	}
+	
+	/**
+	 * 跳转至详情页面
+	 * @param id
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/detail")
+    public String detail(@RequestParam("supportLogId") Integer supportLogId, @RequestParam("id") Integer id, Model model) {
+		SrvLawSupportPojo support = supportService.selectById(id);
+		if (ToolUtil.isEmpty(support)) {
+			throw new BusinessException(BizExceptionEnum.REQUEST_NULL);
+		}
+		support.setCreateTime(DateUtil.parseAndFormat(support.getCreateTime(),"yyyyMMddHHmmss","yyyy-MM-dd"));
+		if(StringUtils.isNotEmpty(support.getBirthday())){
+			support.setBirthday(DateUtil.parseAndFormat(support.getBirthday(),"yyyyMMdd","yyyy-MM-dd"));
+		}
+		String[] sysAttachments = StringUtils.isEmpty(support.getSysAttachments()) ? new String[]{} : support.getSysAttachments().split(",");
+		//收入证明
+		String income = support.getIncome();
+		if(StringUtils.isNotEmpty(income)){
+			JSONArray arr = JSONArray.parseObject(income,JSONArray.class);
+			for(Object o: arr){
+				JSONObject obj = (JSONObject) o;
+				obj.put("path",WebSiteUtil.getBrowseUrl(obj.getString("path")));
+			}
+			model.addAttribute("income",arr);
+		}
+		//证据文件
+		String evidence = support.getEvidence();
+		if(StringUtils.isNotEmpty(evidence)){
+			JSONArray arr = JSONArray.parseObject(evidence,JSONArray.class);
+			for(Object o: arr){
+				JSONObject obj = (JSONObject) o;
+				obj.put("path",WebSiteUtil.getBrowseUrl(obj.getString("path")));
+			}
+			model.addAttribute("evidence",arr);
+		}
+		//户口本
+		String booklet = support.getResidenceBooklet();
+		if(StringUtils.isNotEmpty(booklet)){
+			JSONArray arr = JSONArray.parseObject(booklet,JSONArray.class);
+			for(Object o: arr){
+				JSONObject obj = (JSONObject) o;
+				obj.put("path",WebSiteUtil.getBrowseUrl(obj.getString("path")));
+			}
+			model.addAttribute("booklet",arr);
+		}
+
+		List<Dict> lib_person_type = constantFactory.findInDict("lib_person_type");
+		List<Dict> lib_cause = constantFactory.findInDict("lib_cause");
+		model.addAttribute("lib_person_type",lib_person_type);
+		model.addAttribute("lib_cause",lib_cause);
+
+		model.addAttribute("sysAttachments", WebSiteUtil.getBrowseUrl(sysAttachments));
+		model.addAttribute("support", support);
+		model.addAttribute("supportLogId", supportLogId);
+		model.addAttribute("isExamine", 0);// 区分是否是审核页面还是详情页面
+
+		model.addAttribute("bean",srvLawSupportMapper.lawSupportDetail(id));
+		if (support.getType() == 1) {// 1:海南省职工服务中心援助申请;2:中彩金援助申请
+			return PREFIX + "support_employee";
+		} else {
+			model.addAttribute("contacts",srvStraitenedMapper.selectContacts(id + "", 1));
+			return PREFIX + "support_lottery";
+		}
+	}
+	
+	/**
+	 * 跳转至审核页面
+	 * @param id
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/examine")
+	public String examine(@RequestParam("supportLogId") Integer supportLogId, @RequestParam("id") Integer id, Model model) {
+		if (ToolUtil.isEmpty(supportLogId)) {
+            throw new BusinessException(BizExceptionEnum.REQUEST_NULL);
+        }
+		SrvLawSupportPojo support = supportService.selectById(id);
+		support.setCreateTime(DateUtil.parseAndFormat(support.getCreateTime(),"yyyyMMddHHmmss","yyyy-MM-dd"));
+		if(StringUtils.isNotEmpty(support.getBirthday())){
+			support.setBirthday(DateUtil.parseAndFormat(support.getBirthday(),"yyyyMMdd","yyyy-MM-dd"));
+		}
+		String[] sysAttachments = StringUtils.isEmpty(support.getSysAttachments()) ? new String[]{} : support.getSysAttachments().split(",");
+        model.addAttribute("sysAttachments", WebSiteUtil.getBrowseUrl(sysAttachments));
+		model.addAttribute("support", support);
+		model.addAttribute("supportLogId", supportLogId);
+		model.addAttribute("isExamine", 1);// 区分是否是审核页面还是详情页面
+
+		List<Dict> lib_person_type = constantFactory.findInDict("lib_person_type");
+		List<Dict> lib_cause = constantFactory.findInDict("lib_cause");
+		model.addAttribute("lib_person_type",lib_person_type);
+		model.addAttribute("lib_cause",lib_cause);
+        //收入证明
+        String income = support.getIncome();
+        if(StringUtils.isNotEmpty(income)){
+            JSONArray arr = JSONArray.parseObject(income,JSONArray.class);
+            for(Object o: arr){
+                JSONObject obj = (JSONObject) o;
+                obj.put("path",WebSiteUtil.getBrowseUrl(obj.getString("path")));
+            }
+            model.addAttribute("income",arr);
+        }
+        //证据文件
+		String evidence = support.getEvidence();
+		if(StringUtils.isNotEmpty(evidence)){
+			JSONArray arr = JSONArray.parseObject(evidence,JSONArray.class);
+			for(Object o: arr){
+				JSONObject obj = (JSONObject) o;
+				obj.put("path",WebSiteUtil.getBrowseUrl(obj.getString("path")));
+			}
+			model.addAttribute("evidence",arr);
+		}
+		//户口本
+		String booklet = support.getResidenceBooklet();
+		if(StringUtils.isNotEmpty(booklet)){
+			JSONArray arr = JSONArray.parseObject(booklet,JSONArray.class);
+			for(Object o: arr){
+				JSONObject obj = (JSONObject) o;
+				obj.put("path",WebSiteUtil.getBrowseUrl(obj.getString("path")));
+			}
+			model.addAttribute("booklet",arr);
+		}
+
+		model.addAttribute("bean",srvLawSupportMapper.lawSupportDetail(id));
+		if (support.getType() == 1) {// 1:海南省职工服务中心援助申请;2:中彩金援助申请
+			return PREFIX + "support_employee";
+		} else {
+			List<Map<String, Object>> contacts = srvStraitenedMapper.selectContacts(id + "", 1);
+			model.addAttribute("contacts",contacts);
+			return PREFIX + "support_lottery";
+		}
+
+	}
+
+	@RequestMapping(value="/transfer")
+	public String transferWeb(Model model,@RequestParam("id") Integer id) {
+
+		LoginUser user = getLoginUser();
+
+		Integer deptId = user.getDeptId();
+
+		Integer pid =null;
+
+		String pname = null;
+
+		if(user.getDept().getParentDept()!=null){
+			pid = user.getDept().getPId();
+			pname = user.getDept().getParentDept().getDeptName();
+		}
+
+		model.addAttribute("deptId", deptId);
+		model.addAttribute("pid", pid);
+		model.addAttribute("pname",pname );
+
+		List<Map> sons = supportService.selectSonDept(deptId);
+		model.addAttribute("sons",sons);
+		model.addAttribute("id", id);
+
+		if(pid==null&&(sons==null||sons.size()==0)){
+			model.addAttribute("msg", "没有可转办组织，不能进行转办！");
+		}
+
+		return PREFIX + "support_transfer";
+	}
+	@ResponseBody
+	@RequestMapping("/transferSubmit")
+	public Tip transferSubmit(
+			@RequestParam Integer id
+			,@RequestParam(required = false) String transferReason
+			,@RequestParam Integer deptId
+			){
+
+		if(deptId==null){
+			throw new BusinessException(BizExceptionEnum.REQUEST_NULL);
+		}
+
+		return supportService.updateTransfer(id,deptId,transferReason);
+
+	}
+
+	/**
+     * 提交审核情况
+     * @throws IOException
+     */
+    @RequestMapping(value = "/submit/{status}")
+    @ResponseBody
+    public Tip submit(@RequestParam("id") Integer id, @PathVariable Integer status, @RequestParam(required = false) String comment, @RequestParam("supportLogId") Integer supportLogId, @RequestParam("sysAttachments") String sysAttachments) throws IOException {
+    	SrvLawSupportPojo support = supportService.selectById(id);
+    	// 提交审核情况
+    	support.setStatus(status);
+    	support.setSysAttachments(sysAttachments);
+    	this.supportService.submit(support, comment, supportLogId );
+
+
+    	//给用户推送消息
+		int category=5;
+		String title = "法律援助";
+		title = support.getName()+"您好，您"+getNortDate(support.getCreateTime(),"yyyy年MM月dd日")+"提交的法律援助申请";
+		if(status==2){
+			title+="已通过";
+		}
+		else if(status==3){
+			title+="已拒绝";
+		}
+		int mode = 5;//法律援助
+		int targetId = id;
+		String jumpUrl = null;
+		boolean isPush = true;
+		String[] auids= {support.getCreateUid()};
+		messageService.sendMessageByAuid(category,title,comment,mode,targetId+"",jumpUrl,isPush,auids);
+
+    	return  success();
+    }
+    
+    /**
+	 * 查看审核流程
+	 * @param id
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/log")
+	public String log(@RequestParam("id") Integer id, Model model) {
+		List<LogModel> log = supportService.log(id);
+		model.addAttribute("logList", log);
+		return   "/applyLog/look_log";
+	}
+	
+	
+	/**
+	 * 图片上传
+	 * @param file
+	 * @return
+	 */
+	@RequestMapping(value = "/upload", method = RequestMethod.POST)
+    @ResponseBody
+    public String upload(@RequestParam(value = "attch", required = false) MultipartFile file) {
+        String packName = UploadConstants.SUPPORT;
+        String strDate = DateUtil.getDays();
+        String fileExtensionName = FilenameUtils.getExtension(file.getOriginalFilename());
+        String fileName = UUID.randomUUID().toString() + "." + fileExtensionName;
+        String fileSavePath = "";
+        fileSavePath = manageProperties.getFileUploadPath() + packName + strDate + "/";
+        try {
+            File p = new File(fileSavePath);
+            if (!p.exists()) {
+                p.mkdirs();
+            }
+            file.transferTo(new File(fileSavePath + fileName));
+        } catch (Exception e) {
+            throw new BusinessException(BizExceptionEnum.UPLOAD_ERROR);
+        }
+        String result = WebSiteUtil.getBrowseUrl(packName + strDate + "/" + fileName);
+        return result;
+
+    }
+
+	/**
+	 * 下载
+	 * @param fileName
+	 */
+	@RequestMapping("/downloadWord")
+	@ResponseBody
+    public void downloadWord(String fileName,Integer id){
+
+		Map<String, Object> beanMap = (Map<String, Object>) redisUtils.get(CacheConstant.Law_Support+id);
+		if(ToolUtil.isEmpty(beanMap)){
+			beanMap = srvLawSupportMapper.lawSupportDetail(id);
+			Long expireTime = 300L;
+			redisUtils.set(CacheConstant.Law_Support+id, beanMap, expireTime);
+		}
+		changeValueByKey(beanMap);
+		String template = FileUtil.getResoucePath("static"+File.separator+"word"+File.separator+"support")+File.separator+ this.getTemplateName(fileName,beanMap,id);
+
+		WordUtil.downloadWord(template, fileName, beanMap, getHttpServletResponse(), getHttpServletRequest());
+	}
+
+	private void changeValueByKey(Map<String, Object> beanMap) {
+		if (beanMap.containsKey("create_time") && !DateUtil.isValidDate(String.valueOf(beanMap.get("create_time")),"yyyy年MM月dd日")) {
+			beanMap.put("create_time", DateUtil.parseAndFormat(String.valueOf(beanMap.get("create_time")), "yyyyMMddHHmmss", "yyyy年MM月dd日"));
+		}
+		if (beanMap.containsKey("birthday") && !DateUtil.isValidDate(String.valueOf(beanMap.get("birthday")),"yyyy-MM-dd")) {
+			beanMap.put("birthday", DateUtil.parseAndFormat(String.valueOf(beanMap.get("birthday")), "yyyyMMdd", "yyyy-MM-dd"));
+		}
+	}
+
+	/**
+	 * 根据前端的参数 和 beanMap中的type 确定使用的模板
+	 * @param fileName
+	 * @return
+	 */
+	private String getTemplateName(String fileName,Map<String, Object> beanMap,Integer id) {
+		String suffix = WordUtil.DOCX_SUFFIX;
+		if (fileName.endsWith(WordUtil.DOC_SUFFIX)) {
+			suffix = WordUtil.DOC_SUFFIX;
+		}
+		String templateName = "employee";
+		if ((int)beanMap.getOrDefault("type",0) == 0) {
+			templateName = "lottery";
+
+			List<Map<String, Object>> contacts = (List<Map<String, Object>>) redisUtils.get(CacheConstant.Law_Support_Contacts+id);
+			if(ToolUtil.isEmpty(contacts)){
+				contacts = srvStraitenedMapper.selectContacts(id + "", 1);
+				Long expireTime = 300L;
+				redisUtils.set(CacheConstant.Law_Support_Contacts+id, contacts, expireTime);
+			}
+
+			if (contacts != null && contacts.size()>0){
+				this.list2Map(contacts,beanMap,5);//模板中 亲属最多只有5组
+			}
+		}
+		return templateName + suffix;
+	}
+
+	private void list2Map(List<Map<String, Object>> contacts,Map<String,Object> beanMap,int length) {
+		for(int i=0; i<contacts.size(); i++){
+			beanMap.put("name"+i, contacts.get(i).getOrDefault("name",""));
+			beanMap.put("age"+i, contacts.get(i).getOrDefault("age",""));
+			beanMap.put("relationName"+i, contacts.get(i).getOrDefault("relationName",""));
+			beanMap.put("unit"+i, contacts.get(i).getOrDefault("unit",""));
+			beanMap.put("tel"+i, contacts.get(i).getOrDefault("tel",""));
+			beanMap.put("monthly_income"+i, contacts.get(i).getOrDefault("monthly_income",""));
+        }
+        for(int i=length-1; i>contacts.size()-1; i--){
+			beanMap.put("name"+i, "");
+			beanMap.put("age"+i, "");
+			beanMap.put("relationName"+i, "");
+			beanMap.put("unit"+i, "");
+			beanMap.put("tel"+i, "");
+			beanMap.put("monthly_income"+i, "");
+		}
+	}
+}

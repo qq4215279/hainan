@@ -1,0 +1,97 @@
+<body>
+<!-- 修改下级工会界面 -->
+		<div class="form-horizontal" id="deptInfoForm">
+			<input type="hidden" id="id" value="${dept.id}">
+			<form:text id="simplename" label="工会名称" name="simplename" must="true" value="${dept.simplename}" line="true"></form:text>
+			<form:text id="addr" label="工会地址" name="addr" must="true" value="${dept.addr}" line="true"></form:text>
+			<input id="deptType" th:value="${dept.deptType}" type="hidden" />
+			<div class="row text-center">
+					<qx:btn id="ensure" class="btn btn-primary" fa="fa fa-check" onclick="DeptInfoDlg.editSubmit()"
+							label="提交"></qx:btn>
+					<qx:btn id="ensure" class="btn btn-default" fa="fa fa-eraser" onclick="DeptInfoDlg.close()"
+							label="取消"></qx:btn>
+			</div>
+		</div>
+</body>
+	<script type="text/javascript">
+
+/**
+ * 初始化部门详情对话框
+ */
+var DeptInfoDlg = {
+    deptInfoData : {},
+    zTreeInstance : null,
+    validateFields: {
+        simplename: {
+            validators: {
+                notEmpty: {
+                    message: '工会名称不能为空'
+                }
+            }
+        },
+        addr: {
+            validators: {
+                notEmpty: {
+                    message: '工会地址不能为空'
+                }
+            }
+        }
+    }
+};
+
+/**
+ * 验证数据是否为空
+ */
+DeptInfoDlg.validate = function () {
+    $('#deptInfoForm').data("bootstrapValidator").resetForm();
+    $('#deptInfoForm').bootstrapValidator('validate');
+    return $("#deptInfoForm").data('bootstrapValidator').isValid();
+};
+/**
+ * 设置对话框中的数据
+ *
+ * param key 数据的名称
+ * param val 数据的具体值
+ */
+DeptInfoDlg.set = function(key, val) {
+    this.deptInfoData[key] = (typeof value == "undefined") ? $("#" + key).val() : value;
+    return this;
+}
+/**
+ * 收集数据
+ */
+DeptInfoDlg.collectData = function() {
+    this.set('id').set('simplename').set('fullname').set('tips').set('sort').set('pid').set('addr').set('deptType');
+}
+DeptInfoDlg.editSubmit = function(){
+	this.deptInfoData = {};
+    this.collectData();
+    if (!this.validate()) {
+    	errorFocus();
+        return;
+    }
+    //提交信息
+    var ajax = new $ax(Feng.ctxPath + "/mgr/updateDept", function(data){
+        DeptInfoDlg.close();
+        Feng.success("修改成功!");
+        parent.refreshParentNode();
+    },function(data){
+        Feng.error("修改失败!" + data.responseJSON.message + "!");
+    });
+    ajax.set(this.deptInfoData);
+    ajax.start();
+    DeptInfoDlg.close();
+};
+/**
+ * 关闭此对话框
+ */
+DeptInfoDlg.close = function() {
+	var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+    parent.layer.close(index);
+}
+$(function(){
+	Feng.initValidator("deptInfoForm", DeptInfoDlg.validateFields);
+})
+
+</script>
+	@}

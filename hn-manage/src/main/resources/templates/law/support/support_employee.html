@@ -1,0 +1,507 @@
+<css>
+    <link th:href="@{/static/css/fileUpload.css}" rel="stylesheet">
+<!--    <link th:href="@{http://xiumi.us/connect/ue/v5/xiumi-ue-v5.css}" rel="stylesheet">-->
+</css>
+<body>
+    <div class="form-horizontal" id="lawSupportForm">
+        <input type="hidden" id="id" th:value="${support.id}">
+        <input type="hidden" id="supportLogId" th:value="${supportLogId}">
+        <div class="row">
+
+            <div class="paper paper1 col-sm-8 col-sm-offset-2">
+                <style type="text/css">
+                    .paper {
+                        position:relative;
+                        width:850px;
+                        min-height: 1000px;
+                        background:#fff;
+                        border:1px solid #eee;
+                        float:left;
+                        margin-bottom:10px;
+                        box-shadow:0 0 5px rgba(0,0,0,0.27),0 0 20px  rgba(0,0,0,.1) inset;
+                    }
+                    .paper::after,.paper::before {
+                        content:'';
+                        position:absolute;
+                        bottom:6px;
+                        width:100px;
+                        height:1px;
+                        z-index:-1;
+                        box-shadow:0 2px 12px 5px rgba(0,0,0,.3);
+                    }
+                    .paper::after {
+                        left:4px;
+                        transform:rotate(-6deg);
+                    }
+                    .paper::before {
+                        right:4px;
+                        transform:rotate(6deg);
+                    }
+
+                    .myTable{
+                        width: 90%;
+                        margin: 20px auto;
+                        table-layout: fixed;
+                    }
+                    .myTable th,tr,td{
+                        border: 1px solid #333;
+                    }
+                    .myTable thead tr,th{
+                        border: 0px !important;
+                    }
+
+                    .myTable tbody td{
+                        height: 33px;
+                        line-height: 33px;
+                        padding: 5px;
+                        text-align: center;
+                    }
+                    .exclude{
+
+                        border-top: 0px!important;
+                        border-top: 0px!important;
+                    }
+                    .myTable tbody td{
+                        height: 33px;
+                        line-height: 33px;
+                        padding: 5px;
+                        text-align: center;
+                        font-family: '楷体';
+
+                    }
+
+                    .bold{
+                        font-weight: bold;
+                        font-family: 'Microsoft YaHei';
+                    }
+                    .paper:hover .download_tag{
+                        display: inline-block;
+                    }
+                    .download_tag {
+
+                        display: inline-block;
+                        position: absolute;
+                        right: 0;
+                        top: 0;
+                        width: 140px;
+                        height: 50px;
+                        filter: alpha(Opacity=80);
+                        -moz-opacity: 0.5;
+                        opacity: 0.5;
+                        background-color: #333;
+                        color: #FFF;
+                        text-align: center;
+                        line-height: 50px;
+                        border-radius: 10px;
+                        display: none;
+                        cursor: pointer;
+                    }
+                </style>
+                <span class="download_tag">下载</span>
+                <table class="myTable">
+
+                    <thead>
+                    <tr>
+                        <th style="text-align: center;" colspan="8"><h2 style="font-weight:400;">海南省职工服务中心法律援助申请表</h2></th>
+                    </tr>
+                    <tr>
+                        <th colspan="6"></th>
+
+                        <th colspan="2" th:inline="text">填表日期：[[${support.createTime}]]</th>
+
+                    </tr>
+                    </thead>
+
+                    <tbody>
+
+                    <tr>
+                        <td class="bold">申请人</td><td th:text="${support.name}"></td>
+                        <td class="bold">性别</td><td th:text="${bean.sex_name}"></td>
+                        <td class="bold">出生年月</td><td th:text="${support.birthday}"></td>
+                        <td class="bold">民族</td><td th:text="${bean.nation_name}"></td>
+
+                    </tr>
+                    <tr>
+                        <td class="bold">身份证号</td>
+                        <td colspan="2" th:text="${support.certificateNum}"></td>
+                        <td class="bold">职业</td><td th:text="${support.occupation}"></td>
+                        <td class="bold">联系电话</td><td colspan="2" th:text="${support.mobile}"></td>
+                    </tr>
+                    <tr>
+                        <td class="bold">户籍地</td>
+                        <td colspan="3" th:text="${support.domicilePlace}"></td>
+                        <td class="bold">工作单位</td><td colspan="3" th:text="${support.workUnit}"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="bold">用工所在地</td>
+                        <td colspan="6" th:text="${support.unitAddress}" ></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="bold">住所地(常住地址)</td>
+                        <td colspan="6" th:text="${support.address}" ></td>
+                    </tr>
+                    <!--<tr>-->
+                        <!--<td class="bold">代理人姓名</td>-->
+                        <!--<td colspan="2" th:text="${support.agentName}"></td>-->
+                        <!--<td class="bold">身份证号</td>-->
+                        <!--<td colspan="4" th:text="${support.agentCertificateNum}"></td>-->
+                    <!--</tr>-->
+                    <!--<tr>-->
+
+                        <!--<td class="bold">申请人月收入</td>-->
+                        <!--<td colspan="2" th:text="${support.monthlyIncome}"></td>-->
+                        <!--<td class="bold"> 申请人家庭人均月收入</td>-->
+                        <!--<td colspan="4" th:text="${support.familyMonthlyIncome}"></td>-->
+
+                    <!--</tr>-->
+
+                    <tr>
+
+                    <tr>
+                        <td colspan="2"  style="height: 100px;line-height: 100px;" class="bold">案情及申请理由概述：</td>
+                        <td colspan="6"style="border: 0;" th:text="${support.caseReason}" ></td>
+                    </tr>
+                    <tr>
+
+                        <td colspan="2" style="height: 100px;" class="bold">主要证据材料</td>
+                        <td colspan="6" >见附录</td>
+
+                    </tr>
+                    <tr>
+
+                        <td colspan="8" style="text-align: left" class="bold">本人承诺以上所填内容和提交的证件、证明材料均真实。</td>
+                    </tr>
+                    <tr >
+                        <td colspan="5" style="border-top:0!important;border: 0!important;"></td>
+                        <td colspan="2"  style="border-top:0!important;border: 0!important;" >申请人签字：</td>
+                        <td colspan="1"   style="border-top:0!important;border-left: 0!important;"></td>
+
+                    </tr>
+                    <tr >
+                        <td colspan="5" class="exclude"  style="border-top:0!important;border: 0!important;"></td>
+                        <td colspan="2" class="exclude"   style="border-top:0!important;border: 0!important;">代理人签字：</td>
+                        <td colspan="1" class="exclude"  style="border-top:0!important;border-left: 0!important;"></td>
+
+                    </tr>
+                    <tr >
+                        <td colspan="5" class="exclude" style="border-top:0!important;border: 0!important;"></td>
+                        <td colspan="1"  class="exclude"  style="border-top:0!important;border: 0!important;"></td>
+                        <td colspan="2" class="exclude"  style="border-top:0!important;border-left: 0!important;">&nbsp;&nbsp;&nbsp;&nbsp;年&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;日</td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+            </div>
+            <div class="paper col-sm-8 col-sm-offset-2" style="padding: 10px">
+
+                <div class="col-sm-12" th:if="${income!=null && income.size()>0}">
+                    <h3>收入证明：</h3>
+                    <div class="col-sm-4" th:each="attach : ${income}" style="padding:5px 5px!important;">
+                        <a class="galpop-info" data-galpop-group="info"   th:href="${attach.path}"  th:attr="title=${attach.desc},data-galpop-link=${attach.path},data-galpop-link-title=${attach.desc}"><img th:src="${attach.path}" style="width: 100%;height: 300px" ></a>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <h3>证据文件：</h3>
+                    <div class="col-sm-4" th:each="attach : ${evidence}" style="padding:5px 5px!important;">
+                        <a class="galpop-info" data-galpop-group="info"   th:href="${attach.path}"  th:attr="title=${attach.desc},data-galpop-link=${attach.path},data-galpop-link-title=${attach.desc}"><img th:src="${attach.path}" style="width: 100%;height: 300px" ></a>
+                    </div>
+                </div>
+                <div class="col-sm-12" th:if="${booklet!=null && booklet.size()>0}">
+                    <h3>户口本照片:</h3>
+                    <div class="col-sm-4" th:each="attach : ${booklet}" style="padding:5px 5px!important;">
+                        <a class="galpop-info" data-galpop-group="info"   th:href="${attach.path}"  th:attr="title=${attach.desc},data-galpop-link=${attach.path},data-galpop-link-title=${attach.desc}"><img th:src="${attach.path}" style="width: 100%;height: 300px" ></a>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div th:if="${isExamine==1}" class="row ">
+                <label class="col-sm-2 control-label">
+                    上传图片
+                </label>
+                <div class="col-sm-8">
+                    <div style="display: table">
+                        <div style="display: table-cell; width: 35%">
+                            <input class="form-control" type="text" id="sysAttachments" name="sysAttachments" style="width:10px;display: none;" >
+                        </div>
+                        <div class="jquery-fileupload">
+                            <label for="fileupload" class="btn btn-info" style="display:inline-block;width:100px">
+                                <i class="fa fa-upload">选择上传</i>
+                            </label>
+                            <div class="uploadBtn" style="display:none">
+                                <input id="fileupload" type="file" name="attch" accept="image/*">
+                                <span>+选择文件</span>
+                            </div>
+                            <span class="tips"></span>
+                            <div style="clear: both"></div>
+                            <table>
+                                <tbody class="filesName"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="progress-bar progress-bar-success"></div>
+                </div>
+
+            </div>
+            <div class="row">
+
+                <div class="form-group" id="spArea">
+                    <label class="col-sm-2 control-label">
+                        附件材料
+                    </label>
+                    <div class="col-sm-8" id="spfiles">
+                        <div th:each="attach : ${sysAttachments}" style="margin-left:10px; margin-top: 10px; float:left">
+                            <a th:href="${attach}" ><img th:src="${attach}"  ></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${isExamine==1}" class="row" th:if="${#lists.size(sysAttachments)>0}">
+                <label class="col-sm-2 control-label">
+                    附件材料
+                </label>
+                <div class="col-sm-8">
+                    <div th:each="attach : ${sysAttachments}" style="margin-left:10px; margin-top: 10px; float:left">
+                        <a th:href="${attach}" target="_blank"><img th:src="${attach}" style="width: 200px;height: 100px;" ></a>
+                    </div>
+                </div>
+            </div>
+            <div th:if="${isExamine==1}" style="margin-bottom: 10px">
+
+
+                <div class="row " th:if="${isExamine==1}">
+                    <label class="col-sm-2  control-label" ><span style="color:red;"> * </span>审核意见</label>
+                    <div class="col-sm-5">
+                           <textarea name="comment" id="comment" class="form-control" maxlength="200"
+                                     style="width: 90%;height: 80px;resize: none;"></textarea>
+                    </div>
+                </div>
+                <div class="row col-sm-offset-2" >
+                    <qx:btn class="btn btn-primary"  fa="fa fa-check" label="通过" permission=""
+                            onclick="checkDlg.agree()" ></qx:btn>
+                    <qx:btn class="btn btn-primary"  fa="fa fa-check" label="转办" permission=""
+                            onclick="checkDlg.transfer()" ></qx:btn>
+                    <qx:btn class="btn btn-danger" fa="fa fa-eraser" label="拒绝" permission=""
+                            onclick="checkDlg.refuse()" ></qx:btn>
+                    <qx:btn class="btn btn-info" fa="fa fa-eraser" label="取消" permission=""
+                            onclick="checkDlg.close()" ></qx:btn>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+<js>
+    <div th:include="fragment/fargment :: clipJs"></div>
+    <div th:include="fragment/fargment :: fileUploadJs"></div>
+    <script th:src="@{/static/js/jquery.formHelp.js}"></script>
+    <script th:src="@{/static/ueditor/ueditor.config.js}"></script>
+    <script th:src="@{/static/ueditor/ueditor.all.js}"></script>
+
+    <script type="text/javascript" >
+    $(function(){
+
+      //验证form表单
+      App.initValidator("lawSupportForm", checkDlg.validateFields);
+      var type = $("#type").val();
+      $("#type").val(initTypeFun(type));
+      App.initAlbumNew();
+    });
+    $('.download_tag').click(function(){
+    //      App.print("paper1","法律援助申请表");
+      let paths = window.document.location.pathname.split('/');
+      let pathName = "/";
+      if(paths.length>0){ pathName = pathName + paths[1] }
+      let id = $("#id").val()
+      location.href = pathName + "/law/support/downloadWord?fileName=法律援助申请表.docx&id="+id;
+    });
+
+    function initTypeFun(field){
+      if(field == 1){
+         return '海南职工法律援助申请';
+     }else if (field == 0){
+         return '中彩金法律援助申请';
+     }else {
+         return '-';
+     }
+    }
+
+    /*
+    * 初始对话框
+    */
+    var checkDlg = {
+        recordData: {},
+        deptZtree: null,
+        pNameZtree: null,
+        validateFields: {}
+    }
+
+    /**
+    * 设置对话框中的数据
+    * param key 数据的名称
+    */
+    checkDlg.set = function(key) {
+       this.recordData[key] = $("#" + key).val();
+       return this;
+    }
+
+    /**
+    * 信息设定
+    */
+    checkDlg.collectData = function () {
+       this.set('id').set('comment').set('supportLogId');
+       var sysAttachments = "";
+       $("#spArea img").each(function () {
+           var index = $(this).attr("src").lastIndexOf("straitened");
+           sysAttachments+= $(this).attr("src").substring(index, $(this).attr("src").length) + ",";
+       });
+       sysAttachments=sysAttachments.substring(0,sysAttachments.length)
+       this.recordData["sysAttachments"]=sysAttachments;
+    }
+
+    /**
+    * 清空数据
+    */
+    checkDlg.clearData = function () {
+     this.recordData = {};
+    };
+
+    /**
+    * 验证数据
+    */
+    checkDlg.validate = function () {
+     $('#lawSupportForm').data("bootstrapValidator").resetForm();
+     $('#lawSupportForm').bootstrapValidator('validate');
+     return $("#lawSupportForm").data('bootstrapValidator').isValid();
+    };
+
+
+    /**
+    * 附件材料上传
+    */
+    var uploadStatus=0;
+    $("#fileupload").fileupload({
+       url: App.ctxPath + 'law/support/upload',
+       start: function (e) {
+           uploadStatus=1;
+           $("#sysAttachments").val('');
+           $('#progressText').html('0%');
+           $('#progressText').css('color', 'black');
+           $('#progress .progress-bar').css('width', '0%');
+       },
+       progressall: function (e, data) {
+           var progress = parseInt(data.loaded / data.total * 100, 10);
+           $('#progressText').html(progress + '%')
+           $('#progress .progress-bar').css('width', progress + '%');
+       },
+       done: function (e, data) {
+           uploadStatus=0;
+           $('#progressText').html('complete');
+           $('#progressText').css('color', 'green')
+           /* $('#spArea').css("display","block"); */
+           addsp(data.result);
+       },
+       fail: function (e, data) {
+           $('#progressText').html('error');
+           $('#progressText').css('color', 'red')
+       }
+    });
+
+    /**
+    *审核通过
+    */
+    checkDlg.agree = function(){
+       if(uploadStatus!=0){
+           return App.error("当前正在上传文件，请等待文件上传完成");
+       }
+       debugger;
+       this.clearData();
+       this.collectData();
+       var comment = $("#comment").val();
+       if(comment == null || comment == ""){
+           App.error("审核意见不能为空!");
+           return;
+       }
+
+       //提交信息
+       var ajax = new $ax(App.ctxPath + "law/support/submit/2", function (data) {
+           App.success("审核通过!");
+           window.parent.OptLawSupport.table.refresh();
+           checkDlg.close();
+       }, function (data) {
+           App.error("审核提交失败!" + data.responseJSON.message + "!");
+       });
+       ajax.set(checkDlg.recordData);
+       ajax.start();
+
+    }
+    /**
+    *转办
+    */
+    checkDlg.transfer = function(){
+      var index = layer.open({
+          type: 2,
+          title: '转办页面',
+          area: ['50%', '70%'], //宽高
+          fix: false, //不固定
+          maxmin: true,
+          content: App.ctxPath + 'law/support/transfer?id=' +$("#id").val(),
+          end:function(){
+              window.parent.OptLawSupport.table.refresh();
+              checkDlg.close();
+          }
+      });
+      this.layerIndex = index;
+    }
+
+    /**
+    *拒绝审核
+    */
+    checkDlg.refuse = function(){
+       if(uploadStatus!=0){
+           return App.error("当前正在上传文件，请等待文件上传完成");
+       }
+       this.clearData();
+       this.collectData();
+       var comment = $("#comment").val();
+       if(comment == null || comment == ""){
+           App.error("审核意见不能为空!");
+           return;
+       }
+       //提交信息
+       var ajax = new $ax(App.ctxPath + "law/support/submit/3", function (data) {
+           App.success("审核拒绝!");
+           window.parent.OptLawSupport.table.refresh();
+           checkDlg.close();
+       }, function (data) {
+           App.error("审核提交失败!" + data.responseJSON.message + "!");
+       });
+       ajax.set(checkDlg.recordData);
+       ajax.start();
+
+
+    }
+
+    /**
+    * 关闭此对话框
+    */
+    checkDlg.close = function() {
+       parent.layer.close(window.parent.OptLawSupport.layerIndex);
+    }
+
+
+    function addsp(fileName) {
+        var area=$('<div style="margin-left:10px; margin-top: 10px; float:left">' + '<a href= "' + fileName + '" target="_blank"><img src=" ' + fileName + ' " style="width: 200px;height: 100px;"></div>');
+        $("#spfiles").append(area);
+    }
+    $("#spfiles").on("click",".fa-close",function () {
+        $(this).parent().remove();
+    })
+
+    </script>
+    
+</js>

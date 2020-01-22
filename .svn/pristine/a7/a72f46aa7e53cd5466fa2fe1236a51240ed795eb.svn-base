@@ -1,0 +1,249 @@
+<css xmlns:form="http://www.w3.org/1999/html" xmlns:form="http://www.w3.org/1999/html">
+<!--    <link th:href="@{http://xiumi.us/connect/ue/v5/xiumi-ue-v5.css}" rel="stylesheet">-->
+    <link th:href="@{/static/css/fileUpload.css}" rel="stylesheet">
+</css>
+<body>
+<div class="container">
+    <div class="form-horizontal" id="bannerForm">
+        <input type="hidden" id="category" th:value="${category}"/>
+        <input type="hidden" id="targetId"/>
+        <div class="row">
+            <form class="form-horizontal col-sm-8 col-sm-offset-1" id="add-form">
+                <form:text label="标题" id="title" name="title" type="text" must="true"></form:text>
+                <div th:if="${category} eq '0'">
+                <form:img id="cover" label="封面图" width="480" height="270" viewtype="1"></form:img>
+                </div>
+                <div th:if="${category} eq '101'">
+                    <form:img id="cover" label="封面图" width="500" height="100" viewtype="1"></form:img>
+                </div>
+                <div th:if="${category} eq '102'">
+                    <form:img id="cover" label="封面图" width="480" height="270" viewtype="1"></form:img>
+                </div>
+                <div th:if="${category} eq '103'">
+                    <form:img id="cover" label="封面图" width="1125" height="420" viewtype="1"></form:img>
+                </div>
+
+
+                <form:check id="isEnable" label="是否启用" name="isEnable"></form:check>
+                <form:imgchg name="bannerType" value="${bannerTypeCode}" onclick="cyUlAvtivty(this)"
+                             must="true"></form:imgchg>
+
+                <div id="OnejumpUrl" style="display: none;">
+                    <form:text label="跳转路径" id="jumpUrl" name="jumpUrl" type="text"></form:text>
+                </div>
+                <div id="chooseArticle" style="display: none;">
+                    <form:text label="选择资讯" id="article" name="article" type="text" readonly="true"
+                               onclick="BannerDlg.chooseArticle()"></form:text>
+                </div>
+                <div id="chooseSeminar" style="display: none;">
+                    <form:text label="选择专题" id="seminar" name="seminar" type="text" readonly="true"
+                               onclick="BannerDlg.chooseSeminar()"></form:text>
+                </div>
+                <div id="TwoJumpUrl" style="display: none;">
+                    <form:text label="跳转路径" id="smallJumpUrl" name="smallJumpUrl" type="text"></form:text>
+                </div>
+
+            </form>
+        </div>
+        <div class="row text-center">
+            <div class="hr-line-dashed"></div>
+            <qx:btn fa="fa fa-check" label="提交" permission="" onclick="BannerDlg.addSubmit()"></qx:btn>
+            <qx:btn fa="fa fa-eraser" label="取消" permission="" onclick="BannerDlg.close()"></qx:btn>
+        </div>
+    </div>
+</div>
+</body>
+<js>
+    <div th:include="fragment/fargment :: clipJs"></div>
+    <div th:include="fragment/fargment :: fileUploadJs"></div>
+    <script th:src="@{/static/js/jquery.formHelp.js}"></script>
+    <script th:src="@{/static/ueditor/ueditor.config.js}"></script>
+    <script th:src="@{/static/ueditor/ueditor.all.js}"></script>
+    <script type="text/javascript">
+        /**
+         * 画面初期处理
+         */
+        $(function () {
+            // 详细信息form验证
+            App.initValidator("bannerForm", BannerDlg.validateFields);
+        });
+
+
+        $('input[name="bannerType"]').click(function () {
+            $(this).attr("checked", true);
+            $(this).siblings().removeAttr("checked");
+        })
+
+        // 列表展示类型 radio 选择响应
+        $("label[name='bannerType']").click(function (e) {
+            hiddenAll();
+            var radioId = $(this).attr("for")
+            if ("bannerType0" === radioId) {
+                $("#OnejumpUrl").show();
+            } else if ("bannerType1" === radioId) {
+                $("#chooseArticle").show();
+            }else if('bannerType2'===radioId){
+                $("#chooseSeminar").show();
+            }else if('bannerType4'===radioId){
+                $("#TwoJumpUrl").show();
+            }
+        });
+
+        function hiddenAll() {
+            $("#OnejumpUrl").hide();
+            $("#TwoJumpUrl").hide();
+            $("#chooseArticle").hide();
+            $("#chooseSeminar").hide();
+        }
+
+
+        /**
+         * 初始化详情内容
+         */
+        var BannerDlg = {
+            BannerData: {},
+            zTreeInstance: null,
+            validateFields: {
+                title: {
+                    validators: {
+                        notEmpty: {
+                            message: '标题不能为空。'
+                        },
+                        stringLength: {
+                            min: 2,
+                            max: 70,
+                            message: '标题长度必须在2到70个字符之间。'
+                        }
+                    }
+                }
+            }
+        };
+
+        /**
+         * Banner详细信息设定
+         */
+        BannerDlg.collectData = function () {
+            this.BannerData['category'] = $('#category').val();
+            this.BannerData['title'] = $('#title').val();
+            this.BannerData['cover'] = $('#cover').val();
+            this.BannerData['status'] = typeof $('input[name="isEnable"]:checked').val() != "undefined" ? 0 : 1;
+            this.BannerData['type'] = $('input[name="bannerType"]:checked').val();
+            this.BannerData['jumpUrl'] = $('#jumpUrl').val();
+            this.BannerData['smallJumpUrl'] = $('#smallJumpUrl').val();
+            this.BannerData['targetId'] = $('#targetId').val();
+        }
+
+        /**
+         * 验证数据
+         */
+        BannerDlg.validate = function () {
+            $('#bannerForm').data("bootstrapValidator").resetForm();
+            $('#bannerForm').bootstrapValidator('validate');
+            return $("#bannerForm").data('bootstrapValidator').isValid();
+        };
+
+        /**
+         * 清空数据
+         */
+        BannerDlg.clearData = function () {
+            this.BannerData = {};
+        };
+
+        /**
+         * 【提交】按钮响应
+         */
+        BannerDlg.addSubmit = function () {
+            var bannerType = $('input[name="bannerType"]:checked').val();
+            if (bannerType == null) {
+                App.error("列表展示类型不能为空，请进行选择!");
+                return;
+            }
+            if(bannerType==2&& !$('#targetId').val()){
+                App.error("请选择专题类型");
+                return;
+            }
+            // 使用serializeJson方法的时候引用jquery.formHelp.js文件
+            var parameter = $("#add-form").serializeJson();
+            if (parameter.isEnable == "on") {
+                parameter.isEnable = "0";
+            } else {
+                parameter.isEnable = "1";
+            }
+            this.clearData();
+            this.collectData();
+            if (!this.validate()) {
+                errorFocus();
+                return;
+            }
+            //提交信息
+            var ajax = new $ax(App.ctxPath + "banner/save", function (data) {
+                App.success("添加成功!");
+                window.parent.ObjBanner.search();
+                BannerDlg.close();
+            }, function (data) {
+                App.error("添加失败!" + data.responseJSON.message + "!");
+            });
+            ajax.set(BannerDlg.BannerData);
+            ajax.start();
+        };
+
+        /**
+         * 【取消】按钮响应 关闭当前窗口
+         */
+        BannerDlg.close = function () {
+            parent.layer.close(window.parent.ObjBanner.layerIndex);
+        };
+
+        /**
+         * 选择资讯
+         */
+        var chooseLayerIndex;
+        BannerDlg.chooseArticle = function () {
+            chooseLayerIndex = layer.open({
+                type: 2,
+                area: ["100%", "100%"],
+                fixed: true,
+                maxmin: true,
+                content: App.ctxPath + 'article/choose'
+            });
+        }
+
+        // 选择专题
+
+        BannerDlg.chooseSeminar = function () {
+            chooseLayerIndex = layer.open({
+                type: 2,
+                title: '选择专题',
+                area: ["100%", "100%"],
+                fixed: true,
+                maxmin: true,
+                content: App.ctxPath + 'banner/chooseSeminar'
+            });
+        }
+
+
+        /**
+         * 选择资讯后回调方法
+         * @param articleId
+         * @param articleTitle
+         */
+        function chooseArticle(articleId, articleTitle) {
+            $("#targetId").val(articleId);
+            $("#article").val(articleTitle);
+            layer.close(chooseLayerIndex);
+        }
+
+        /**
+         * 选择专题
+         * @param serminar_id
+         */
+        function chooseSeminar(seminarId,seminarName){
+
+            $("#targetId").val(seminarId);
+            $("#seminar").val(seminarName);
+            layer.close(chooseLayerIndex);
+
+        }
+
+    </script>
+</js>

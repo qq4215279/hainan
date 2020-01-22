@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.mst.dao.DistrictDao">
+	<select id="tree" resultType="com.gobestsoft.common.modular.mst.model.DistrictZtreeNode">
+		select district_code as id,p_district_code as pId,district_name as name,
+		(
+		CASE
+		WHEN (p_district_code = '' OR p_district_code IS NULL) THEN
+			'true'
+		ELSE
+			'false'
+		END
+		) as isOpen 
+		from mst_district
+	</select>
+	
+	<!-- 对应select方法 -->
+	<resultMap type="com.gobestsoft.common.modular.dao.model.MstDistrictPojo" id="BaseResultMap">
+       <result property="districtCode" column="district_code" /> 
+       <result property="pDistrictCode" column="p_district_code" /> 
+       <result property="districtName" column="district_name" /> 
+       <result property="pDistrictName" column="p_district_name" /> 
+       <result property="level" column="level" /> 
+       <result property="cityCode" column="city_code" /> 
+   	</resultMap>
+	
+	<select id="selectByLevel" resultMap="BaseResultMap">
+		SELECT
+			district_code ,district_name 
+		FROM
+			mst_district
+		WHERE
+			level = #{level}
+	</select>
+	
+	<select id="selectdistrictCode" resultMap="BaseResultMap">
+	SELECT
+			district_code,district_name
+		FROM
+			mst_district
+		WHERE
+			p_district_code = #{districtCode}
+	</select>
+	
+	<select id="selectName" resultType="String">
+	SELECT district_name FROM mst_district where district_code = #{districtCode}
+	</select>
+	
+	<select id="selectCode" resultType="String">
+	SELECT district_code FROM mst_district where district_name = #{districtName}
+	</select>
+	
+	
+</mapper>

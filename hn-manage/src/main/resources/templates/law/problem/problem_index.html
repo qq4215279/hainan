@@ -1,0 +1,36 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<css >
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="form-horizontal">
+    <!--<div class="row">-->
+        <!--<div class="col-sm-3">-->
+            <!--<search:input id="name" label="法定代表人" name="name" value=""-->
+                          <!--type="text"></search:input>-->
+        <!--</div>-->
+        <!--<div class="col-sm-3">-->
+        <!--<search:input id="agentName" label="经办人" name="agentName" value=""-->
+        <!--type="text"></search:input>-->
+        <!--</div>-->
+        <!--<div class="col-sm-3">-->
+            <!--<search:input id="deptName" label="工会名称" name="deptName" value=""-->
+                          <!--type="text"></search:input>-->
+        <!--</div>-->
+        <!--<div class="col-sm-1">-->
+            <!--<qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="LegalChange.search()"></qx:btn>-->
+        <!--</div>-->
+    <!--</div>-->
+    <div class="hidden-xs" id="LegalChangeTableToolbar" role="group">
+        <qx:btn class="btn btn-primary" fa="fa fa-plus" label="添加" permission="" onclick="LawProblem.add()"></qx:btn>
+        <qx:btn class="btn btn-primary" fa="fa fa-edit" label="编辑" permission="" onclick="LawProblem.edit()"></qx:btn>
+        <qx:btn class="btn btn-primary" fa="fa fa-trash" label="删除" permission="" onclick="LawProblem.del()"></qx:btn>
+    </div>
+    <table id="LawProblemTable" data-mobile-responsive="true" data-click-to-select="true">
+    </table>
+</div>
+</body>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script th:src="@{/static/modular/law/problem/problem_index.js}"></script>
+</js>

@@ -1,0 +1,26 @@
+package com.gobestsoft.common.modular.system.dao;
+
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
+import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.baomidou.mybatisplus.plugins.Page;
+import com.gobestsoft.common.modular.appuser.model.AppUserEntity;
+import com.gobestsoft.common.modular.system.model.SysMsg;
+
+/**
+ * 消息的dao
+ *
+ * @author li
+ * @date 2018年9月4日 
+ */
+@Repository
+public interface MsgDao extends BaseMapper<SysMsg>{
+	
+	public List<SysMsg> msgList(@Param("page") Page<SysMsg> page,@Param("deptId") Integer deptId,@Param("type") String type);
+
+}

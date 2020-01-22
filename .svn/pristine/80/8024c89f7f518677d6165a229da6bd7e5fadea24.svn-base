@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.legal.mapper.DeptLegalHistoryMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.legal.model.DeptLegalHistory">
+		<id column="id" property="id" />
+		<result column="dept_id" property="deptId" />
+		<result column="name" property="name" />
+		<result column="sex" property="sex" />
+		<result column="nation" property="nation" />
+		<result column="birthday" property="birthday" />
+		<result column="education" property="education" />
+		<result column="political_outlook" property="politicalOutlook" />
+		<result column="native_place" property="nativePlace" />
+		<result column="work_position" property="workPosition" />
+		<result column="tnure_start_date" property="tnureStartDate" />
+		<result column="tnure_end_data" property="tnureEndData" />
+		<result column="part_time_job" property="partTimeJob" />
+		<result column="certificate_no" property="certificateNo" />
+		<result column="other_position" property="otherPosition" />
+		<result column="join_time" property="joinTime" />
+		<result column="income_accumulative_last_year" property="incomeAccumulativeLastYear" />
+		<result column="income_annual_dues" property="incomeAnnualDues" />
+		<result column="income_trade_union_funds" property="incomeTradeUnionFunds" />
+		<result column="income_other" property="incomeOther" />
+		<result column="capital_total" property="capitalTotal" />
+		<result column="capital_fixed_funds" property="capitalFixedFunds" />
+		<result column="capital_working" property="capitalWorking" />
+		<result column="capital_other" property="capitalOther" />
+		<result column="place_total" property="placeTotal" />
+		<result column="place_office_area" property="placeOfficeArea" />
+		<result column="place_activity" property="placeActivity" />
+		<result column="place_other" property="placeOther" />
+		<result column="ability_to_bear" property="abilityToBear" />
+		<result column="dept_name" property="deptName" />
+		<result column="unit_tel" property="unitTel" />
+		<result column="unit_address" property="unitAddress" />
+		<result column="unit_zip_code" property="unitZipCode" />
+		<result column="createunion_time" property="createunionTime" />
+		<result column="election_date" property="electionDate" />
+		<result column="approve_no" property="approveNo" />
+		<result column="unit_number" property="unitNumber" />
+		<result column="membership" property="membership" />
+		<result column="cadres_number" property="cadresNumber" />
+		<result column="chairman_name" property="chairmanName" />
+		<result column="chairman_session" property="chairmanSession" />
+		<result column="chairman_mobile" property="chairmanMobile" />
+		<result column="cer_time" property="cerTime" />
+		<result column="cer_no" property="cerNo" />
+		<result column="p_dept_fullname" property="pDeptFullname" />
+		<result column="assets_handing" property="assetsHanding" />
+		<result column="create_uid" property="createUid" />
+		<result column="debt_handing" property="debtHanding" />
+		<result column="legal_mobile" property="legalMobile" />
+		<result column="office_term" property="officeTerm" />
+		<result column="certificate_number" property="certificateNumber" />
+		<result column="person_certificate_number" property="personCertificateNumber" />
+	</resultMap>
+	
+	<!-- 根据applyId,查询法人备份基本信息 -->
+	<select id="selectOneByApplyId" resultMap="BaseResultMap">
+		select t.* from dept_legal_history  t where t.apply_id = #{applyId}
+	</select>
+
+</mapper>

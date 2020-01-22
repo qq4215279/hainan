@@ -1,0 +1,635 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.cms.dao.ArticleDao">
+
+    <!-- 对应selectByCondition方法，条件查询，无分页（状态，标题，开始日期，结束日期） -->
+    <resultMap type="HashMap" id="selResultMap">
+<!--         <result property="id" column="id"/> -->
+<!--         <result property="media_Type" column="media_Type"/> -->
+<!--         <result property="title" column="title"/> -->
+<!--         <result property="sub_title" column="sub_title"/> -->
+<!--         <result property="content" column="content"/> -->
+<!--         <result property="roundup" column="roundup"/> -->
+<!--         <result property="source_from" column="source_from"/> -->
+<!--         <result property="author" column="author"/> -->
+<!--         <result property="info_type" column="info_type"/> -->
+<!--         <result property="template_type" column="template_type"/> -->
+<!--         <result property="jump_url" column="jump_url"/> -->
+<!--         <result property="published_time" column="published_time"/> -->
+<!--         <result property="published_user" column="published_user"/> -->
+<!--         <result property="sync_time" column="sync_time"/> -->
+<!--         <result property="end_time" column="end_time"/> -->
+<!--         <result property="is_on_top" column="is_on_top"/> -->
+<!--         <result property="tags" column="tags"/> -->
+<!--         <result property="sort" column="sort"/> -->
+<!--         <result property="status" column="status"/> -->
+<!--         <result property="check_desc" column="check_desc"/> -->
+<!--         <result property="check_date" column="check_date"/> -->
+<!--         <result property="check_user_id" column="check_user_id"/> -->
+<!--         <result property="share_num" column="share_num"/> -->
+<!--         <result property="comm_num" column="comm_num"/> -->
+<!--         <result property="thumbup_num" column="thumbup_num"/> -->
+<!--         <result property="collect_num" column="collect_num"/> -->
+<!--         <result property="hit_num" column="hit_num"/> -->
+<!--         <result property="is_share" column="is_share"/> -->
+<!--         <result property="is_topic" column="is_topic"/> -->
+<!--         <result property="is_like" column="is_like"/> -->
+<!--         <result property="is_collect" column="is_collect"/> -->
+<!--         <result property="create_user" column="create_user"/> -->
+<!--         <result property="create_time" column="create_time"/> -->
+<!--         <result property="update_user" column="update_user"/> -->
+<!--         <result property="update_time" column="update_time"/> -->
+<!--         <result property="del_flg" column="del_flg"/> -->
+<!--         <result property="cover_path" column="cover_path"/> -->
+        <!-- <result property="cover_url" column="cover_url" /> -->
+<!--         <result property="is_hot" column="is_hot"/> -->
+<!--         <result property="media_id" column="media_id"/> -->
+<!--         <result property="name" column="name"/> -->
+<!--         <result property="columnId" column="column_id"/> -->
+    </resultMap>
+
+    <!-- 条件查询 集合 -->
+    <select id="selectByCondition" resultType="com.gobestsoft.common.modular.cms.model.Article">
+        SELECT t.* 
+        FROM cms_article t 
+        WHERE 
+        t.del_Flg = 0 
+        <if test="status != null and status != 0">
+            AND t.status = #{status}
+        </if>
+        <if test="title != null and title != ''">
+            AND ( 
+            	t.title LIKE CONCAT('%',#{title},'%') 
+            	OR t.roundup LIKE CONCAT('%',#{title},'%') 
+            	OR t.source_from LIKE CONCAT('%',#{title},'%') 
+            )
+        </if>
+        <if test="begDate != null and begDate != ''">
+            AND t.pub_time &gt;= #{begDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND t.pub_time &lt;= #{endDate}
+        </if>
+        ORDER BY t.id DESC
+    </select>
+
+
+    <!-- 对应addArticle方法，新增一条资讯 -->
+    <insert id="addArticle" parameterType="com.gobestsoft.common.modular.cms.model.Article">
+		INSERT INTO cms_article (
+		id,
+		title,
+		tags,
+		roundup,
+		source_from,
+		author,
+		cover_path,
+		content,
+		pub_time,
+		pub_user,
+		template_type,
+		org_id,
+		create_user,
+		create_time,
+		update_user,
+		update_time,
+		jump_url,
+		info_type,
+        sort,
+        is_on_top,
+        is_on_top_overdue_time,
+        is_share,
+        is_topic,
+        is_topic_check,
+        is_like,
+        is_collect
+		)
+		VALUES(
+		#{id},
+		#{title},
+		#{tags},
+		#{roundup},
+		#{sourceFrom},
+		#{author},
+		#{coverPath},
+		#{content},
+		#{pubTime},
+		#{pubUser},
+		#{templateType},
+		#{orgId},
+		#{createUser},
+		#{createTime},
+		#{updateUser},
+		#{updateTime},
+		#{jumpUrl},
+		#{infoType},
+        #{sort},
+        #{isOnTop},
+        #{isOnTopOverdueTime},
+        #{isShare},
+        #{isTopic},
+        #{isTopicCheck},
+        #{isLike},
+        #{isCollect}
+		)
+	</insert>
+
+    <!-- 对应updateArticle方法，修改一条资讯 -->
+    <update id="updateArticle" parameterType="com.gobestsoft.common.modular.cms.model.Article">
+        UPDATE cms_article
+        SET
+        title = #{title},
+        tags = #{tags},
+        roundup= #{roundup},
+        source_From= #{sourceFrom},
+        author = #{author},
+        template_type= #{templateType},
+        <if test="coverPath != null and coverPath != ''">
+        cover_path= #{coverPath},
+        </if>
+        content = #{content},
+        pub_time= #{pubTime},
+        pub_user= #{pubUser},
+        <if test="status != null ">
+        status = #{status},
+        </if>
+        sort= #{sort},
+        <if test="orgId != null ">
+        org_id = #{orgId},
+        </if>
+        published_time= #{publishedTime},
+        pub_status = #{pubStatus},
+        is_on_top = #{isOnTop},
+        is_on_top_overdue_time = #{isOnTopOverdueTime},
+        check_desc = #{checkDesc},
+        check_date = #{checkDate},
+        check_user_id = #{checkUserId},
+        is_share = #{isShare},
+        is_Topic= #{isTopic},
+        is_Like= #{isLike},
+        is_Collect= #{isCollect},
+        update_User= #{updateUser},
+        update_Time= #{updateTime},
+        jump_url=#{jumpUrl},
+        info_type=#{infoType}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 对应updateArticle方法，修改一条资讯 -->
+    <update id="delArticle">
+		UPDATE cms_article
+		SET del_flg = 1
+		WHERE id = #{id}
+	</update>
+
+	<!-- 修改资讯状态 有效 和 无效 -->
+    <update id="updateArticleStatusById">
+        UPDATE cms_article
+        SET pub_status = #{status},
+            published_time = #{pubtime},
+        	update_user = #{updateUser},
+			update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 修改资讯 -->
+
+
+    <!-- 主键查询 -->
+    <select id="selectById" resultType="com.gobestsoft.common.modular.cms.model.Article">
+		SELECT * FROM cms_article
+		WHERE id = #{id}
+	</select>
+
+<!--     <select id="getPageContent" resultType="java.lang.String"> -->
+<!-- 		SELECT content FROM -->
+<!-- 		cms_article WHERE id = #{id} -->
+<!-- 	</select> -->
+
+
+<!--     <resultMap id="articleInfoMap" -->
+<!--                type="com.gobestsoft.common.modular.cms.model.ArticleInfo"> -->
+<!--         <id column="id" property="articleId"/> -->
+<!--         <result column="title" property="title"/> -->
+<!--         <result column="thumbup_num" property="thumbsUp_total"/> -->
+<!--         <result column="comm_num" property="comment_total"/> -->
+<!--         <result column="share_num" property="share_total"/> -->
+<!--         <result column="collect_num" property="collcetion_total"/> -->
+<!--         <result column="hit_num" property="hit_total"/> -->
+<!--         <result column="is_share" property="can_share"/> -->
+<!--         <result column="is_topic" property="can_topic"/> -->
+<!--         <result column="is_like" property="can_like"/> -->
+<!--         <result column="is_collect" property="can_collect"/> -->
+<!--         <result column="is_hot" property="is_hot"/> -->
+<!--         <result column="isCollection" property="isCollection"/> -->
+<!--         <result column="author" property="operation_personnel"/> -->
+<!--         <result column="isThumbsUp" property="isThumbsUp"/> -->
+<!--         <association column="{id=media_id}" property="subscription" -->
+<!--                      javaType="com.gobestsoft.common.modular.cms.model.Subscription" -->
+<!--                      select="getSubscription"></association> -->
+<!--         <association property="share_info" -->
+<!--                      javaType="com.gobestsoft.common.modular.cms.model.InformationShareInfo"> -->
+<!--             <result column="title" property="share_title"/> -->
+<!--             <result column="roundup" property="share_content"/> -->
+<!--             <result column="cover_path" property="share_cover"/> -->
+<!--         </association> -->
+<!--     </resultMap> -->
+
+
+<!--     <resultMap id="subscriptionMap" -->
+<!--                type="com.gobestsoft.common.modular.cms.model.Subscription"> -->
+<!--         <id column="media_id" property="id"/> -->
+<!--         <result column="avatar_path" property="avatar"/> -->
+<!--         <result column="media_name" property="name"/> -->
+<!--         <result column="create_time" property="create_time"/> -->
+<!--         <result column="isSubscribed" property="is_subscribed"/> -->
+<!--         <result column="description" property="description"/> -->
+<!--     </resultMap> -->
+
+<!--     <select id="getArticleInfo" resultMap="articleInfoMap"> -->
+<!--         SELECT -->
+<!--         id,title,thumbup_num,collect_num,comm_num,share_num,hit_num,is_share,is_topic,is_like,is_collect,cover_path,roundup, -->
+<!--         <choose> -->
+<!--             <when test="auId!=null and auId!=''"> -->
+<!--                 (SELECT COUNT(0) FROM my_favorite WHERE -->
+<!--                 auid=#{auId} -->
+<!--                 AND relation_id=${articleId} AND  (type=1 OR type=2 OR type=3)) AS isCollection, -->
+<!--                 (SELECT COUNT(0) FROM -->
+<!--                 cms_article_thumbup WHERE article_id='${articleId}' AND -->
+<!--                 auid=#{auId})as isThumbsUp , -->
+<!--             </when> -->
+<!--             <otherwise> -->
+<!--                 (SELECT 0) AS isCollection, -->
+<!--                 (SELECT 0) AS isThumbsUp, -->
+<!--             </otherwise> -->
+<!--         </choose> -->
+<!--         author,media_id -->
+<!--         FROM cms_article WHERE id=${articleId}; -->
+<!--     </select> -->
+
+<!--     <select id="getSubscription" resultMap="subscriptionMap"> -->
+<!--         select -->
+<!--         id AS media_id,avatar_path,media_name,create_time,description, -->
+<!--         <choose> -->
+<!--             <when test=" auId!=null and auId!='' "> -->
+<!--                 (select COUNT(0) from -->
+<!--                 my_subscribe where -->
+<!--                 media_id=cms_media.id and auid=#{auId}) as -->
+<!--                 isSubscribed -->
+<!--             </when> -->
+<!--             <otherwise> -->
+<!--                 (select 0) as isSubscribed -->
+<!--             </otherwise> -->
+<!--         </choose> -->
+<!--         from -->
+<!--         cms_media where id=#{id}; -->
+<!--     </select> -->
+
+
+<!--     <select id="getSubscriptionByArticleId" resultMap="subscriptionMap"> -->
+<!--         select -->
+<!--         id AS media_id,avatar_path,media_name,create_time,description, -->
+<!--         <choose> -->
+<!--             <when test=" auId!=null and auId!='' "> -->
+<!--                 (SELECT COUNT(0) FROM -->
+<!--                 my_subscribe where -->
+<!--                 media_id=cms_media.id and auid=#{auId}) as -->
+<!--                 isSubscribed -->
+<!--             </when> -->
+<!--             <otherwise> -->
+<!--                 (select 0) as isSubscribed -->
+<!--             </otherwise> -->
+<!--         </choose> -->
+<!--         from -->
+<!--         cms_media where id=(select media_id from cms_article where -->
+<!--         id=${id}) -->
+<!--     </select> -->
+
+<!--     <resultMap id="cmsArticleEntityMap" -->
+<!--                type="com.gobestsoft.common.modular.cms.model.CmsArticleEntity"> -->
+<!--         <id column="id" property="id"/> -->
+<!--         <result column="title" property="title"/> -->
+<!--         <result column="media_name" property="create_by"/> -->
+<!--         <result column="info_type" property="info_type"/> -->
+<!--         <result column="template_type" property="template_type"/> -->
+<!--         <result column="published_time" property="published_time"/> -->
+<!--         <result column="is_on_top" property="is_on_top"/> -->
+<!--         <result column="thumbup_num" property="thumbup_num"/> -->
+<!--         <result column="hit_num" property="hit_num"/> -->
+<!--         <result column="is_hot" property="is_hot"/> -->
+<!--         <result column="cover_path" property="cover_url"/> -->
+<!--         <result column="article_type_name" property="article_type"/> -->
+<!--         <collection property="covers" column="{id=id}" javaType="ArrayList" -->
+<!--                     select="getArticleCovers" ofType="java.lang.String"></collection> -->
+<!--     </resultMap> -->
+
+<!--     <sql id="cmsArticleColumn"> -->
+<!-- 		SELECT -->
+<!-- 		 cms_article.id,title,author,info_type,template_type,published_time, -->
+<!-- 		is_on_top,tags,share_num,comm_num,thumbup_num,collect_num,hit_num, -->
+<!-- 		is_share,is_topic,is_like,is_collect,is_hot,cms_article.cover_path,cms_article.media_id,cms_media.media_name,mst_article_type.article_type_name -->
+<!-- 		FROM cms_article LEFT JOIN cms_media ON -->
+<!-- 		cms_article.media_id=cms_media.id -->
+<!-- 		LEFT JOIN mst_article_type ON -->
+<!-- 		mst_article_type.article_type=cms_article.article_type -->
+<!-- 	</sql> -->
+
+<!--     <select id="getArticleCovers" resultType="java.lang.String"> -->
+<!-- 		SELECT img_path FROM -->
+<!-- 		cms_article_image WHERE -->
+<!-- 		article_id=${id} ORDER BY sort ASC LIMIT 3 -->
+<!-- 	</select> -->
+
+<!--     <select id="getCmsColumnArticle" resultMap="cmsArticleEntityMap"> -->
+<!--         <include refid="cmsArticleColumn"/> -->
+<!--         WHERE (cms_article.city_code=#{cityCode} OR IFNULL(cms_article.city_code,'')='') -->
+<!--         <choose> -->
+<!--             <when test="columnId==-2"> -->
+<!--                 AND EXISTS (SELECT 0 FROM r_article_column WHERE r_article_column.article_id=cms_article.id) -->
+<!--             </when> -->
+<!--             <when test="columnId==-1"> -->
+<!--                 AND EXISTS (SELECT 0 FROM r_article_column WHERE r_article_column.article_id=cms_article.id) -->
+<!--                 AND is_on_top=1 -->
+<!--             </when> -->
+<!--             <otherwise> -->
+<!--                 AND EXISTS (SELECT 0 FROM r_article_column WHERE r_article_column.article_id=cms_article.id -->
+<!--                 AND  r_article_column.column_id=${columnId} ) -->
+<!--             </otherwise> -->
+<!--         </choose> -->
+<!--         <if test="keyword!=null and keyword!=''"> -->
+<!--             AND (title like '%${keyword}%' or tags like '%${keyword}%') -->
+<!--         </if> -->
+<!--         AND cms_article.status=1 AND cms_article.del_flg=0 -->
+<!--         AND (cms_article.media_type=1 OR  cms_article.media_type=0) -->
+<!--         ORDER BY published_time DESC -->
+<!--         LIMIT ${pageSize} OFFSET ${startIndex} -->
+<!--     </select> -->
+
+
+
+<!--     <resultMap type="com.gobestsoft.common.modular.cms.model.SubmissionArticle" -->
+<!--                id="submissionArticleMap"> -->
+<!--         <id column="id" property="id"/> -->
+<!--         <result column="nick_name" property="nickname"/> -->
+<!--         <result column="avatar" property="avatar"/> -->
+<!--         <result column="title" property="title"/> -->
+<!--         <result column="info_type" property="info_type"/> -->
+<!--         <result column="template_type" property="template_type"/> -->
+<!--         <result column="published_time" property="published_time"/> -->
+<!--         <result column="is_on_top" property="is_on_top"/> -->
+<!--         <result column="thumbup_num" property="thumbup_num"/> -->
+<!--         <result column="hit_num" property="hit_num"/> -->
+<!--         <result column="is_hot" property="is_hot"/> -->
+<!--         <result column="cover_path" property="cover_url"/> -->
+<!--         <result column="tags" property="tags"/> -->
+<!--         <result column="addr" property="address"/> -->
+
+<!--         <discriminator column="template_type" javaType="Integer"> -->
+<!--             <case value="3"> -->
+<!--                 <collection property="covers" column="{id=id}" javaType="ArrayList" -->
+<!--                             select="getArticleCovers" ofType="java.lang.String"></collection> -->
+<!--             </case> -->
+<!--         </discriminator> -->
+<!--     </resultMap> -->
+
+
+<!--     <select id="getSubmissionArticle" resultMap="submissionArticleMap"> -->
+<!--         select -->
+<!--         cms_article.id,cms_article.title,app_user.avatar,app_user.nick_name,cms_article.info_type,cms_article.template_type,cms_article.published_time, -->
+<!--         cms_article.is_on_top,cms_article.thumbup_num,cms_article.article_type,cms_article.hit_num,cms_article.is_hot,cover_path,my_contribute.addr,cms_article.tags -->
+<!--         from my_contribute INNER JOIN cms_article ON -->
+<!--         article_id=cms_article.id -->
+<!--         INNER JOIN app_user ON -->
+<!--         my_contribute.auid=app_user.auid -->
+<!--         WHERE cms_article.media_type=9 -->
+<!--         AND (city_code=#{cityCode} OR IFNULL(city_code,'')='') -->
+<!--         <if test=" columnId!=null "> -->
+<!--             AND cms_article.id IN (select article_id from r_article_column where column_id=${columnId}) -->
+<!--         </if> -->
+<!--         <if test="showedIds!=null and showedIds!=''"> -->
+<!--             AND  cms_article.id NOT IN (${showedIds}) -->
+<!--         </if> -->
+<!--         ORDER BY published_time DESC -->
+<!--         <if test=" pageSize!=-1 and startIndex!=-1 "> -->
+<!--             LIMIT ${pageSize} -->
+<!--             OFFSET ${startIndex} -->
+<!--         </if> -->
+<!--     </select> -->
+
+
+<!--     <resultMap id="cmsBannerMap" type="com.gobestsoft.common.modular.cms.model.CmsBanner"> -->
+<!--         <id property="id" column="id"/> -->
+<!--         <result column="title" property="title"/> -->
+<!--         <result column="img_path" property="cover"/> -->
+<!--         <result column="published_time" property="time"/> -->
+<!--         <result column="tags" property="label"/> -->
+<!--         <result column="article_type_name" property="type"/> -->
+<!--     </resultMap> -->
+
+<!--     <select id="getRecommendBannerArticles" resultMap="cmsBannerMap"> -->
+<!--         SELECT -->
+<!--             T2.id, -->
+<!--             T1.title, -->
+<!--             T1.img_path, -->
+<!--             T2.tags, -->
+<!--             T2.published_time, -->
+<!--             T3.article_type_name -->
+<!--         FROM -->
+<!--             app_banner AS T1 -->
+<!--             INNER JOIN cms_article AS T2 ON T1.resource_id = T2.id -->
+<!--             LEFT JOIN mst_article_type AS T3 ON T3.article_type = T2.article_type -->
+<!--         WHERE -->
+<!--             T1.category_id = 10 -->
+<!--             AND (T1.city_code = #{cityCode} OR IFNULL(T1.city_code,'')='') -->
+<!--             AND T1.del_flg = 0 -->
+<!--             AND T1.is_enable = 1 -->
+<!--         ORDER BY -->
+<!--             T1.create_time DESC -->
+<!--             LIMIT 5 -->
+<!-- 	</select> -->
+
+<!--     <resultMap id="SlideArticleByMediaIdMap" type="com.gobestsoft.common.modular.cms.model.SlideArticles"> -->
+<!--         <id column="media_id" property="media_id"/> -->
+<!--         <result column="media_name" property="name"/> -->
+<!--         <result column="avatar_path" property="avatar"/> -->
+<!--         <result column="is_subscribed" property="is_subscribed"/> -->
+<!--         <collection  property="spreads" column="{media_id=media_id}" javaType="ArrayList" -->
+<!--                     select="getSpreads" ofType="com.gobestsoft.common.modular.cms.model.MediaArticles"></collection> -->
+<!--     </resultMap> -->
+
+<!--     <select id="getSlideMediaArticle" resultMap="SlideArticleByMediaIdMap"> -->
+<!--         SELECT id AS media_id,media_name,avatar_path, -->
+<!--         <choose> -->
+<!--             <when test="auId !=null and auId!= ''"> -->
+<!--                 (SELECT COUNT(0) FROM my_subscribe WHERE auid=#{auId} and media_id=cms_media.id  ) AS is_subscribed -->
+<!--             </when> -->
+<!--             <otherwise> -->
+<!--                 (SELECT 0 ) AS is_subscribed -->
+<!--             </otherwise> -->
+<!--         </choose> -->
+<!--         FROM cms_media where EXISTS (SELECT 0 FROM -->
+<!--         cms_article WHERE cms_article.media_id=cms_media.id) -->
+<!--         <if test=" showedIds!=null and showedIds!='' "> -->
+<!--             AND id NOT IN (${showedIds}) -->
+<!--         </if> -->
+<!--     </select> -->
+
+
+<!--     <resultMap id="getSpreadsMap" type="com.gobestsoft.common.modular.cms.model.MediaArticles"> -->
+<!--         <result column="id" property="id"/> -->
+<!--         <result column="title" property="title"/> -->
+<!--         <result column="cover_path" property="cover_url"/> -->
+<!--     </resultMap> -->
+
+<!--     <select id="getSpreads" resultMap="getSpreadsMap"> -->
+<!--         select id,title,cover_path from cms_article where media_id=#{media_id} order by published_time desc limit 10 -->
+<!--         OFFSET 0 -->
+<!--     </select> -->
+
+
+
+<!-- 	<resultMap type="com.gobestsoft.common.modular.cms.model.MediaArticles" id="bannerArticle"> -->
+<!-- 			<result column="id" property="id"/> -->
+<!-- 			<result column="title" property="title"/> -->
+<!-- 			<result column="cover_path" property="cover_url"/> -->
+<!-- 			<result column="jump_url" property="jump_url"/> -->
+<!-- 	</resultMap> -->
+
+<!-- 	<select id="getBannerArticle" resultMap="bannerArticle"> -->
+<!-- 	 SELECT id,title,cover_path,jump_url -->
+<!-- 	 FROM cms_article -->
+<!-- 	 WHERE cms_article.media_id=#{mediaId} -->
+<!-- 	  LIMIT 10 OFFSET ${startIndex} -->
+<!-- 	</select> -->
+    <!--根据用户检索对应资讯一览内容-->
+    <select id="selectArtilceList" resultType="com.gobestsoft.common.modular.cms.model.Article">
+        select * from (SELECT ca1.*,'查看编辑' as divide
+        FROM cms_article ca1
+        WHERE exists(
+                  SELECT *
+                  FROM cms_approve_log cal
+                  WHERE cal.info_id = ca1.id and (cal.from_dept = #{deptId} OR cal.to_dept = #{deptId}))
+              AND
+              ca1.del_Flg = 0
+        union ALL
+        select ca2.*,'草稿编辑' as divide from cms_article ca2
+        where not exists(select * from cms_approve_log cal
+        WHERE cal.info_id = ca2.id ) and ca2.create_user = #{userId}
+         and ca2.del_flg = 0) ca
+        WHERE
+         1=1
+        <if test="status != null and status != -2">
+            AND ca.status = #{status}
+        </if>
+        <if test="title != null and title != ''">
+            AND (
+            ca.title LIKE CONCAT('%',#{title},'%')
+            OR ca.roundup LIKE CONCAT('%',#{title},'%')
+            OR ca.source_from LIKE CONCAT('%',#{title},'%')
+            )
+        </if>
+        <if test="begDate != null and begDate != ''">
+            AND ca.pub_time &gt;= #{begDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND ca.pub_time &lt;= #{endDate}
+        </if>
+        ORDER BY ca.create_time DESC
+    </select>
+
+    <!--根据用户检索已审核资讯一览内容-->
+    <select id="selectValidList" resultType="com.gobestsoft.common.modular.cms.model.Article">
+        SELECT * from
+          <if test="deptId != 1">
+              (
+              SELECT
+              ca1.*
+              FROM
+              cms_article ca1
+              WHERE
+              EXISTS (
+              SELECT
+              *
+              FROM
+              cms_approve_log cal
+              WHERE
+              cal.info_id = ca1.id
+              AND (
+              cal.from_dept = #{deptId}
+              OR cal.to_dept = #{deptId}
+              )
+              )
+              AND ca1.del_Flg = 0
+              ) ca1
+          </if>
+
+        <if test="deptId == 1">
+            cms_article ca1
+        </if>
+        WHERE
+        ca1.status = 1
+        <if test="deptId == 1">
+            and ca1.del_Flg = 0
+        </if>
+        <if test="title != null and title != ''">
+            AND (
+            ca1.title LIKE CONCAT('%',#{title},'%')
+            OR ca1.roundup LIKE CONCAT('%',#{title},'%')
+            OR ca1.source_from LIKE CONCAT('%',#{title},'%')
+            )
+        </if>
+        <if test="begDate != null and begDate != ''">
+            AND ca1.pub_time &gt;= #{begDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND ca1.pub_time &lt;= #{endDate}
+        </if>
+        ORDER BY
+        ca1.id DESC
+    </select>
+
+    <!-- 获取推送消息列表-->
+    <select id="selectPublishList" resultType="com.gobestsoft.common.modular.cms.model.CmsRelationEntity" >
+        SELECT
+          case when r.id is null then false else true end as isExist,
+          c.id as categoryId,
+          c.name as categoryName,
+          r.pub_status as pubStatus,
+          r.published_time as published_time
+        FROM cms_category c LEFT JOIN r_article_category r ON c.id = r.category_id AND r.article_id = #{articleId}
+        WHERE pid != 0 AND del_flg = 0
+        AND is_app = #{pubtype}
+        order by categoryId
+    </select>
+
+    <!--获取指定资讯栏目状态 -->
+    <select id="selectCmsRelation" resultType="com.gobestsoft.common.modular.cms.model.CmsRelationEntity" >
+        select
+          rac.id as id,
+          rac.article_id as articleId,
+          rac.category_id as categoryId,
+          rac.pub_status as pubStatus,
+          rac.published_time as publishedTime
+        from r_article_category rac
+        where rac.article_id=#{articleId}
+          and rac.category_id=#{categoryId}
+    </select>
+
+    <!--更新定向推送栏目 -->
+    <update id="updateCmsRelation">
+        UPDATE r_article_category SET pub_status=#{pubStatus}
+        <if test="pubStatus ==2">
+            ,published_time = #{publishedTime}
+        </if>
+        WHERE
+		id=#{id}
+</update>
+
+    <insert id="insertCmsRelation">
+        INSERT INTO r_article_category(article_id, category_id,pub_status,published_time)
+		VALUES (#{articleId}, #{categoryId},#{pubStatus},#{publishedTime});
+    </insert>
+    <delete id="deleteCmsRelation">
+        delete from r_article_category where id = #{id}
+    </delete>
+</mapper>

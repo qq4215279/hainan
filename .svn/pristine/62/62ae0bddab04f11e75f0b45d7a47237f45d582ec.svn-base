@@ -1,0 +1,997 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dept.mapper.DeptMemberMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="HashMap">
+        <id column="id" property="id" />
+        <result column="dept_id" property="deptId" />
+        <result column="person_id" property="personId" />
+        <result column="station_card" property="stationCard" />
+        <result column="member_card" property="memberCard" />
+        <result column="name" property="name" />
+        <result column="sex" property="sex" />
+        <result column="birthday" property="birthday" />
+        <result column="nation" property="nation" />
+        <result column="work_situation" property="workSituation" />
+        <result column="certificate_type" property="certificateType" />
+        <result column="certificate_num" property="certificateNum" />
+        <result column="education" property="education" />
+        <result column="technology_level" property="technologyLevel" />
+        <result column="mobile" property="mobile" />
+        <result column="household" property="household" />
+        <result column="domicile" property="domicile" />
+        <result column="member_change" property="memberChange" />
+        <result column="member_change_date" property="memberChangeDate" />
+        <result column="member_change_reason" property="memberChangeReason" />
+        <result column="political_status" property="politicalStatus" />
+        <result column="work_unit" property="workUnit" />
+        <result column="native_place" property="nativePlace" />
+        <result column="homeplace" property="homeplace" />
+        <result column="is_farmer" property="isFarmer" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+        <result column="update_user" property="updateUser" />
+        <result column="update_time" property="updateTime" />
+        <result column="type" property="type" />
+    </resultMap>
+
+    <!-- 通用版全部字段,可用于插入 -->
+    <sql id="commonColumns">
+	    dept_member.id,
+		dept_member.dept_id,
+		dept_member.person_id,
+		dept_member.station_card,
+		dept_member.member_card,
+		person_info.name,
+		person_info.sex,
+		person_info.birthday,
+		person_info.certificate_num,
+		person_info.mobile,
+		person_info.domicile,
+		person_info.member_change_date,
+		person_info.work_unit,
+		person_info.native_place,
+		person_info.homeplace,
+		person_info.is_farmer,
+		sys_user.name AS create_user,
+		dept_member.create_time,
+		dept_member.update_user,
+		dept_member.update_time,
+		dept_member.type
+	</sql>
+
+    <!-- 对应selectByCondition方法，条件查询（工会名称,姓名，工会编号） -->
+    <select id="selectByCondition" resultMap="BaseResultMap">
+        SELECT
+        sys_dept.simplename AS unionSimplename,
+        sys_dept.fullname AS unionName,
+        sys_dept.dept_no AS deptNo,
+        dept_member.id,
+        dept_member.dept_id,
+        dept_member.person_id,
+        dept_member.station_card,
+        dept_member.member_card,
+        dept_member.isBind,
+        person_info.name,
+        person_info.sex,
+        person_info.nation,
+        person_info.work_situation,
+        person_info.certificate_type,
+        person_info.education,
+        person_info.technology_level,
+        person_info.household,
+        person_info.political_status,
+        person_info.member_change,
+        person_info.member_change_reason,
+        person_info.birthday,
+        person_info.certificate_num,
+        person_info.mobile,
+        person_info.domicile,
+        person_info.member_change_date,
+        person_info.work_unit,
+        person_info.native_place,
+        person_info.homeplace,
+        person_info.is_farmer,
+        sys_user.name AS create_user,
+        dept_member.create_time,
+        dept_member.update_user,
+        dept_member.update_time,
+        dept_member.type
+        FROM dept_member
+        INNER join sys_dept on sys_dept.id=dept_member.dept_id
+        INNER JOIN dept_organization ON sys_dept.id = dept_organization.dept_id
+        INNER join person_info on person_info.id=dept_member.person_id
+        LEFT JOIN sys_user ON sys_user.uid=dept_member.create_user
+        <where>
+            <if test="unionName != null and unionName != ''">
+                AND sys_dept.simplename  LIKE '%${unionName}%' OR sys_dept.fullname  LIKE '%${unionName}%'
+            </if>
+            <if test="deptNo != null and deptNo != ''">
+                AND sys_dept.dept_no  like '%${deptNo}%'
+            </if>
+            <if test="name != null and name != ''">
+                AND person_info.name like concat('%',#{name},'%')
+            </if>
+            <if test="query_certified_member !=null and query_certified_member == 0 and query_certified_member != ''">
+                AND dept_member.isBind=0
+            </if>
+            <if test="query_certified_member !=null and query_certified_member == 1 and query_certified_member != ''">
+                AND dept_member.isBind=1
+            </if>
+            <if test="memberCard != null and memberCard != ''">
+                AND (dept_member.member_card like '%${memberCard}%' OR dept_member.station_card LIKE '%${memberCard}%')
+            </if>
+            <if test="memberRange != null and memberRange == '01' ">
+                AND dept_member.dept_id = #{deptId}
+            </if>
+            <if test="memberRange != null and memberRange == '02'">
+                AND ( sys_dept.id=${deptId} or locate(',${deptId}',sys_dept.pids)>0 )
+            </if>
+            <if test="query_sex!=null and query_sex!=''">
+                AND person_info.sex =#{query_sex}
+            </if>
+            <if test="query_ethnicGroup!=null and query_ethnicGroup!=''">
+                AND person_info.nation=#{query_ethnicGroup}
+            </if>
+            <if test="query_workSituation !=null and query_workSituation !=''">
+                AND person_info.work_situation=#{query_workSituation}
+            </if>
+            <if test="query_certificateType !=null and query_certificateType !=''">
+                AND person_info.certificate_type=#{query_certificateType}
+            </if>
+            <if test="query_certificateNum !=null and query_certificateNum !=''">
+                AND person_info.certificate_num LIKE CONCAT('%',#{query_certificateNum},'%')
+            </if>
+            <if test="query_education !=null and query_education !=''">
+                AND person_info.education=#{query_education}
+            </if>
+            <if test="query_technologyLevel !=null and query_technologyLevel !=''">
+                AND person_info.technology_level=#{query_technologyLevel}
+            </if>
+            <if test="query_workSituation !=null and query_workSituation !=''">
+                AND person_info.work_situation like concat('%',#{query_workSituation},'%')
+            </if>
+            <if test="query_mobile !=null and query_mobile !=''">
+                AND person_info.mobile like concat('%',#{query_mobile},'%')
+            </if>
+            <if test="query_household !=null and query_household !=''">
+                AND person_info.household =#{query_household}
+            </if>
+            <if test="query_domicile !=null and query_domicile !=''">
+                AND person_info.domicile like concat('%',#{query_domicile},'%')
+            </if>
+            <if test="query_memberChange !=null and query_memberChange !=''">
+                AND person_info.member_change =#{query_memberChange}
+            </if>
+            <if test="query_memberChangeDate_start !=null and query_memberChangeDate_start !=''">
+                AND person_info.member_change_date <![CDATA[>=]]> #{query_memberChangeDate_start}
+            </if>
+            <if test="query_memberChangeDate_end !=null and query_memberChangeDate_end !=''">
+                AND person_info.member_change_date <![CDATA[<=]]> #{query_memberChangeDate_end}
+            </if>
+            <if test="query_politicalStatus !=null and query_politicalStatus !=''">
+                AND person_info.political_status = #{query_politicalStatus}
+            </if>
+            <if test="query_workUnit !=null and query_workUnit !=''">
+                AND person_info.work_unit like concat('%',#{query_workUnit},'%')
+            </if>
+            <if test="query_nativePlace !=null and query_nativePlace !=''">
+                AND person_info.native_place like concat('%',#{query_nativePlace},'%')
+            </if>
+            <if test="query_farmer_flag !=null and query_farmer_flag !=''">
+                AND person_info.is_farmer=#{query_farmer_flag}
+            </if>
+        </where>
+        order by dept_member.create_time desc
+    </select>
+
+    <!--elasticSearch同步用的数据-->
+    <select id="selectListEs" resultType="com.gobestsoft.common.modular.es.model.MemberModel">
+
+        SELECT
+        sys_dept.simplename AS unionSimplename,
+        sys_dept.fullname AS unionName,
+        sys_dept.dept_no AS deptNo,
+        sys_dept.pids,
+        dept_member.id,
+        dept_member.dept_id deptId,
+        dept_member.person_id personId,
+        dept_member.station_card stationCard,
+        dept_member.member_card memberCard,
+        person_info.name,
+        person_info.sex,
+        person_info.birthday,
+        person_info.certificate_num certificateNum,
+        person_info.mobile,
+        person_info.domicile,
+        person_info.member_change_date memberChangeDate,
+        person_info.work_unit workunit,
+        person_info.native_place nativeplace,
+        person_info.homeplace,
+        person_info.is_farmer isFarmer,
+        person_info.nation,
+        person_info.work_situation workSituation,
+        person_info.certificate_type certificateType,
+        person_info.education,
+        person_info.technology_level technologyLevel,
+        person_info.household household,
+        person_info.political_status politicalStatus,
+        person_info.member_change memberChange,
+        person_info.member_change_reason memberChangeReason,
+        sys_user.name AS createUser,
+        dept_member.create_time createTime,
+        dept_member.update_user updateUser,
+        dept_member.update_time updateTime,
+        dept_member.type,
+        D1.name AS sexName,
+        D2.name AS nationName,
+        D3.name AS workSituationName,
+        D4.name AS certificateTypeName,
+        D5.name AS educationName,
+        D6.name AS technologyLevelName,
+        D7.name AS householdName,
+        D8.name AS politicalStatusName,
+        D9.name as memberChangeName,
+        D10.name as memberChangeReasonName,
+        dept_member.isBind
+        FROM dept_member
+        INNER join sys_dept on sys_dept.id=dept_member.dept_id
+        INNER join person_info on person_info.id=dept_member.person_id
+        LEFT  JOIN sys_dict AS D1 ON D1.code=person_info.sex AND D1.group_code='lib_sex'
+        LEFT  JOIN sys_dict AS D2 ON D2.code=person_info.nation AND D2.group_code='lib_ethnic_group'
+        LEFT  JOIN sys_dict AS D3 ON D3.code=person_info.work_situation AND D3.group_code='lib_work_situation'
+        LEFT  JOIN sys_dict AS D4 ON D4.code=person_info.certificate_type AND D4.group_code='lib_identification_type'
+        LEFT  JOIN sys_dict AS D5 ON D5.code=person_info.education AND D5.group_code='lib_education_code'
+        LEFT  JOIN sys_dict AS D6 ON D6.code=person_info.technology_level AND D6.group_code='lib_technology'
+        LEFT  JOIN sys_dict AS D7 ON D7.code=person_info.household AND D7.group_code='lib_household'
+        LEFT  JOIN sys_dict AS D8 ON D8.code=person_info.political_status AND D8.group_code='lib_political_status'
+        LEFT  JOIN sys_dict AS D9 ON D9.code=person_info.member_change AND D9.group_code='lib_member_change'
+        LEFT  JOIN sys_dict AS D10 ON D10.code=person_info.member_change_reason AND D10.group_code='lib_member_change_reason'
+        LEFT JOIN sys_user ON sys_user.uid=dept_member.create_user
+        order by createTime
+
+
+    </select>
+
+    <!-- 查询当前登录用户所属组织下及子组织、子部门下的会员  -->
+    <select id="selectByConditionByDeptId" resultMap="BaseResultMap">
+        SELECT
+        sys_dept.simplename AS unionSimplename,
+        sys_dept.fullname AS unionName,
+        sys_dept.dept_no AS deptNo,
+        <include refid="commonColumns"></include>
+        FROM dept_member
+        left join sys_dept on sys_dept.id=dept_member.dept_id
+        left join person_info on person_info.id=dept_member.person_id
+        LEFT JOIN sys_user ON sys_user.uid=dept_member.create_user
+        where dept_id in
+        (select id from sys_dept where id = #{deptId} or FIND_IN_SET(#{deptId},pids) order by
+        level,sort,id)
+        <if test="unionName != null and unionName != ''">
+            and sys_dept.simplename  like '%${unionName}%' OR sys_dept.fullname  like '%${unionName}%'
+        </if>
+        <if test="deptNo != null and deptNo != ''">
+            and sys_dept.dept_no  like '%${deptNo}%'
+        </if>
+        <if test="name != null and name != ''">
+            and person_info.name like '%${name}%'
+        </if>
+        <if test="memberCard != null and memberCard != ''">
+            and dept_member.member_card like '%${memberCard}%' OR dept_member.station_card like '%${memberCard}%'
+        </if>
+        order by dept_member.dept_id,dept_member.create_time
+    </select>
+
+    <select id="selectByMemberId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="commonColumns"></include>
+        FROM dept_member
+        left join person_info on person_info.id=dept_member.person_id
+        LEFT JOIN sys_user ON sys_user.uid=dept_member.create_user
+        where dept_member.id=#{id}
+    </select>
+
+    <!-- 根据工会id,获取父级工会下的会员和该工会下的会员信息  -->
+    <select id="getPidMemberListByUnionId" resultType="map">
+        select p.id,p.name,p.union_name,p.sex,p.duty from (
+        select id,name,union_name,sex,duty from dept_member
+        where dept_member.dept_id = #{pid}
+        union all
+        select id,name,union_name,sex,duty from dept_member
+        where dept_member.dept_id = #{unionId}
+        )p
+        <where>
+            <if test="name != null and name != ''">
+                and p.name like '%${name}%'
+            </if>
+            <if test="unionName != null and unionName != ''">
+                and p.union_name like '%${unionName}%'
+            </if>
+            <if test="duty != null and duty != ''">
+                and p.duty like '%${duty}%'
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据所属工会id,获取会员id拼接的字符串,多个id以逗号分隔  -->
+    <select id="getMemberIdsByUnionId" resultType="string">
+	 select group_concat(id) from dept_member group by dept_member.dept_id
+	 having dept_member.dept_id = #{deptId}
+    </select>
+
+    <!-- 批量更新会员的type字段值 -->
+    <update id="updateTypeByList" parameterType="java.util.List">
+        update dept_member  set type= #{type}
+        where id in
+        <foreach collection="deptMembers" index="index" item="item"
+                 separator="," open="(" close=")">
+            #{item.member_id}
+        </foreach>
+    </update>
+
+    <!-- 新建临时表（导入会员时先导入至临时表） -->
+    <update id="createTemporaryTable" >
+		CREATE TABLE ${tableName} (
+			  `id` int(32) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+			  `index` varchar(255) DEFAULT NULL COMMENT '序号',
+			  `name` varchar(128) DEFAULT NULL COMMENT '姓名',
+			  `sex` varchar(10) DEFAULT NULL COMMENT '性别',
+			  `birthday` char(32) DEFAULT NULL COMMENT '生日yyyyMMdd',
+			  `nation` varchar(32) DEFAULT NULL COMMENT '民族字典：group_code=lib_ethnic_group',
+			  `work_situation` varchar(32) DEFAULT NULL COMMENT '就业情况：字典：groupCode=lib_work_situation',
+			  `certificate_type` varchar(32) DEFAULT NULL COMMENT '证件类型：字典：groupCode=lib_identification_type',
+			  `certificate_num` char(128) DEFAULT NULL COMMENT '证件号',
+			  `station_card` char(128) DEFAULT NULL COMMENT '站内会员卡号',
+			  `education` varchar(32) DEFAULT NULL COMMENT '学历：字典，groupCode=lib_education_code',
+			  `technology_level` varchar(32) DEFAULT NULL COMMENT '技能等级：字典：groupCode=lib_technology',
+			  `mobile` char(255) DEFAULT NULL COMMENT '手机号',
+			  `household` varchar(32) DEFAULT NULL COMMENT '户籍类型：字典，groupCode=lib_household',
+			  `domicile` varchar(32) DEFAULT NULL COMMENT '户籍所在地',
+			  `member_change` varchar(32) DEFAULT NULL COMMENT '会籍变化类型,字典，groupCode=lib_member_change',
+			  `member_change_date` char(32) DEFAULT NULL COMMENT '会籍变化时间',
+			  `member_change_reason` varchar(32) DEFAULT NULL COMMENT '会籍变化原因,字典gorupCode=lib_member_change_reason',
+			  `political_status` varchar(32) DEFAULT NULL COMMENT '政治面貌，字典：lib_political_status',
+			  `work_unit` varchar(255) DEFAULT NULL COMMENT '工作单位',
+			  `native_place` varchar(255) DEFAULT NULL COMMENT '籍贯',
+-- 			  `homeplace` varchar(255) DEFAULT NULL COMMENT '出生地',
+			  `is_farmer` varchar(255) DEFAULT NULL COMMENT '是否农民工会员,字典，groupCode=lib_is_not',
+			  `errors_message` varchar(500) DEFAULT NULL COMMENT '错误原因',
+			  `if_success` char(4) DEFAULT NULL COMMENT '是否成功',
+			  PRIMARY KEY (`id`)
+		) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+	</update>
+
+    <!-- 删除临时表 -->
+    <update id="dropTemporaryTable">
+		DROP TABLE IF EXISTS ${tableName};
+	</update>
+
+    <!-- 临时表插入数据 -->
+    <insert id="insertList" parameterType="java.util.Map">
+        INSERT INTO ${tableName}
+        (`name`,
+        `index`,
+        `sex`,
+        `birthday`,
+        `nation`,
+        `work_situation`,
+        `certificate_type`,
+        `certificate_num`,
+        `station_card`,
+        `education`,
+        `technology_level`,
+        `mobile`,
+        `household`,
+        `domicile`,
+        `member_change`,
+        `member_change_date`,
+        `member_change_reason`,
+        `political_status`,
+        `work_unit`,
+        `native_place`,
+        `is_farmer`,
+        `errors_message`,
+        `if_success`)
+        VALUES
+        <foreach collection="pojos" item="pojo" separator=",">
+            (#{pojo.name},
+            #{pojo.index},
+            #{pojo.sex},
+            #{pojo.birthday},
+            #{pojo.nation},
+            #{pojo.work_situation},
+            #{pojo.certificate_type},
+            #{pojo.certificate_num},
+            #{pojo.station_card},
+            #{pojo.education},
+            #{pojo.technology_level},
+            #{pojo.mobile},
+            #{pojo.household},
+            #{pojo.domicile},
+            #{pojo.member_change},
+            #{pojo.member_change_date},
+            #{pojo.member_change_reason},
+            #{pojo.political_status},
+            #{pojo.work_unit},
+            #{pojo.native_place},
+            #{pojo.is_farmer},
+            #{pojo.errors_message},
+            #{pojo.if_success})
+        </foreach>
+    </insert>
+
+    <!-- 创建存储过程  -->
+    <update id="createImportMemberProcedure">
+	CREATE DEFINER = `admin`@`%` PROCEDURE ${procedureName}()
+	BEGIN
+
+	  DECLARE flag INT DEFAULT FALSE;
+	  DECLARE total INT DEFAULT 0;
+
+	  DECLARE importMemberId INT;
+      DECLARE memberName VARCHAR(36);
+	  DECLARE memberSex VARCHAR(255);
+	  DECLARE memberSexCode char(4);
+      DECLARE memberBirthday varchar(8);
+      DECLARE memberNation VARCHAR(255);
+      DECLARE memberNationCode char(4);
+      DECLARE workSituation VARCHAR(255);
+      DECLARE workSituationCode char(4);
+      DECLARE certificateType VARCHAR(255);
+      DECLARE certificateTypeCode char(4);
+      DECLARE certificateNum char(20);
+      DECLARE memberEducation VARCHAR(255);
+      DECLARE memberEducationCode char(4);
+      DECLARE technologyLevel VARCHAR(255);
+      DECLARE technologyLevelCode char(4);
+      DECLARE memebrMobile varchar(11);
+      DECLARE memberHousehold VARCHAR(255);
+      DECLARE memberHouseholdCode char(4);
+      DECLARE memberDomicile VARCHAR(255);
+      DECLARE memberChange VARCHAR(255);
+      DECLARE memberChangeCode char(4);
+      DECLARE memberChangeDate char(14);
+      DECLARE memberChangeReason VARCHAR(255);
+      DECLARE memberChangeReasonCode char(4);
+      DECLARE politicalStatus VARCHAR(255);
+      DECLARE politicalStatusCode char(4);
+      DECLARE workUnit VARCHAR(255);
+      DECLARE nativePlace VARCHAR(255);
+      DECLARE isFarmer VARCHAR(12);
+      DECLARE isFarmerCode char(4);
+      DECLARE stationCard char(50);
+      DECLARE errorsMessage VARCHAR(500);
+      DECLARE ifSuccess CHAR(4) DEFAULT '1';
+      DECLARE personId INT;
+
+      DECLARE members CURSOR FOR SELECT id,name,sex,birthday,nation,work_situation,certificate_type,certificate_num,station_card,education,technology_level,
+      mobile,household,domicile,member_change,member_change_date,member_change_reason,political_status,work_unit,native_place,is_farmer,errors_message,if_success from ${tableName} WHERE IFNULL(if_success,'1')='1';
+	  declare continue handler for not found set flag = TRUE;
+      start transaction;
+      OPEN members;
+
+	  REPEAT
+
+	  FETCH members INTO importMemberId,memberName,memberSex,memberBirthday,memberNation,workSituation,certificateType,
+      certificateNum,stationCard,memberEducation,technologyLevel,memebrMobile,memberHousehold,memberDomicile,memberChange,memberChangeDate,
+      memberChangeReason,politicalStatus,workUnit,nativePlace,isFarmer,errorsMessage,ifSuccess;
+
+	  if NOT flag then
+
+	  		 IF errorsMessage IS NULL THEN
+                    SET errorsMessage='错误原因：';
+			END IF;
+
+ 			IF EXISTS(SELECT 1 FROM person_info WHERE certificate_num=certificateNum ) THEN
+ 				SET errorsMessage=CONCAT(errorsMessage,'-当前身份证会员信息已经存在！');
+ 				SET ifSuccess='0';
+ 			END IF;
+
+
+			IF ifSuccess='0' THEN
+				UPDATE ${tableName} SET errors_message=errorsMessage,if_success='0' WHERE id=importMemberId ;
+			ELSE
+
+				IF memberSex IS NOT NULL AND  EXISTS(select 1 From sys_dict where name =memberSex AND group_code='lib_sex') THEN
+					 SELECT code INTO memberSexCode From sys_dict where name =memberSex AND group_code='lib_sex';
+				END IF;
+				IF memberNation IS NOT NULL AND  EXISTS(select 1 From sys_dict where name =memberNation AND group_code='lib_ethnic_group') THEN
+					 SELECT code INTO memberNationCode From sys_dict where name =memberNation AND group_code='lib_ethnic_group';
+				END IF;
+				IF workSituation IS NOT NULL AND  EXISTS(select 1 From sys_dict where name =workSituation AND group_code='lib_work_situation') THEN
+					  SELECT code INTO workSituationCode From sys_dict where name =workSituation AND group_code='lib_work_situation';
+				END IF;
+				IF certificateType IS NOT NULL AND  EXISTS(select 1 From sys_dict where name =certificateType AND group_code='lib_identification_type') THEN
+					  SELECT code INTO certificateTypeCode From sys_dict where name =certificateType AND group_code='lib_identification_type';
+				END IF;
+				IF memberEducation IS NOT NULL AND  EXISTS(select 1 From sys_dict where name =memberEducation AND group_code='lib_education_code') THEN
+					  SELECT code INTO memberEducationCode From sys_dict where name =memberEducation AND group_code='lib_education_code';
+				END IF;
+				IF technologyLevel IS NOT NULL AND  EXISTS(select 1 From sys_dict where name =technologyLevel AND group_code='lib_technology') THEN
+					 SELECT code INTO technologyLevelCode From sys_dict where name =technologyLevel AND group_code='lib_technology';
+				END IF;
+				IF memberHousehold IS NOT NULL AND  EXISTS(select 1 From sys_dict where name =memberHousehold AND group_code='lib_household') THEN
+					SELECT code INTO memberHouseholdCode From sys_dict where name =memberHousehold AND group_code='lib_household';
+				END IF;
+				IF memberChange IS NOT NULL AND  EXISTS(select 1 From sys_dict where name =memberChange AND group_code='lib_member_change') THEN
+					 SELECT code INTO memberChangeCode From sys_dict where name =memberChange AND group_code='lib_member_change';
+				END IF;
+				IF memberChangeReason IS NOT NULL AND  EXISTS(select 1 From sys_dict where name =memberChangeReason AND group_code='lib_member_change_reason') THEN
+					 SELECT code INTO memberChangeReasonCode From sys_dict where name =memberChangeReason AND group_code='lib_member_change_reason';
+				END IF;
+				IF politicalStatus IS NOT NULL AND  EXISTS(select 1 From sys_dict where name =politicalStatus AND group_code='lib_political_status') THEN
+					 SELECT code INTO politicalStatusCode From sys_dict where name =politicalStatus AND group_code='lib_political_status';
+				END IF;
+				IF isFarmer IS NOT NULL AND  EXISTS(select 1 From sys_dict where name =isFarmer AND group_code='lib_is_not') THEN
+					 SELECT code INTO isFarmerCode From sys_dict where name =isFarmer AND group_code='lib_is_not';
+				END IF;
+
+				INSERT INTO person_info(name,sex,birthday,nation,work_situation,certificate_type,certificate_num,education,technology_level,
+                mobile,household,domicile,member_change,member_change_date,member_change_reason,political_status,work_unit,native_place,is_farmer) VALUES
+                (memberName,memberSexCode,memberBirthday,memberNationCode,workSituationCode,certificateTypeCode,
+                certificateNum,memberEducationCode,technologyLevelCode,memebrMobile,memberHouseholdCode,memberDomicile,memberChangeCode,memberChangeDate,
+                memberChangeReasonCode,politicalStatusCode,workUnit,nativePlace,isFarmerCode);
+
+				select  last_insert_id() INTO personId;
+
+				INSERT INTO dept_member(dept_id,person_id,create_user,create_time,update_user,update_time,type,station_card)VALUES
+                (#{deptId},personId,#{createUid},#{createTime},#{createUid},#{createTime},'1',stationCard);
+
+                UPDATE ${tableName} SET if_success='1' WHERE id=importMemberId ;
+
+            END IF;
+		END IF;
+		UNTIL flag END REPEAT;
+		commit ;
+		select * from ${tableName};
+		CLOSE members;
+    END
+	</update>
+
+    <!-- 调用存储过程 -->
+    <select id="callImportMemberProcedure" resultType="java.util.Map">
+	     CALL ${procedureName};
+	</select>
+
+    <!-- 删除存储过程  -->
+    <update id="dropImportMemberProcedure">
+	     DROP PROCEDURE IF EXISTS ${procedureName};
+	</update>
+
+    <resultMap id="memberInfoMap" type="com.gobestsoft.common.modular.dept.model.DeptMemberInfoEntity">
+        <id column="member_id" property="member_id"/>
+        <result column="dept_id" property="dept_id"/>
+        <result column="dept_name" property="dept_name"/>
+        <result column="station_card" property="station_card"/>
+        <result column="member_card" property="member_card"/>
+        <result column="name" property="name"/>
+        <result column="sex" property="sex"/>
+        <result column="nation" property="nation"/>
+        <result column="work_situation" property="work_situation"/>
+        <result column="certificate_type" property="certificate_type"/>
+        <result column="birthday" property="birthday"/>
+        <result column="education" property="education"/>
+        <result column="technology_level" property="technology_level"/>
+        <result column="mobile" property="mobile"/>
+        <result column="household" property="household"/>
+        <result column="domicile" property="domicile"/>
+        <result column="political_status" property="political_status"/>
+        <result column="work_unit" property="work_unit"/>
+        <result column="native_place" property="native_place"/>
+        <result column="homeplace" property="homeplace"/>
+        <result column="member_change_date" property="member_change_date"/>
+        <result column="member_change" property="member_change"/>
+        <result column="member_change_reason" property="member_change_reason"/>
+        <result column="is_farmer" property="is_farmer"/>
+        <result column="is_bind" property="isBind"/>
+        <result column="certificate_num" property="certificate_num"/>
+    </resultMap>
+
+    <select id="getMemberInfo" resultMap="memberInfoMap">
+
+		SELECT
+        T1.id AS member_id,
+        T1.dept_id,
+        ifnull(T3.fullname,'组织被转移') AS dept_name,
+        T1.station_card,
+        T1.member_card,
+        T2.`name`,
+        D1.NAME AS sex,
+        D2.NAME AS nation,
+        D3.NAME AS work_situation,
+        D4.NAME AS certificate_type,
+        T2.birthday,
+        T2.certificate_num,
+        D5.NAME AS education,
+        D6.NAME AS technology_level,
+        T2.mobile,
+        D7.NAME AS household,
+        T2.domicile,
+        D8.NAME AS poitical_status,
+        T2.work_unit,
+        T2.native_place,
+        T2.homeplace
+        FROM
+        dept_member AS T1
+        INNER JOIN person_info AS T2 ON T1.person_id = T2.id
+        left JOIN sys_dept AS T3 ON T1.dept_id = T3.id
+        LEFT JOIN sys_dict AS D1 ON D1.CODE = T2.sex
+        AND D1.group_code = 'lib_sex'
+        LEFT JOIN sys_dict AS D2 ON D2.CODE = T2.nation
+        AND D2.group_code = 'lib_ethnic_group'
+        LEFT JOIN sys_dict AS D3 ON D3.CODE = T2.work_situation
+        AND D3.group_code = 'lib_work_situation'
+        LEFT JOIN sys_dict AS D4 ON D4.CODE = T2.certificate_type
+        AND D4.group_code = 'lib_identification_type'
+        LEFT JOIN sys_dict AS D5 ON D5.CODE = T2.education
+        AND D5.group_code = 'lib_education_code'
+        LEFT JOIN sys_dict AS D6 ON D6.CODE = T2.technology_level
+        AND D6.group_code = 'lib_technology'
+        LEFT JOIN sys_dict AS D7 ON D7.CODE = T2.household
+        AND D7.group_code = 'lib_household'
+        LEFT JOIN sys_dict AS D8 ON D8.CODE = T2.household
+        AND D8.group_code = 'lib_political_status'
+        WHERE
+        T1.id=${memberId}
+	</select>
+
+    <select id="selectByCondition4Remove" resultMap="BaseResultMap">
+        SELECT * FROM (SELECT
+        sys_dept.simplename AS unionSimplename,
+        sys_dept.fullname AS unionName,
+        sys_dept.dept_no AS deptNo,
+        dept_member.id,
+        dept_member.dept_id,
+        dept_member.station_card,
+        dept_member.member_card,
+        person_info.name,
+        person_info.sex,
+        person_info.id person_id,
+        person_info.birthday,
+        person_info.certificate_num,
+        person_info.mobile,
+        person_info.domicile,
+        person_info.member_change_date,
+        person_info.work_unit,
+        person_info.native_place,
+        person_info.homeplace,
+        person_info.is_farmer,
+        sys_user.name AS create_user,
+        dept_member.create_time,
+        dept_member.update_user,
+        dept_member.update_time,
+        dept_member.type,
+        D1.name AS sexName,
+        D2.name AS nation,
+        D3.name AS work_situation,
+        D4.name AS certificate_type,
+        D5.name AS education,
+        D6.name AS technology_level,
+        D7.name AS household,
+        D8.name AS political_status,
+        D9.name as member_change,
+        D10.name as member_change_reason,
+        dept_member.isBind
+        FROM person_info
+        left join dept_member on person_info.id=dept_member.person_id
+        left join sys_dept on sys_dept.id=dept_member.dept_id
+        LEFT  JOIN sys_dict AS D1 ON D1.code=person_info.sex AND D1.group_code='lib_sex'
+        LEFT  JOIN sys_dict AS D2 ON D2.code=person_info.nation AND D2.group_code='lib_ethnic_group'
+        LEFT  JOIN sys_dict AS D3 ON D3.code=person_info.work_situation AND D3.group_code='lib_work_situation'
+        LEFT  JOIN sys_dict AS D4 ON D4.code=person_info.certificate_type AND D4.group_code='lib_identification_type'
+        LEFT  JOIN sys_dict AS D5 ON D5.code=person_info.education AND D5.group_code='lib_education_code'
+        LEFT  JOIN sys_dict AS D6 ON D6.code=person_info.technology_level AND D6.group_code='lib_technology'
+        LEFT  JOIN sys_dict AS D7 ON D7.code=person_info.household AND D7.group_code='lib_household'
+        LEFT  JOIN sys_dict AS D8 ON D8.code=person_info.political_status AND D8.group_code='lib_political_status'
+        LEFT  JOIN sys_dict AS D9 ON D9.code=person_info.member_change AND D9.group_code='lib_member_change'
+        LEFT  JOIN sys_dict AS D10 ON D10.code=person_info.member_change_reason AND D10.group_code='lib_member_change_reason'
+        LEFT JOIN sys_user ON sys_user.uid=dept_member.create_user
+        where person_info.mobile = #{query_mobile} or person_info.certificate_num=#{query_certificate_num}
+        ) AS T WHERE 1=1 and ( mobile is not null and mobile!='')
+        order by create_time desc
+    </select>
+
+    <!--查询需要删除的用户信息表  主表是person_info-->
+    <select id="getMemberInfo4Remove" resultMap="memberInfoMap">
+		SELECT T1.id AS member_id,T1.dept_id,T3.fullname AS dept_name,T1.station_card,T1.member_card,T2.`name`,D1.name AS sex,D2.name AS nation,
+		D3.name AS work_situation,D4.name AS certificate_type,T2.birthday,T2.certificate_num,
+		D5.name AS education,D6.name AS technology_level,T2.mobile,D7.name AS household,T2.domicile,D8.name AS poitical_status,T2.work_unit,T2.native_place,T2.homeplace,
+		T1.isBind is_bind
+		FROM
+		person_info AS T2
+		LEFT JOIN dept_member AS T1 ON T1.person_id=T2.id
+		LEFT JOIN sys_dept AS T3 ON T1.dept_id=T3.id
+		LEFT  JOIN sys_dict AS D1 ON D1.code=T2.sex AND D1.group_code='lib_sex'
+		LEFT  JOIN sys_dict AS D2 ON D2.code=T2.nation AND D2.group_code='lib_ethnic_group'
+		LEFT  JOIN sys_dict AS D3 ON D3.code=T2.work_situation AND D3.group_code='lib_work_situation'
+		LEFT  JOIN sys_dict AS D4 ON D4.code=T2.certificate_type AND D4.group_code='lib_identification_type'
+		LEFT  JOIN sys_dict AS D5 ON D5.code=T2.education AND D5.group_code='lib_education_code'
+		LEFT  JOIN sys_dict AS D6 ON D6.code=T2.technology_level AND D6.group_code='lib_technology'
+		LEFT  JOIN sys_dict AS D7 ON D7.code=T2.household AND D7.group_code='lib_household'
+		LEFT  JOIN sys_dict AS D8 ON D8.code=T2.household AND D8.group_code='lib_political_status'
+		WHERE T2.id=#{memberId}
+	</select>
+
+    <select id="getMemberList" resultMap="memberInfoMap">
+        SELECT T1.id AS member_id,T1.dept_id,T3.fullname AS dept_name,T1.station_card,T1.member_card,T2.`name`,D1.name AS sex,D2.name AS nation,
+        D3.name AS work_situation,D4.name AS certificate_type,T2.birthday,
+        D5.name AS education,D6.name AS technology_level,T2.mobile,D7.name AS household,T2.domicile,D8.name AS political_status,T2.work_unit,T2.native_place,T2.homeplace,
+        T2.member_change_date,D10.name as member_change_reason,D9.name as member_change,T2.is_farmer,T2.certificate_num
+        FROM dept_member AS T1
+        INNER JOIN person_info AS T2 ON T1.person_id=T2.id
+        INNER JOIN sys_dept AS T3 ON T1.dept_id=T3.id
+        LEFT  JOIN sys_dict AS D1 ON D1.code=T2.sex AND D1.group_code='lib_sex'
+        LEFT  JOIN sys_dict AS D2 ON D2.code=T2.nation AND D2.group_code='lib_ethnic_group'
+        LEFT  JOIN sys_dict AS D3 ON D3.code=T2.work_situation AND D3.group_code='lib_work_situation'
+        LEFT  JOIN sys_dict AS D4 ON D4.code=T2.certificate_type AND D4.group_code='lib_identification_type'
+        LEFT  JOIN sys_dict AS D5 ON D5.code=T2.education AND D5.group_code='lib_education_code'
+        LEFT  JOIN sys_dict AS D6 ON D6.code=T2.technology_level AND D6.group_code='lib_technology'
+        LEFT  JOIN sys_dict AS D7 ON D7.code=T2.household AND D7.group_code='lib_household'
+        LEFT  JOIN sys_dict AS D8 ON D8.code=T2.political_status AND D8.group_code='lib_political_status'
+        LEFT  JOIN sys_dict AS D9 ON D9.code=T2.member_change AND D9.group_code='lib_member_change'
+        LEFT  JOIN sys_dict AS D10 ON D10.code=T2.member_change_reason AND D10.group_code='lib_member_change_reason'
+        WHERE 1=1
+        <if test="unionName != null and unionName != ''">
+            AND sys_dept.simplename  LIKE '%${unionName}%' OR sys_dept.fullname  LIKE '%${unionName}%'
+        </if>
+        <if test="deptNo != null and deptNo != ''">
+            AND sys_dept.dept_no  like '%${deptNo}%'
+        </if>
+        <if test="name != null and name != ''">
+            AND T2.name like '%${name}%'
+        </if>
+        <if test="memberCard != null and memberCard != ''">
+            AND T1.member_card like '%${memberCard}%' OR T1.station_card LIKE '%${memberCard}%'
+        </if>
+        <if test="memberRange == null or memberRange == '01' ">
+            AND T1.dept_id = #{deptId}
+        </if>
+        <if test="memberRange != null and memberRange == '02'">
+            AND T1.dept_id IN (SELECT id FROM sys_dept where id=${deptId} or pids like '%,${deptId}%' or pids like '%${deptId},%')
+        </if>
+        <if test="query_sex!=null and query_sex!=''">
+            AND T2.sex =#{query_sex}
+        </if>
+        <if test="query_ethnicGroup!=null and query_ethnicGroup!=''">
+            AND T2.nation=#{query_ethnicGroup}
+        </if>
+        <if test="query_workSituation !=null and query_workSituation !=''">
+            AND T2.work_situation=#{query_workSituation}
+        </if>
+        <if test="query_certificateType !=null and query_certificateType !=''">
+            AND T2.certificate_type=#{query_certificateType}
+        </if>
+        <if test="query_certificateNum !=null and query_certificateNum !=''">
+            AND T2.certificate_num LIKE CONCAT('%',#{query_certificateNum},'%')
+        </if>
+        <if test="query_education !=null and query_education !=''">
+            AND T2.education=#{query_education}
+        </if>
+        <if test="query_technologyLevel !=null and query_technologyLevel !=''">
+            AND T2.technology_level=#{query_technologyLevel}
+        </if>
+        <if test="query_workSituation !=null and query_workSituation !=''">
+            AND T2.mobile like concat('%',#{query_workSituation},'%')
+        </if>
+        <if test="query_mobile !=null and query_mobile !=''">
+            AND T2.mobile like concat('%',#{query_mobile},'%')
+        </if>
+        <if test="query_household !=null and query_household !=''">
+            AND T2.household =#{query_household}
+        </if>
+        <if test="query_domicile !=null and query_domicile !=''">
+            AND T2.domicile like concat('%',#{query_domicile},'%')
+        </if>
+        <if test="query_memberChange !=null and query_memberChange !=''">
+            AND T2.member_change =#{query_memberChange}
+        </if>
+        <if test="query_memberChangeDate_start !=null and query_memberChangeDate_start !=''">
+            AND T2.member_change_date <![CDATA[>=]]> #{query_memberChangeDate_start}
+        </if>
+        <if test="query_memberChangeDate_end !=null and query_memberChangeDate_end !=''">
+            AND T2.member_change_date <![CDATA[<=]]> #{query_memberChangeDate_end}
+        </if>
+        <if test="query_politicalStatus !=null and query_politicalStatus !=''">
+            AND T2.political_status = #{query_politicalStatus}
+        </if>
+        <if test="query_workUnit !=null and query_workUnit !=''">
+            AND T2.work_unit like concat('%',#{query_workUnit},'%')
+        </if>
+        <if test="query_nativePlace !=null and query_nativePlace !=''">
+            AND T2.native_place like concat('%',#{query_nativePlace},'%')
+        </if>
+        <if test="query_farmer_flag !=null and query_farmer_flag !=''">
+            AND T2.is_farmer=#{query_farmer_flag}
+        </if>
+
+
+    </select>
+
+    <select id="selectOrganizationByDeptId" resultType="java.util.Map">
+
+		select t.unit_district,d1.name as unit_district_name,unit_name from dept_organization t
+		left join sys_dict d1 on d1.code = t.unit_district and d1.group_code='unit_district_code'
+		where dept_id =#{dept_id}
+
+	</select>
+
+    <update id="clearAppuser">
+
+		update app_user set member_id=null
+		where member_id=#{member_id}
+
+	</update>
+
+    <select id="selectMemberCountList" resultType="com.gobestsoft.common.modular.dept.model.MemberCountModel">
+
+        select * from t_member_count
+        <if test="deptId!=null and deptId!=''">
+            where pid=#{deptId}
+        </if>
+
+    </select>
+
+    <select id="selectMemberStationCardNull" resultMap="memberInfoMap">
+        SELECT T1.id AS member_id,T1.dept_id,T3.fullname AS dept_name,T1.station_card,T2.sex
+		FROM dept_member AS T1
+		INNER JOIN person_info AS T2 ON T1.person_id=T2.id
+		INNER JOIN sys_dept AS T3 ON T1.dept_id=T3.id
+		WHERE T1.station_card is null or T1.station_card=''
+		order by T1.dept_id asc limit 1000
+    </select>
+
+    <update id="updateStationCard">
+
+        update dept_member set station_card =#{station_card}
+        where id= #{id}  and  station_card is null or station_card=''
+
+    </update>
+
+    <select id="selectByHouseHold" resultType="java.util.Map">
+            SELECT
+                t1.id,
+                t1.`name`,
+                t1.num,
+                t1.mobile,
+                t1.household,
+                t1.isbind,
+                d2.unit_name,
+                d2.union_name,
+                d2.p_name
+            FROM
+                dept_organization d2
+            INNER JOIN (
+                SELECT
+                    m2.id AS id,
+                    k1.household,
+                    k1.name,
+                    k1.mobile,
+                    k1.num,
+                    m2.dept_id AS dept_id,
+                    m2.isBind AS isbind
+                FROM
+                    (
+                        SELECT
+                            p1.id AS id,
+                            p1. NAME AS `name`,
+                            p1.mobile AS mobile,
+                            p1.certificate_num AS num,
+                            p1.household
+                        FROM
+                            person_info p1
+                        <where>
+                            <if test="query_name != '' and query_name != null">
+                                and p1.name like concat ('%',#{query_name},'%')
+                            </if>
+
+                            <if test="query_num != '' and query_num != null">
+                                and p1.certificate_num = #{query_num}
+                            </if>
+                        </where>
+                    ) k1
+                INNER JOIN dept_member m2 ON k1.id = m2.person_id
+            ) t1 ON d2.dept_id = t1.dept_id
+
+          <if test="query_num == '' and query_name == ''">
+              WHERE isbind IS NULL
+          </if>
+    </select>
+
+    <select id="selectByRehome" resultType="java.util.Map">
+        SELECT
+            t1.id,
+            t1.`name`,
+            t1.num,
+            t1.mobile,
+            t1.household,
+            t1.isbind,
+            d2.unit_name,
+            d2.union_name,
+            d2.p_name
+        FROM
+            dept_organization d2
+        INNER JOIN (
+        SELECT
+            m2.id AS id,
+            k1.household,
+            k1.name,
+            k1.mobile,
+            k1.num,
+            m2.dept_id AS dept_id,
+            m2.isBind AS isbind
+        FROM
+        (
+        SELECT
+            p1.id AS id,
+            p1. NAME AS `name`,
+            p1.mobile AS mobile,
+            p1.certificate_num AS num,
+            p1.household
+        FROM
+            person_info p1
+        where
+            EXISTS (SELECT 1 from hainan_php.wp_rob_tickets p2 where p1.certificate_num = p2.idcard)
+            <if test="query_name != '' and query_name != null">
+                and p1.name like concat ('%',#{query_name},'%')
+            </if>
+
+            <if test="query_num != '' and query_num != null">
+                and p1.certificate_num = #{query_num}
+            </if>
+        ) k1
+        INNER JOIN dept_member m2 ON k1.id = m2.person_id
+        ) t1
+        ON d2.dept_id = t1.dept_id
+        where
+          1=1
+          <if test="query_deptname != '' and query_deptname != null">
+              and d2.union_name = #{query_deptname}
+          </if>
+
+    </select>
+
+    <!-- 存储过程中的具体方法替换为 select 1, 还原后去除该方法 resultType 属性-->
+    <select id="getReHomeTicket" resultType="int">
+        call generateDeptRehomeCount;
+    </select>
+
+    <select id="selectByMemrehomeCheck" resultType="map">
+        SELECT
+            tranfer.id,
+            tranfer.`status`,
+            tranfer.fullname,
+            tranfer.createTime,
+            tranfer.member_id as memId,
+            p4.`name`,
+            p4.certificate_num as num
+        FROM (
+            SELECT
+              p1.id,
+              p1.member_id,
+              p1.`status`,
+              p1.create_time as createTime,
+              p2.fullname
+            FROM
+            dept_member_transfer p1
+            LEFT JOIN sys_dept p2 ON p2.id = p1.turn_out_dept_id
+            where p1.transfer_dept_id = #{quert_deptId}
+            and p1.return_flg = 1
+        ) tranfer
+
+        LEFT JOIN dept_member p3 ON p3.id = tranfer.member_id
+        LEFT JOIN person_info p4 ON p4.id = p3.person_id
+
+        <where>
+            <if test="quert_name != null and quert_name != ''">
+                AND p4.name like CONCAT('%',#{quert_name},'%')
+            </if>
+            <if test="quert_status != null and quert_status != ''">
+                AND tranfer.status = #{quert_status}
+            </if>
+        </where>
+
+        order by tranfer.createTime
+    </select>
+
+</mapper>

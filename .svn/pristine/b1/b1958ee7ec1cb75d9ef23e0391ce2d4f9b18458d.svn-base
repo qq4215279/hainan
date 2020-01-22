@@ -1,0 +1,92 @@
+package com.gobestsoft.common.modular.gsp.service;
+
+import com.gobestsoft.common.modular.dao.mapper.AppIntegralMapper;
+import com.gobestsoft.common.modular.dao.mapper.AppIntegralUpdateMapper;
+import com.gobestsoft.common.modular.dao.model.AppIntegralPojo;
+import com.gobestsoft.common.modular.dao.model.AppIntegralUpdatePojo;
+import com.gobestsoft.common.modular.gsp.model.AppIntegralUpdateDto;
+import com.gobestsoft.core.util.DateUtil;
+import com.gobestsoft.core.util.ToolUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+
+@Service
+public class AppIntegralService {
+
+    @Resource
+    private AppIntegralMapper appIntegralMapper;
+    @Resource
+    private AppIntegralUpdateMapper appIntegralUpdateMapper;
+
+    public String checkParams(AppIntegralUpdateDto dto){
+        String auid = dto.getAuid();
+        String tid = dto.getTid();
+        Integer value = dto.getJifen();
+        Integer type = dto.getType();
+        if (ToolUtil.isEmpty(auid) || StringUtils.isEmpty(tid) || ToolUtil.isEmpty(value) || ToolUtil.isEmpty(type)) {
+            return "参数有误";
+        }
+        return "";
+    }
+
+    public String checkDto(AppIntegralUpdateDto dto){
+        try {
+            // 查询订单
+            AppIntegralUpdatePojo pojo = new AppIntegralUpdatePojo(0, dto.getTid());
+            AppIntegralUpdatePojo resultPojo = this.selectUpdateOne(pojo);
+            if (ToolUtil.isNotEmpty(resultPojo)) {
+                // 减扣判断
+                if (dto.getType() <= 0) {
+                    return "该订单已被扣减积分,请勿重复提交！";
+                }
+                // 增加判断
+                if (Math.abs(dto.getJifen()) > Math.abs(resultPojo.getJifen())) {
+                    return "新增积分数量异常！";
+                }
+            }
+            if (dto.getType() > 0) {
+                if (ToolUtil.isEmpty(resultPojo)) {
+                    return "该订单无扣减,不能增加积分";
+                }
+
+                pojo = new AppIntegralUpdatePojo(1, dto.getTid());
+                resultPojo = this.selectUpdateOne(pojo);
+                if (ToolUtil.isNotEmpty(resultPojo)) {
+                    return "该订单已增加积分,请勿重复提交！";
+                }
+            } else {
+                dto.setJifen(-(Math.abs(resultPojo.getJifen())));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "服务器内部异常";
+        }
+        return "";
+    }
+
+    private AppIntegralUpdatePojo selectUpdateOne(AppIntegralUpdatePojo pojo){
+        return appIntegralUpdateMapper.selectOne(pojo);
+    }
+
+    /**
+     * 执行插入 订单记录 积分记录
+      */
+    @Transactional(rollbackFor = Exception.class)
+    public void insertIntegral(AppIntegralUpdateDto dto) {
+        AppIntegralUpdatePojo orderPojo = new AppIntegralUpdatePojo(dto.getAuid(), dto.getType(), dto.getJifen(), dto.getTid(), dto.getGoods());
+        this.appIntegralUpdateMapper.insert(orderPojo);
+
+        AppIntegralPojo appIntegralPojo = new AppIntegralPojo();
+        appIntegralPojo.setAuid(dto.getAuid());
+        appIntegralPojo.setCreateTime(DateUtil.getAllTime());
+        appIntegralPojo.setTargetId("11");
+        appIntegralPojo.setType(0);
+        appIntegralPojo.setValue(dto.getJifen());
+        this.appIntegralMapper.insert(appIntegralPojo);
+    }
+
+}

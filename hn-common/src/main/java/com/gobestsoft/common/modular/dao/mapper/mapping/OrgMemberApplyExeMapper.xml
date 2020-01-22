@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dao.mapper.OrgMemberApplyExeMapper">
+  <resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.dao.model.OrgMemberApplyExePojo">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="apply_id" jdbcType="VARCHAR" property="applyId" />
+    <result column="apply_type" jdbcType="VARCHAR" property="applyType" />
+    <result column="apply_text" jdbcType="VARCHAR" property="applyText" />
+    <result column="apply_time" jdbcType="VARCHAR" property="applyTime" />
+    <result column="apply_desc" jdbcType="VARCHAR" property="applyDesc" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="user_name_bak" jdbcType="VARCHAR" property="userNameBak" />
+    <result column="org_id" jdbcType="INTEGER" property="orgId" />
+    <result column="org_name_bak" jdbcType="VARCHAR" property="orgNameBak" />
+    <result column="sort" jdbcType="INTEGER" property="sort" />
+    <result column="handle_flg" jdbcType="VARCHAR" property="handleFlg" />
+  </resultMap>
+</mapper>

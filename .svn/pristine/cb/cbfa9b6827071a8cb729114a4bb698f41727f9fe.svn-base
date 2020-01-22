@@ -1,0 +1,190 @@
+<css >
+    <div  th:include="fragment/fargment :: treeCss"></div>
+    <style>
+        .ztree li span.button.pIcon01_ico_open, .ztree li span.button.pIcon01_ico_close,
+        .ztree li span.button.pIcon01_ico_docu {
+            margin-right: 2px;
+            background: url('../static/plugin/ztree/img/diy/1_open.png') no-repeat scroll 0 0 transparent;
+            vertical-align: top;
+            *vertical-align: middle
+        }
+
+        .ztree li span.button.pIcon02_ico_open, .ztree li span.button.pIcon02_ico_close,
+        .ztree li span.button.pIcon02_ico_docu {
+            margin-right: 2px;
+            background: url('../static/plugin/ztree/img/diy/2.png') no-repeat scroll 0 0 transparent;
+            vertical-align: top;
+            *vertical-align: middle
+        }
+        span.square {
+            width: 10px;
+            height: 10px;
+            display: inline-block;
+            margin-left: 5px;
+            border: solid #ddd 1px;
+        }
+
+        .bg-green{
+            background-color: #1d9d74;
+        }
+        .bg-green-light{
+            background-color: #1dc5a3;
+        }
+        .bg-yellow{
+            background-color: #e1e10d;
+        }
+        .bg-orange{
+            background-color: orange;
+        }
+        .bg-red{
+            background-color: #cc0000;
+        }
+
+        .color-green{
+            color: #1d9d74;
+        }
+        .color-green-light{
+            color: #1dc5a3;
+        }
+        .color-yellow{
+            color: #e1e10d;
+        }
+        .color-orange{
+            color: orange;
+        }
+        .color-red{
+            color: #cc0000;
+        }
+        .bolid{
+            font-weight: 600;
+        }
+        .container{
+            width: 1150px !important;
+        }
+    </style>
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="row">
+    <div class="col-sm-5" style="margin-left:-20px">
+        <!-- 当前登录用户是否具有工会添加、删除权限  -->
+        <input type="hidden" id="addRelationByUser" th:value="${addRelationByUser}">
+        <!-- 当前登录人的orgId  -->
+        <input type="hidden" id="loginOrgId" th:value="${loginOrgId}">
+        <!-- 部门id；即当前登录人的orgId，该字典会随着点击ztree节点而改变  -->
+        <input type="hidden" id="deptId" th:value="${loginOrgId}">
+        <div class="panel panel-default">
+            <div class="panel-heading">组织机构</div>
+
+            <div class="row" style="width: 300px !important;margin: 5px 0px 0px 30px; display: none">
+                <div class="col-sm-9">
+                    <input type="text" id="dname" placeholder="请输入工会名称检索" style="width:225px; height:35px">
+                </div>
+                <div class="col-sm-3">
+                    <qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="getTree()"></qx:btn>
+                </div>
+            </div>
+            <div class="panel-body dept-tree">
+                <ul id="deptTree" class="ztree"></ul>
+            </div>
+        </div>
+        <div id="rMenu" style="position: absolute; visibility: hidden; z-index: 1;">
+            <ul class="menu">
+                <li id="m_add" onclick="addTreeNode(0);" class="line1">添加下级工会</li>
+                <li id="m_addNew" onclick="addTreeNode(1);" class="line1">添加本级部门</li>
+                <li id="m_edit" onclick="edit();" class="line1">修改信息</li>
+                <li id="m_remove" onclick="removeTreeNode();">删除</li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-sm-7">
+        <div class="row">
+            <div class="col-sm-10">
+                <input type="hidden" id="loginDeptId">
+                <div class="col-sm-5">
+                   <search:input label="工会名称" id="unionName" name="unionName" value=""
+							                            placeholder="工会名称" type="text"></search:input>
+                </div>
+                <div class="col-sm-5">
+                    <search:input label="工会编号" id="deptNo" name="deptNo" value=""
+							                            placeholder="工会编号" type="text"></search:input>
+                </div>
+            </div>
+            <div class="col-sm-2">
+                 <qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission=""
+                          onclick="OptOrganization.search()"></qx:btn>
+            </div>
+        </div>
+
+        <div class="row" style="padding-top: 10px">
+            <!--<label class="col-sm-2">工会类型</label>-->
+            <div class="col-sm-10">
+                <span class="square bg-green"></span>独立基层工会
+                <span class="square bg-green-light"></span>联合基层工会
+                <span class="square bg-yellow"></span>总工会
+                <span class="square bg-orange"></span>产业（系统）工会
+                <span class="square bg-red"></span>工会联合会
+            </div>
+
+        </div>
+        <div class="hidden-xs" id="OrganizationTableToolbar" role="group">
+            <qx:btn class="btn btn-primary" fa="fa fa-edit" label="编辑" permission="pldrzz" onclick="OptOrganization.edit()"></qx:btn>
+			<qx:btn class="btn btn-primary" fa="fa fa-plus" label="批量导入" permission="pldrzz" onclick="OptOrganization.openUpload()"></qx:btn>
+			<qx:btn class="btn btn-primary" fa="fa fa-download" label="导出" permission="exportorganize" onclick="OptOrganization.exportList()"></qx:btn>
+        </div>
+
+        <table id="OrganizationTable" data-mobile-responsive="true" data-click-to-select="true">
+
+        </table>
+    </div>
+</div>
+
+</body>
+
+<js>
+    <div th:include="fragment/fargment :: treeJs"></div>
+     <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+     <script th:src="@{/static/modular/dept/organization/organization_ztree.js}"></script>
+     <script th:src="@{/static/modular/dept/organization/organization.js}"></script>
+     <script th:src="@{/static/js/echarts.min.js}"></script>
+     <script th:src="@{/static/modular/dept/organization/organization_echarts.js}"></script>
+</js>
+<script>
+    function getTree(){
+        if($("#dname").val()==""){
+            initZtreeByJsonData();
+        }else{
+        $.ajax({
+            type: 'POST',
+            dataType: "json",
+            data:{"dname":$("#dname").val()},
+            url: App.ctxPath + "dept/getTreeName",//请求的action路径
+            error: function () {//请求失败处理函数
+                alert('请求失败');
+            },
+            success: function (data) { //请求成功后处理函数。
+                var t = $("#deptTree");
+                $.fn.zTree.init(t, setting, data);
+                zTree = $.fn.zTree.getZTreeObj("deptTree");
+                rMenu = $("#rMenu");
+
+                //判断id是否存在；存在则表示当前是部门或工会添加页面执行的刷新操作
+                if (dept_id) {
+                    $("#deptId").val(dept_id);
+                    OptOrganization.search();
+                } else {
+                    if (!initFlag) {
+                        initTableFun();
+                        initFlag = true;
+                    } else {
+                        OptOrganization.search();
+                    }
+                }
+            },
+            complete: function () {
+                App.closeLoading();
+            }
+        });
+        }
+    }
+</script>

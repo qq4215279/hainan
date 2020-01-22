@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.system.dao.MailDao">
+	<resultMap type="HashMap" id="selResultMap">
+       <result property="id" column="id" /> 
+       <result property="mail_id" column="mail_id" /> 
+       <result property="subject" column="subject" /> 
+       <result property="context" column="context" /> 
+       <result property="send_id" column="send_id" /> 
+       <result property="rec_id" column="rec_id" /> 
+       <result property="creat_time" column="creat_time" />
+       <result property="is_delect" column="is_delect" />
+       <result property="is_draft" column="is_draft" />
+       <result property="mId" column="mId" />
+       <result property="status" column="status" />
+       <result property="sendName" column="sendName" />
+   </resultMap>
+
+	<resultMap type="HashMap" id="ResultMap">
+       <result property="id" column="id" /> 
+       <result property="text" column="text" /> 
+   </resultMap>
+	<!-- 对应searchForInbox方法，收件箱条件查询（邮件内容，开始时间，结束时间） -->
+	<select id="searchForInbox" resultMap="selResultMap">
+				SELECT 
+					d.*,
+					m.status,
+					u.name || '(' || u.account || ')' AS sendName
+				FROM sys_mail_detail d
+				INNER JOIN sys_mail m
+					ON d.mail_id=m.mail_id
+					AND (m.status='0' or m.status='1')
+					AND m.accept_id=#{userId}
+				LEFT JOIN sys_user u
+					ON u.uid=d.send_id
+				WHERE 1 = 1
+		<if test="content != null and content != ''">
+			AND (d.subject like CONCAT('%',#{content},'%')
+					OR u.name like CONCAT('%',#{content},'%')
+					OR d.context like CONCAT('%',#{content},'%'))
+		</if>
+		<if test="startDate != null and startDate != ''">
+			AND d.creat_time &gt;=#{startDate}
+		</if>
+		<if test="endDate != null and endDate != ''">
+			AND d.creat_time &lt;=#{endDate}
+		</if>
+		order by d.creat_time DESC
+	</select>
+	
+	<!-- 对应searchForSendbox方法，已发送条件查询（邮件内容，开始时间，结束时间） -->
+	<select id="searchForSendbox" resultMap="selResultMap">
+			SELECT
+				d.*
+			FROM
+				sys_mail_detail d
+			LEFT JOIN sys_user u ON u.uid = d.send_id
+		WHERE 1 = 1
+		<if test="content != null and content != ''">
+			AND (d.subject like CONCAT('%',#{content},'%')
+					OR d.rec_id like CONCAT('%',#{content},'%')
+					OR d.context like CONCAT('%',#{content},'%'))
+		</if>
+		<if test="startDate != null and startDate != ''">
+			AND d.creat_time &gt;=#{startDate}
+		</if>
+		<if test="endDate != null and endDate != ''">
+			AND d.creat_time &lt;=#{endDate}
+		</if>
+		AND d.send_id=#{userId}
+		AND d.is_delect=0
+		AND d.is_draft=0
+			ORDER BY
+				d.creat_time DESC
+	</select>
+	
+	<!-- 对应searchForDeletebox方法，已删除条件查询（邮件内容，开始时间，结束时间） -->
+	<select id="searchForDeletebox" resultMap="selResultMap">
+				SELECT 
+					d.*,
+					u.name || '(' || u.account || ')' AS sendName
+				FROM sys_mail_detail d
+				INNER JOIN sys_mail m
+					ON d.mail_id=m.mail_id
+					AND m.status='2'
+					AND m.accept_id=#{userId}
+				LEFT JOIN sys_user u
+					ON u.uid=d.send_id
+				WHERE 1 = 1
+		<if test="content != null and content != ''">
+			AND (d.subject like CONCAT('%',#{content},'%')
+					OR u.name like CONCAT('%',#{content},'%')
+					OR d.context like CONCAT('%',#{content},'%'))
+		</if>
+		<if test="startDate != null and startDate != ''">
+			AND d.creat_time &gt;=#{startDate}
+		</if>
+		<if test="endDate != null and endDate != ''">
+			AND d.creat_time &lt;=#{endDate}
+		</if>
+		order by d.creat_time DESC
+	</select>
+	
+	<!-- 对应searchForDraftbox方法，草稿箱条件查询（邮件内容，开始时间，结束时间） -->
+	<select id="searchForDraftbox" resultMap="selResultMap">
+			SELECT
+				d.*,
+				u.name AS sendName
+			FROM
+				sys_mail_detail d
+			LEFT JOIN sys_user u ON u.uid = d.send_id
+		WHERE 1 = 1
+		<if test="content != null and content != ''">
+			AND (d.subject like CONCAT('%',#{content},'%')
+					OR d.rec_id like CONCAT('%',#{content},'%')
+					OR d.context like CONCAT('%',#{content},'%'))
+		</if>
+		<if test="startDate != null and startDate != ''">
+			AND d.creat_time &gt;=#{startDate}
+		</if>
+		<if test="endDate != null and endDate != ''">
+			AND d.creat_time &lt;=#{endDate}
+		</if>
+		AND d.send_id=#{userId}
+		AND d.is_draft=1
+			ORDER BY
+				d.creat_time DESC
+	</select>
+	
+	<select id="getDetail" resultType="com.gobestsoft.common.modular.system.model.Mail">
+		SELECT
+			d.*,
+			u.name || '(' || u.account || ')' AS sendName
+			<if test="userId != null and userId != ''">
+			,m.status
+			</if>
+		FROM
+			sys_mail_detail d
+		LEFT JOIN sys_user u ON u.uid = d.send_id
+		<if test="userId != null and userId != ''">
+		INNER JOIN sys_mail m
+			ON d.mail_id=m.mail_id
+			AND m.accept_id=#{userId}
+			</if>
+		WHERE d.mail_id =#{mailId}
+	</select>
+	
+	<select id="getDetailDraftbox" resultType="com.gobestsoft.common.modular.system.model.Mail">
+		SELECT
+			d.*
+		FROM
+			sys_mail_detail d
+		WHERE d.mail_id =#{mailId}
+	</select>
+	
+	<select id="userTree" resultType="com.gobestsoft.core.node.UserNode">
+		select concat(b.uid,'') as id,concat(b.deptid,'') as pid ,b.name as name,
+		b.account as account,
+		(case when (b.uid = '' OR b.uid IS NULL) then 'false' else 'false' end) as isopen,
+		(case when (b.uid = '' OR b.uid IS NULL) then 'pIcon03'else 'pIcon03' end ) as iconSkin,
+		(case when (b.uid = '' OR b.uid IS NULL) then '1'else '1' end ) as isUser
+		from sys_dept a
+		right join sys_user b on a.id=b.deptid where b.deptid is not null
+		union 
+		select concat(c.id,'') as id,concat(c.pid,'') as pid ,c.simplename as name,
+		'' as account,
+		(case when (concat(c.pid,'') = '0' ) then 'true' else 'false' end) as isopen,
+		(case when (dept_Type = 0 OR c.pid IS NULL) then 'pIcon01'else 'pIcon02' end ) as iconSkin,
+		(case when (dept_Type = 0 OR c.pid IS NULL) then '0'else '0' end ) as isUser
+		from  sys_dept c
+	</select>
+	
+	<select id="getUser" resultMap="selResultMap">
+		SELECT
+			u.uid as id,
+			concat(u.name,'(',u.account,')') AS text
+		FROM
+			sys_user u
+	</select>
+	
+	<select id="getUserName" resultType="String">
+		SELECT
+			u.name || '(' || u.account || ')' AS recname
+		FROM
+			sys_user u
+		WHERE 
+			u.uid=#{uid}
+	</select>
+	
+	<!-- 对应addMail方法，新增一条工会信息  -->
+	<insert id="addMail" parameterType="com.gobestsoft.common.modular.system.model.Mail" >
+		INSERT INTO sys_mail (
+		mail_id,
+		accept_id,
+		status
+		)
+		VALUES(
+		#{mailId},
+		#{acceptId},
+		#{status}
+		)
+	</insert>
+	
+	<!-- 对应addMailDetail方法，新增一条工会信息  -->
+	<insert id="addMailDetail" parameterType="com.gobestsoft.common.modular.system.model.Mail" >
+		INSERT INTO sys_mail_detail (
+		mail_id,
+		subject,
+		context,
+		send_id,
+		rec_id,
+		creat_time,
+		is_delect,
+		is_draft
+		)
+		VALUES(
+		#{mailId},
+		#{subject},
+		#{context},
+		#{sendId},
+		#{recId},
+		#{creatTime},
+		#{isDelect},
+		#{isDraft}
+		)
+	</insert>
+	
+	<!-- 对应editMailDetail方法，修改工会信息  -->
+	<update id="editMailDetail" parameterType="com.gobestsoft.common.modular.system.model.Mail" >
+		UPDATE sys_mail_detail
+		SET  subject=#{subject},
+				context=#{context},
+				creat_time=#{creatTime}
+		WHERE mail_id=#{mailId}		
+	</update>
+	
+	<!-- 对应editMail方法，修改邮件状态  -->
+	<update id="editMail" >
+		UPDATE sys_mail
+		SET  status=#{status}
+		WHERE mail_id=#{mailId}
+		AND accept_id=#{acceptId}
+	</update>
+	
+	<!-- 对应editMailDetail方法，修改邮件detail状态  -->
+	<update id="editMailDetail" >
+		UPDATE sys_mail_detail
+		SET  is_delect=#{isDelect}
+		WHERE mail_id=#{mailId}
+	</update>
+	
+	<!-- 对应editMailDetail方法，修改邮件detail状态  -->
+	<update id="updateMailDetail" parameterType="com.gobestsoft.common.modular.system.model.Mail" >
+		UPDATE sys_mail_detail
+		SET  rec_id=#{recId},
+				creat_time=#{creatTime},
+				is_draft=#{isDraft}
+		WHERE mail_id=#{mailId}
+	</update>
+	
+	<delete id="deleteMailDetail" >
+		DELETE FROM sys_mail_detail
+		WHERE mail_id=#{mailId}
+	</delete>
+	
+</mapper>

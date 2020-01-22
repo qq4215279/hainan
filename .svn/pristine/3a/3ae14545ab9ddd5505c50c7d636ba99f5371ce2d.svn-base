@@ -1,0 +1,444 @@
+<css >
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12" search>
+                        <div class="row">
+            				<input type="hidden" id="deptId" th:value="${deptId}">
+                            <div class="col-sm-3">
+                            <search:input id="name" label="姓名" name="name" value=""
+                                          type="text"></search:input>
+                        </div>
+                            <div class="col-sm-3">
+                                <search:input id="memberCard" label="会员卡号" name="memberCard" value=""
+                                              type="text"></search:input>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:select id="memberRange" label="会员范围" name="memberRange"
+                                               code="lib_member_range" value="01"></search:select>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:select id="query_sex" label="性别" name="query_sex"
+                                               code="lib_sex" ></search:select>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:select id="query_ethnicGroup" label="民族" name="query_ethnicGroup" value=""
+                                             code="lib_ethnic_group"></search:select>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:select id="query_workSituation" label="就业状况" name="query_workSituation"
+                                               code="lib_work_situation" ></search:select>
+                            </div>
+                            <!--<div class="col-sm-3">-->
+                                <!--<search:select id="query_certificateType" label="有效证件类型" name="query_certificateType" value=""-->
+                                              <!--code="lib_identification_type"></search:select>-->
+                            <!--</div>-->
+                            <div class="col-sm-3">
+                                <search:input id="query_certificateNum" label="证件号码" name="query_certificateNum" value=""
+                                              type="text"></search:input>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:select id="query_education" label="学历" name="query_education"
+                                               code="lib_education_code" value=""></search:select>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:select id="query_technologyLevel" label="技能等级" name="query_technologyLevel"
+                                               code="lib_technology" value=""></search:select>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:input id="query_mobile" label="手机号" name="query_mobile"
+                                               type="text" value=""></search:input>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:select id="query_household" label="户籍类型" name="query_household"
+                                               code="lib_household" value=""></search:select>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:input id="query_domicile" label="户籍所在地" name="query_domicile"
+                                              type="text" value=""></search:input>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:select id="query_memberChange" label="会籍变化类型" name="query_memberChange"
+                                               code="lib_member_change" value=""></search:select>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:datetime id="query_memberChangeDate_start" label="会籍变化日期" name="query_memberChangeDate_start"
+                                                 format="yyyy-MM-dd" value=""></search:datetime>
+                            </div>
+                            <div class="col-sm-3" style="margin-left: -30px">
+                                <search:datetime id="query_memberChangeDate_end" label="至" name="query_memberChangeDate_end"
+                                                 format="yyyy-MM-dd" value=""></search:datetime>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:select id="query_politicalStatus" label="政治面貌" name="query_politicalStatus"
+                                                 code="lib_political_status" value=""></search:select>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:input id="query_workUnit" label="工作单位" name="query_workUnit"
+                                              type="text" value=""></search:input>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:input id="query_nativePlace" label="籍贯" name="query_nativePlace"
+                                              type="text" value=""></search:input>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:select id="query_farmer_flag" label="是否是农民工" name="query_farmer_flag"
+                                              code="lib_is_not" value=""></search:select>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:select id="query_certified_member" label="会员是否认证" name="query_certified_member"
+                                               code="lib_is_not" value=""></search:select>
+                            </div>
+                            <div class="row text-center">
+                                <qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="OptDeptMember.search()"></qx:btn>
+                                <qx:btn  class="btn btn-primary" fa="fa fa-refresh" label="清空搜索" permission="" onclick="OptDeptMember.refresh()"></qx:btn>
+                            </div>
+                        </div>
+                    </div>
+                    <div  id="OptDeptMemberTableToolbar" role="group">
+                        <qx:btn class="btn btn-primary" fa="fa fa-plus" label="新增"  onclick="OptDeptMember.add()"></qx:btn>
+<!--                        <qx:btn class="btn btn-primary" fa="fa fa-edit" label="编辑"  onclick="OptDeptMember.edit()"></qx:btn>-->
+                        <qx:btn class="btn btn-primary" fa="fa fa-trash" label="删除"  onclick="OptDeptMember.del()"></qx:btn>
+						<qx:btn class="btn btn-primary" fa="fa fa-plus" label="批量导入" onclick="OptDeptMember.openUpload()"></qx:btn>
+                        <qx:btn class="btn btn-primary" fa="fa fa-remove" label="批量删除" onclick="OptDeptMember.deletes()"></qx:btn>
+						<qx:btn class="btn btn-primary" fa="fa fa-download" label="导出" permission="exportmember" onclick="OptDeptMember.exportList()"></qx:btn>
+                        <qx:btn class="btn btn-primary" fa="fa fa-plus" label="转会" onclick="OptDeptMember.memTurnout()"></qx:btn>
+                    </div>
+                    <table id="OptDeptMemberTable" data-mobile-responsive="true" data-click-to-select="true">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+    /**
+     * 初始化表格对象
+     */
+    var OptDeptMember = {
+        id: "OptDeptMemberTable",	//表格id
+        seItem: null,		//选中的条目
+        table: null,
+        layerIndex: -1
+    };
+
+    /**
+     * 初始化表格的列
+     *
+     */
+     OptDeptMember.initColumn = function () {
+        return [
+            {field: 'selectItem', checkbox: true},
+            {title: '姓名', field: 'name', align: 'center', valign: 'middle'},
+            {title: '所属工会名称', field: 'unionName', visible: true, align: 'center', valign: 'middle'},
+            {title: '当前工作单位', field: 'workUnit', visible: true, align: 'center', valign: 'middle'},
+            {title: '会员卡号', field: 'stationCard', align: 'center', valign: 'middle'},
+            {title: '性别', field: 'sexName', align: 'center', valign: 'middle'},
+            {title: '民族', field: 'nation', align: 'center', valign: 'middle'},
+            {title: '就业情况', field: 'workSituation', align: 'center', valign: 'middle'},
+            {title: '证件类型', field: 'certificateType', align: 'center', valign: 'middle'},
+            {title: '证件号码', field: 'certificateNum', align: 'center', valign: 'middle'},
+            {title: '学历', field: 'education', align: 'center', valign: 'middle'},
+            {title: '技术等级', field: 'technologyLevel', align: 'center', valign: 'middle'},
+            {title: '联系电话', field: 'mobile', align: 'center', valign: 'middle'},
+            {title: '户籍类型', field: 'household', align: 'center', valign: 'middle'},
+            {title: '户籍所在地', field: 'domicile', align: 'center', valign: 'middle'},
+            {title: '会籍变化类型', field: 'memberChange', align: 'center', valign: 'middle'},
+            {title: '会籍变化日期', field: 'memberChangeDate', align: 'center', valign: 'middle'},
+            {title: '政治面貌', field: 'politicalStatus', align: 'center', valign: 'middle'},
+            {title: '籍贯', field: 'nativePlace', align: 'center', valign: 'middle'},
+            {title: '是否农民工', field: 'isFarmer', align: 'center', valign: 'middle',formatter:function (value,row) {
+                    if(parseInt(value)==1){
+                        return "是";
+                    }
+                    return "否";
+                }},
+            {title: '会员是否认证', field: 'isBind', align: 'center', valign: 'middle',formatter: function (value,row) {
+                        if(parseInt(value)==1){
+                            return "是";
+                        }
+                        return "否";
+                }},
+            {title: '创建人', field: 'createUser', align: 'center', valign: 'middle'},
+            {title: '创建时间', field: 'createTime', align: 'center', valign: 'middle',formatter: initTimeField},
+            {title: '操作', align: 'center', valign: 'middle',
+                formatter: function (value, row, index) {
+                    return '<a href="javascript:OptDeptMember.detail(' + row.id + ')">查看详情</a>';
+                }
+            }
+        ];
+    }
+
+    /**
+     * 初始化列表的时间类型的字段
+     */
+     function initTimeField(value, row, index){
+     	if(row.createTime){
+     		return returnTimeStr(row.createTime);
+     	}
+     }
+     /**
+      * 返回组装好的日期字符串
+      */
+     function returnTimeStr(time) {
+    	 return time.substring(0,4)+"-"+time.substring(4,6)+"-"+time.substring(6,8);
+     }
+
+    /**
+     * 点击新增
+     */
+     OptDeptMember.add = function () {
+        var index = layer.open({
+            type: 2,
+            title: '新增会员信息',
+            area: ['100%', '100%'], //宽高
+            fix: false, //不固定
+            maxmin: true,
+            content: App.ctxPath + 'dept/member/add?deptId=' +$("#deptId").val()
+        });
+        this.layerIndex = index;
+    };
+    
+    /**
+     * 点击编辑
+     */
+     OptDeptMember.edit = function () {
+        if (this.check()) {
+            var selected = $('#' + this.id).bootstrapTable('getSelections');
+            if(selected.length > 1){
+                return App.info("请选择一条记录进行编辑！");
+            }
+            var index = layer.open({
+                type: 2,
+                title: '修改会员信息',
+                area: ['100%', '100%'], //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: App.ctxPath + 'dept/member/edit?id=' + OptDeptMember.seItem.id
+            });
+            this.layerIndex = index;
+        }
+    };
+
+    /**
+     * 检查是否选中
+     */
+     OptDeptMember.check = function () {
+        var selected = $('#' + this.id).bootstrapTable('getSelections');
+        if (selected.length === 0) {
+            App.info("请先选中表格中的某一记录！");
+            return false;
+        } else {
+        	OptDeptMember.seItem = selected[0];
+            return true;
+        }
+    };
+    /**
+     * 点击删除
+     */
+    OptDeptMember.del = function () {
+        if (this.check()) {
+            var id = OptDeptMember.seItem.id;
+            var fun = function () {
+                var ajax = new $ax(App.ctxPath + "dept/member/remove?id=" + id, function (data) {
+                    if (data.code === 200) {
+                        App.success("成功删除！");
+                    } else {
+                        App.error(data.message);
+                    }
+                }, function (data) {
+                    App.error("删除失败!");
+                });
+                ajax.start();
+                OptDeptMember.table.refresh({query: OptDeptMember.formParams()});
+            }
+           App.confirm("确定要删除吗？", fun);
+        }
+    };
+
+    /**
+     * 批量删除
+     */
+    OptDeptMember.deletes=function(){
+        if (this.check()) {
+            var selected = $('#' + this.id).bootstrapTable('getSelections');
+            var ids ="";
+            for (i=0;i<selected.length;i++){
+                ids=ids+","+selected[i].id;
+            }
+            ids = ids.substring(1);
+            var operationDelete = function(){
+                var ajax = new $ax(App.ctxPath + "dept/member/deletes", function (data) {
+                    if(data.code === 200){
+                        App.success("成功删除！");
+                    }else{
+                        App.error(data.message);
+                    }
+                }, function (data) {
+                    App.error("删除失败!" + data.responseJSON.message + "!");
+                });
+                ajax.set("ids",ids);
+                ajax.start();
+                OptDeptMember.table.refresh({query: OptDeptMember.formParams()});
+            };
+            App.confirm("是否刪除所选会员?", operationDelete);
+        }
+    };
+    
+    /**
+     *打开批量导入添加的窗口
+     */
+     OptDeptMember.openUpload = function () {
+    	var index = layer.open({
+            type: 2,
+            title: '批量导入工会信息',
+            area: ['100%', '100%'], //宽高
+            fix: true, //不固定
+            maxmin: true,
+            content: App.ctxPath + 'dept/member/member_upload?deptId='+$("#deptId").val(),
+            end:function () {
+                OptDeptMember.search();
+            }
+        });
+        layer.full(index); 
+        this.layerIndex = index;
+    };
+    
+    /**
+     * 点击查看会员操作
+     */
+     OptDeptMember.detail = function (id) {
+        var index = layer.open({
+            type: 2,
+            title: '查看详情',
+            area: ['100%', '100%'], //宽高
+            fix: false, //不固定
+            maxmin: true,
+            content: App.ctxPath + 'dept/member/detail?id='+id
+        });
+        this.layerIndex = index;
+    }
+
+    /**
+     * 转会操作
+     */
+    OptDeptMember.memTurnout = function () {
+        if(this.check()){
+            var selected = $('#' + this.id).bootstrapTable('getSelections');
+            if(selected.length > 1){
+                App.info("请选择一条记录进行会员转会操作！");
+                return false;
+            }
+            var index = layer.open({
+                type: 2,
+                title: '会员转出',
+                area: ['100%', '100%'], //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: App.ctxPath + 'dept/member/memreout?id=' + selected[0].id
+            });
+            this.layerIndex = index;
+        }
+    }
+    
+    /**
+     * 查询表单提交参数对象
+     *
+     */
+     OptDeptMember.formParams = function () {
+        var queryData = {};
+        queryData['name'] = $("#name").val();
+        queryData['memberCard'] = $("#memberCard").val();
+        queryData['deptId'] = $("#deptId").val();
+        queryData['memberRange'] = $("#memberRange").val();
+        queryData['query_sex'] = $("#query_sex").val();
+        queryData['query_ethnicGroup'] = $("#query_ethnicGroup").val();
+        queryData['query_workSituation'] = $("#query_workSituation").val();
+        // queryData['query_certificateType'] = $("#query_certificateType").val();
+        queryData['query_certificateNum'] = $("#query_certificateNum").val();
+        queryData['query_education'] = $("#query_education").val();
+        queryData['query_technologyLevel'] = $("#query_technologyLevel").val();
+        queryData['query_mobile'] = $("#query_mobile").val();
+        queryData['query_household'] = $("#query_household").val();
+        queryData['query_domicile'] = $("#query_domicile").val();
+        queryData['query_memberChange'] = $("#query_memberChange").val();
+        queryData['query_memberChangeDate_start'] = $("#query_memberChangeDate_start").val();
+        queryData['query_memberChangeDate_end'] = $("#query_memberChangeDate_end").val();
+        queryData['query_politicalStatus'] = $("#query_politicalStatus").val();
+        queryData['query_workUnit'] = $("#query_workUnit").val();
+        queryData['query_nativePlace'] = $("#query_nativePlace").val();
+        queryData['query_farmer_flag'] = $("#query_farmer_flag").val();
+        queryData['query_certified_member'] = $("#query_certified_member").val();
+        return queryData;
+    }
+
+    /**
+     * 查询列表
+     */
+     OptDeptMember.search = function () {
+    	 OptDeptMember.table.refresh({query: OptDeptMember.formParams()});
+    };
+     OptDeptMember.refresh = function () {
+         $('[search]').find('input:not[name="deptId"]').val('');
+         $('[search]').find('select').each(function(){
+             $(this).find('option').removeAttr('selected');
+             $(this).find('option[value=""]').attr('selected','selected');
+         });
+    	 OptDeptMember.table.refresh({query: OptDeptMember.formParams()});
+    };
+     OptDeptMember.exportList=function(){
+         var queryData=OptDeptMember.formParams();
+         var form=$("<form method='post' action='"+App.ctxPath+"/dept/member/exportList'></form>");
+         form.append("<input type='hidden' name='name' value='"+ queryData['name']+"'>");
+         form.append("<input type='hidden' name='memberCard' value='"+ queryData['memberCard'] +"'>");
+         form.append("<input type='hidden' name='deptId' value='"+ queryData['deptId']+"'>");
+         form.append("<input type='hidden' name='memberRange' value='"+ queryData['memberRange']+"'>");
+         appendForm(form,queryData,"query_sex");
+         appendForm(form,queryData,"query_ethnicGroup");
+         appendForm(form,queryData,"query_workSituation");
+         // appendForm(form,queryData,"query_certificateType");
+         appendForm(form,queryData,"query_certificateNum");
+         appendForm(form,queryData,"query_education");
+         appendForm(form,queryData,"query_technologyLevel");
+         appendForm(form,queryData,"query_mobile");
+         appendForm(form,queryData,"query_household");
+         appendForm(form,queryData,"query_domicile");
+         appendForm(form,queryData,"query_memberChange");
+         appendForm(form,queryData,"query_household");
+         appendForm(form,queryData,"query_memberChangeDate_start");
+         appendForm(form,queryData,"query_memberChangeDate_end");
+         appendForm(form,queryData,"query_politicalStatus");
+         appendForm(form,queryData,"query_workUnit");
+         appendForm(form,queryData,"query_nativePlace");
+         appendForm(form,queryData,"query_farmer_flag");
+         appendForm(form,queryData,"query_certified_member");
+         $('body').append(form);
+         form.submit();
+     }
+
+    /**
+     *
+     * @param name
+     */
+     function appendForm(form,queryData,name){
+        form.append("<input type='hidden' name='"+name+"' value='"+ queryData[name]+"'>");
+     }
+
+    $(function () {
+        var defaultColunms = OptDeptMember.initColumn();
+        var table = new BSTable(OptDeptMember.id, "dept/member/list", defaultColunms);
+        table.setPaginationType("server");
+        table.setQueryParams(OptDeptMember.formParams());
+        OptDeptMember.table = table.init();
+    });
+</script>
+</js>
+</body>

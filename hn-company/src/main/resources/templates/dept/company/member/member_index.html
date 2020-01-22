@@ -1,0 +1,31 @@
+<css >
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+	<div class="form-horizontal">
+		 <div class="row">
+               <div class="col-sm-3">
+               		<search:input id="name" label="姓名" name="name" value=""
+                                              type="text"></search:input>
+               </div>
+               <div class="col-sm-3">
+               		<search:input id="memberCard" label="会员卡号" name="memberCard" value=""
+                                              type="text"></search:input>
+               </div>
+               <div class="col-sm-1">
+                      <qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="OptDeptMember.search()"></qx:btn>
+               </div>
+         </div>
+		<div class="hidden-xs" id="OptDeptMemberTableToolbar" role="group">
+			 <qx:btn class="btn btn-primary" fa="fa fa-plus" label="新增" permission="" onclick="OptDeptMember.add()"></qx:btn>
+             <qx:btn class="btn btn-primary" fa="fa fa-edit" label="编辑" permission="" onclick="OptDeptMember.edit()"></qx:btn>
+             <qx:btn class="btn btn-primary" fa="fa fa-trash" label="删除" permission="" onclick="OptDeptMember.del()"></qx:btn>
+		</div>
+		<table id="OptDeptMemberTable" data-mobile-responsive="true" data-click-to-select="true">
+		</table>
+	</div>
+</body>
+<js>
+	<div th:include="fragment/fargment :: bootstrapTableJs"></div>
+	<script th:src="@{/static/modular/dept/company/member/member_index.js}"></script>
+</js>

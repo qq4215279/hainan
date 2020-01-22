@@ -1,0 +1,25 @@
+<div th:fragment="bottom">
+	<div th:if="${isExamine==1}" >
+			        <div class="row text-center">
+			         <label class="col-sm-2 col-sm-offset-2 control-label" ><span style="color:red;"> * </span>审核意见</label>
+			              <div class="col-sm-5">
+			                   <textarea name="comment" id="comment" class="form-control" maxlength="200"
+						               style="width: 90%;height: 80px;resize: none;"></textarea>
+			              </div> 
+			        </div>
+			         <div class="row text-center">
+			             <qx:btn class="btn btn-primary"  fa="fa fa-check" label="通过" permission=""
+							onclick="checkDlg.agree()"></qx:btn>
+					<qx:btn class="btn btn-danger" fa="fa fa-eraser" label="拒绝" permission=""
+							onclick="checkDlg.refuse()"></qx:btn>
+					<qx:btn class="btn btn-info" fa="fa fa-eraser" label="取消" permission=""
+							onclick="checkDlg.close()"></qx:btn>
+			        </div>
+	             
+	        </div>
+
+            <div th:if="${isExamine==0}" class="row text-center">
+                   <qx:btn class="btn btn-info" fa="fa fa-eraser" label="取消" permission=""
+							onclick="checkDlg.close()"></qx:btn>
+            </div>
+</div>

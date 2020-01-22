@@ -1,0 +1,184 @@
+<css >
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+	<div class="ibox">
+    <div class="col-sm-6" style="height: 743px;">
+        <form id="search">
+            <div class="row">
+                <div class="col-sm-6">
+                    <search:input id="account" label="手机/账号" name="account" value="" type="text"></search:input>
+                </div>
+                <div class="col-sm-6">
+                    <search:input id="nickname" label="昵称" name="nickname" value="" type="text"></search:input>
+                </div>
+            </div>
+        </form>
+        <div class="row text-center" style="margin-top: 15px;">
+        	<qx:btn  class="btn btn-primary" fa="fa fa-close" label="重置" permission="" onclick="AppUser.reset()"></qx:btn>
+        	<qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="AppUser.search()"></qx:btn>
+        </div>
+        <div  id="appUserTableToolbar" >
+        	<qx:btn  class="btn btn-primary" fa="fa fa-plus" label="添加" permission="" onclick="uSelect.add()"></qx:btn>
+        </div>
+        <table id="appUserTable" data-mobile-responsive="true" data-click-to-select="true">
+		</table>
+    </div>
+    <div id="appointArea"  class="col-sm-6" style="height: 743px;padding-top: 46px;">
+        <h3>已选择用户</h3>
+        <div  id="selectTableToolbar" >
+        	<qx:btn  class="btn btn-primary" fa="fa fa-minus" label="删除" permission="" onclick="uSelect.remove()"></qx:btn>
+        </div>
+        <table id="selectTable"  data-mobile-responsive="true" data-click-to-select="true">
+        </table>
+    </div>
+    <div class="row text-center form-row-top">
+        <qx:btn  class="btn btn-primary" fa="fa fa-reply" label="返回" permission="" onclick="back()"></qx:btn>
+        <qx:btn  class="btn btn-primary" fa="fa fa-send" label="完成" permission="" onclick="success()"></qx:btn>
+    </div>
+</div>
+</body>
+<js>
+<script th:src="@{/static/js/select-object.js}"></script>
+<div th:include="fragment/fargment :: bootstrapTableJs"></div>
+<script>
+
+    var uSelect=new Selection(appUserTableSelected,selectTableSelected,selectTableRefresh);
+    if(parent.MsgAddDlg.uSelect){
+        uSelect.selectOptions=parent.MsgAddDlg.uSelect.selectOptions;
+    }
+
+    drawTable();
+    /**
+     * 角色管理的单例
+     */
+    var AppUser = {
+        tableId: "appUserTable",	//表格id
+        seItem: null,
+        table: null,
+        layerIndex: -1
+    };
+
+    /**
+     * 初始化表格的列
+     */
+    AppUser.initColumn = function () {
+    	return columns = [
+            {checkbox:true},
+            {title: 'id', field: 'id', visible: true, align: 'center', valign: 'middle',
+            	formatter: function (value, row, index) {
+	                return index+1;
+	            }},
+            {title: '昵称', field: 'nickname', align: 'center', valign: 'middle'},
+            {title: '手机号', field: 'account', align: 'center', valign: 'middle'},
+            {title: '性别', field: 'sex', align: 'center', valign: 'middle',
+            	formatter: function (value, row, index) {
+            		row.id=row.auId;
+                    if(value == 1){
+                    	value= "男";
+                    }else{
+                    	value = "女";
+                    }
+                    return value;
+                }}]
+//             }
+//         return columns;
+    };
+
+    /**
+     * 搜索用户
+     */
+    AppUser.search = function () {
+        var param = {};
+        param.account=$("#account").val();
+        param.nickname=$("#nickname").val();
+        AppUser.table.refresh({query: param});
+    }
+
+    AppUser.reset=function(){
+        $('#search')[0].reset();
+    }
+
+
+    $(function () {
+        var defaultColumn = AppUser.initColumn();
+        var table = new BSTable(AppUser.tableId, "/appUser/list", defaultColumn);
+        table.setPaginationType("server");
+//         table.setShowColumns(false);
+        AppUser.table = table.init();
+    });
+
+    /**已选择区域*/
+    /**
+     *绘制指定范围内用户
+     */
+    var selectTable;
+    function drawTable() {
+        selectTable=  $('#selectTable').bootstrapTable({
+            height:500,
+            toolbar: "#selectTableToolbar",
+            columns: [
+                {checkbox:true},
+                {title: 'id', field: 'id', visible: true, align: 'center', valign: 'middle',
+                	formatter: function (value, row, index) {
+    	                return index+1;
+    	            }},
+                {title: '昵称', field: 'nickname', align: 'center', valign: 'middle'},
+                {title: '手机号', field: 'account', align: 'center', valign: 'middle'},
+                {title: '性别', field: 'sex', align: 'center', valign: 'middle',
+                	formatter: function (value, row, index) {
+                        var a = row.sex;
+                        if(a == 1){
+                            a = "男";
+                        }else{
+                            a = "女";
+                        }
+                        return a;
+                    }}
+            ],
+            data: uSelect.selectOptions
+        });
+        //register_id
+
+    }
+
+    /**
+     * 获取用户表格选择项
+     */
+    function appUserTableSelected() {
+        return  AppUser.table.btInstance.bootstrapTable('getSelections');
+    }
+
+    /**
+     * 刷新表格
+     */
+    function selectTableRefresh() {
+        selectTable.bootstrapTable('load',uSelect.selectOptions);
+    }
+
+    /**
+     * 获取已添加选择项
+     */
+    function selectTableSelected() {
+        return  selectTable.bootstrapTable('getSelections');
+    }
+
+
+    /**
+     * 选择完成
+     */
+    function success(){
+    	parent.MsgAddDlg.selectUserCallBack(uSelect.selectOptions);
+        closePage();
+    }
+    function back(){
+        closePage();
+    }
+
+    function closePage() {
+        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+        parent.layer.close(index); //再执行关闭
+    }
+
+</script>
+</js>

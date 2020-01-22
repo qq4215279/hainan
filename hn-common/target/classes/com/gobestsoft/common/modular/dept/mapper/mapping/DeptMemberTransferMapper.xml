@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dept.mapper.DeptMemberTransferMapper">
+
+    <select id="selectCheckByCondition" resultType="map">
+        SELECT dmr.id, pi.name, pi.sex, dmr.create_time, dmr.status,dmr.out_status,dmr.member_id FROM dept_member_transfer dmr
+            LEFT JOIN dept_member dm on dmr.member_id = dm.id
+            LEFT JOIN person_info pi on pi.id = dm.person_id
+            LEFT JOIN sys_dept sd on sd.id = dmr.turn_out_dept_id
+        where sd.id = ${deptId}
+        <if test="name != null and name != ''">
+            AND pi.name like CONCAT('%',#{name},'%')
+        </if>
+        <if test="status != null and status != ''">
+            AND dmr.out_status = #{status}
+        </if>
+        ORDER BY dmr.create_time
+    </select>
+
+    <select id="selectSecondCheckByCondition" resultType="map">
+        SELECT
+            DISTINCT tranfer.id,
+            tranfer.name,
+            tranfer.sex,
+            tranfer.create_time,
+            tranfer.status,
+            tranfer.member_id,
+            tranfer.turn_out_dept_id
+        FROM
+            (
+                SELECT
+                    dmr.id,
+                    pi.name,
+                    pi.sex,
+                    dmr.create_time,
+                    dmr.status,
+                    dmr.member_id,
+                    dmr.turn_out_dept_id
+                FROM
+                    dept_member_transfer dmr
+                LEFT JOIN dept_member dm ON dmr.member_id = dm.id
+                LEFT JOIN person_info pi ON pi.id = dm.person_id
+                LEFT JOIN sys_dept sd ON sd.id = dmr.transfer_dept_id
+                where sd.id = ${deptId}
+            ) tranfer
+        INNER JOIN dept_member_transfer_log dmtl ON dmtl.apply_id = tranfer.id
+        AND dmtl.create_dept_id = tranfer.turn_out_dept_id
+        WHERE
+            dmtl.next_check_dept_id = ${deptId}
+            <if test="name != null and name != ''">
+                AND tranfer.name like CONCAT('%',#{name},'%')
+            </if>
+            <if test="status != null and status != ''">
+                AND tranfer.status = #{status}
+            </if>
+        order by dmtl.create_time
+    </select>
+
+</mapper>

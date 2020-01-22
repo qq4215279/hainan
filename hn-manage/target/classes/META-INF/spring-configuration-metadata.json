@@ -1,0 +1,50 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "com.gobestsoft.mamage.config.properties.ManageProperties",
+      "name": "manage",
+      "type": "com.gobestsoft.mamage.config.properties.ManageProperties"
+    }
+  ],
+  "properties": [
+    {
+      "sourceType": "com.gobestsoft.mamage.config.properties.ManageProperties",
+      "name": "manage.article-access",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.gobestsoft.mamage.config.properties.ManageProperties",
+      "name": "manage.file-upload-path",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.gobestsoft.mamage.config.properties.ManageProperties",
+      "defaultValue": false,
+      "name": "manage.have-create-path",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "sourceType": "com.gobestsoft.mamage.config.properties.ManageProperties",
+      "defaultValue": false,
+      "name": "manage.kaptcha-open",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "sourceType": "com.gobestsoft.mamage.config.properties.ManageProperties",
+      "name": "manage.password-salt",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.gobestsoft.mamage.config.properties.ManageProperties",
+      "name": "manage.ueditor-config-file",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.gobestsoft.mamage.config.properties.ManageProperties",
+      "defaultValue": false,
+      "name": "manage.write-log",
+      "type": "java.lang.Boolean"
+    }
+  ]
+}

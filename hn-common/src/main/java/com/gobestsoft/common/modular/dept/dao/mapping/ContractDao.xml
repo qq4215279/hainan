@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dept.dao.ContractDao">
+
+	<select id="selectByCondition" resultType="map">
+		SELECT T1.id,T1.simplename,T1.dept_no,T1.pic_name,T1.establish_date,T2.* FROM sys_dept AS T1
+		INNER JOIN mst_enterprise_ext AS T2 ON T1.id=T2.dept_id
+		<if test="deptNo != null and deptNo != ''">
+			AND T1.dept_no like CONCAT('%',#{deptNo},'%')
+		</if>
+		<if test="simpleName != null and simpleName != ''">
+			AND T1.simplename like CONCAT('%',#{simpleName},'%')
+		</if>
+		<if test="orgCode != null and orgCode != ''">
+			AND T2.org_code like CONCAT('%',#{orgCode},'%')
+		</if>
+			<choose>
+				<when test="hasGroupContract==1">
+				AND	contract_number &gt; contract_number
+				</when>
+				<when test="hasGroupContract==0">
+				AND	contract_number &lt;= contract_number
+				</when>
+				<otherwise>
+				</otherwise>
+			</choose>
+		ORDER BY T2.create_time DESC
+	</select>
+	<select id="selectGetById" resultType="map">
+		SELECT
+		d.dept_no AS deptNo,
+		c.contract_id AS contractId,
+		c.init_date AS initDate,
+		c.createtime AS createTime,
+		d.simplename AS simpleName,
+		d.p_dept_name AS pDeptName,
+		d.pic_name AS picName,
+		d.id AS id,
+		e.org_code AS orgCode
+		FROM
+		org_contract c
+		LEFT JOIN sys_dept d ON c.dept_id = d.id
+		LEFT JOIN org_dept_ext e ON d.id = e.dept_id
+		WHERE
+		c.contract_id = #{contractId}
+	</select>
+
+	<update id="updateByContractId">
+		update org_contract set createtime = #{createTime} where contract_id =
+		#{contractId}
+	</update>
+</mapper>

@@ -1,0 +1,145 @@
+<body>
+<div class="form-horizontal">
+    <div class="row">
+        <div class="col-sm-5">
+            <form:text id="dictName" label="字典名称" name="dictName" type="text" value="${dictionary.name}"></form:text>
+        </div>
+        <div class="col-sm-5">
+            <form:text id="groupCode" label="字典识别码" name="groupCode" type="text" value="${groupCode}"></form:text>
+        </div>
+        <div class="col-sm-2">
+            <qx:btn class="btn btn-primary" fa="fa fa-plus" label="增加" onclick="DictInfoDlg.addItem()"></qx:btn>
+        </div>
+    </div>
+    <div id="itemsArea">
+
+        <div th:each="item : ${dictionary.dict}" class="row dictItem" name="dictItem">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group"><label class="col-sm-2 control-label">值</label>
+                        <div class="col-sm-9">
+                            <input class="form-control" type="text" name="itemNum"  th:value="${item.code}">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group"><label class="col-sm-2 control-label">名称</label>
+                        <div class="col-sm-9">
+                            <input class="form-control" type="text" name="itemName" th:value="${item.name}">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <button class="btn btn-default remove-btn" type="button" ><i
+                                class="fa fa-remove"></i>删除
+                        </button>
+                        <button class="btn btn-primary add-third" type="button"><i
+                                class="fa fa-plus"></i>增加
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-offset-1 third">
+                    <div th:each="third : ${item.dict}" class="row thirdItem" name="thirdItem">
+                        <div class="col-sm-4">
+                            <div class="form-group"><label class="col-sm-2 control-label">值</label>
+                                <div class="col-sm-9">
+                                    <input class="form-control" type="text" name="itemNum"  th:value="${third.code}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group"><label class="col-sm-2 control-label">名称</label>
+                                <div class="col-sm-9">
+                                    <input class="form-control" type="text" name="itemName"  th:value="${third.name}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <button class="btn btn-default third-remove-btn" type="button" ><i
+                                        class="fa fa-remove"></i>删除
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="row text-center">
+        <qx:btn id="ensure" class="btn btn-primary" fa="fa fa-check" label="保存"
+                onclick="DictInfoDlg.addSubmit()"></qx:btn>
+        <qx:btn id="cancel" class="btn btn-default" fa="fa fa-eraser" label="取消" onclick="DictInfoDlg.close()"></qx:btn>
+    </div>
+</div>
+</body>
+
+<js>
+    <script type="text/template" id="itemTemplate">
+        <div class="row dictItem" name="dictItem">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group"><label class="col-sm-2 control-label">值</label>
+                        <div class="col-sm-9">
+                            <input class="form-control" type="text" name="itemNum">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group"><label class="col-sm-2 control-label">名称</label>
+                        <div class="col-sm-9">
+                            <input class="form-control" type="text" name="itemName">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <button class="btn btn-default remove-btn" type="button" ><i
+                                class="fa fa-remove"></i>删除
+                        </button>
+                        <button class="btn btn-primary add-third" type="button"><i
+                                class="fa fa-plus"></i>增加
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-offset-1 third">
+
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/template" id="thirdTemplate">
+        <div class="row thirdItem" name="thirdItem">
+            <div class="col-sm-4">
+                <div class="form-group"><label class="col-sm-2 control-label">值</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="text" name="itemNum">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group"><label class="col-sm-2 control-label">名称</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="text" name="itemName">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <button class="btn btn-default third-remove-btn" type="button" ><i
+                            class="fa fa-remove"></i>删除
+                    </button>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script th:src="@{/static/modular/system/dict/dict_info.js}"></script>
+</js>

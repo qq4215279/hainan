@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dept.mapper.DeptMemberTransferLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.dept.model.DeptMemberTransferLog">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="apply_id" jdbcType="INTEGER" property="applyId"/>
+        <result column="apply_status" jdbcType="VARCHAR" property="applyStatus"/>
+        <result column="record_flow_info" jdbcType="VARCHAR" property="recordFlowInfo"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="create_dept_id" jdbcType="INTEGER" property="createDeptId"/>
+        <result column="next_check_dept_id" jdbcType="INTEGER" property="nextCheckDeptId"/>
+        <result column="create_uid" jdbcType="VARCHAR" property="createUid"/>
+        <result column="create_time" jdbcType="VARCHAR" property="createTime"/>
+    </resultMap>
+
+    <sql id="columns">
+        dept_member_transfer_log.id,
+        dept_member_transfer_log.apply_id,
+        dept_member_transfer_log.apply_status,
+        dept_member_transfer_log.record_flow_info,
+        dept_member_transfer_log.content,
+        dept_member_transfer_log.create_dept_id,
+        dept_member_transfer_log.next_check_dept_id,
+        dept_member_transfer_log.create_uid,
+        dept_member_transfer_log.create_time
+    </sql>
+
+    <!-- 查看流程：根据申请id，查询转入审核日志 -->
+    <select id="selectMapByApplyId" parameterType="java.lang.Integer" resultType="map">
+        SELECT <include refid="columns"></include>,sys_dept.fullname FROM dept_member_transfer
+        left join sys_dept on dept_member_transfer.turn_out_dept_id = sys_dept.id
+        left join dept_member_transfer_log on dept_member_transfer.id= dept_member_transfer_log.apply_id
+        where dept_member_transfer.id= #{id}
+        ORDER BY dept_member_transfer_log.create_time;
+    </select>
+
+</mapper>

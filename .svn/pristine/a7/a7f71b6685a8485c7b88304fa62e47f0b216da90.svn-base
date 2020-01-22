@@ -1,0 +1,120 @@
+<body xmlns:th="http://www.thymeleaf.org">
+<css>
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+    <style type="text/css">
+        .print{
+            float:left;
+            width:75px;
+            height:30px;
+            border-radius: 5px;
+            background: #1E90FF;
+            color: white !important;
+            font-size: 16px;
+            cursor: pointer;
+            text-align:center;
+            line-height:30px
+        }
+
+        .print:hover{
+            color:red
+        }
+
+        .pull-left.pagination-detail{
+            display: none !important;
+        }
+    </style>
+<div class="row">
+    <div class="col-sm-12"></div>
+    <div class="content">
+        <div class="">
+
+        </div>
+        <div class="container-fluid">
+            <div class="row" >
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="header">
+                            <h4 class="title" style="font-weight: 600">海南省总工会下一级工会会员统计表<span style="color: red">（总会员人数、已认证会员人数、农业户口人数）</span></h4>
+                            <p class="category"></p>
+                        </div>
+                        <div class="content">
+                            <table id="overallpepTable" data-mobile-responsive="true" data-click-to-select="true">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row" style="margin-top: 15px">
+    <span class="title print" id="export" style="margin-left:15px;margin-bottom: 10px" onclick="OverAllPep.onClickExport()">导出</span>
+</div>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script th:src="@{/static/assets/js/chartist.min.js}"></script>
+    <script th:src="@{/static/assets/js/bootstrap-notify.js}"></script>
+    <script th:src="@{/static/assets/js/paper-dashboard.js}"></script>
+    <script th:src="@{/static/js/jquery.jqprint-0.3.js}"></script>
+    <script th:src="@{/static/js/layui.all.js}"></script>
+    <script type="text/javascript">
+
+        var OverAllPep = {
+            tableId: "overallpepTable"
+        };
+
+        /**
+         * 初始化表格
+         */
+        OverAllPep.initColumn = function () {
+            return [
+                {title: '工会名称', field: 'unionName', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {title: '总会员人数', field: 'allMemCnt', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {title: '已认证会员人数', field: 'allAuthMemCnt', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {title: '农业户口人数', field: 'allFarmerCnt', align: 'center', valign: 'middle'}
+            ]
+        };
+
+        $(function () {
+            var defaultColunms = OverAllPep.initColumn();
+            var table = new BSTable(OverAllPep.tableId, "overallpep/getOverAllPep", defaultColunms);
+            table.setPaginationType("server");
+            OverAllPep.table = table.init();
+            $(".bootstrap-table .fixed-table-pagination").css("display", "none");
+        });
+
+
+        /**
+         * 数据导出
+         * @returns
+         */
+        OverAllPep.onClickExport = function () {
+                var excelJson = new Array();
+                $("#overallpepTable tbody tr").each(function () {
+                    var arr = new Array();
+                    $(this).children("td").each(function () {
+                        var aa = $(this).text();
+                        arr.push(aa);
+                    });
+                    excelJson.push(arr);
+
+                });
+
+                var excelJsonTxt = JSON.stringify(excelJson);
+
+                App.loadingAjax({
+                    url: App.ctxPath + "overallpep/downExportExcel?excelJsonTxt=" + encodeURIComponent(excelJsonTxt),
+                    success: function (result) {
+                        if(result.code == 200){
+                            window.location.href = result.data;
+                        }
+                    }
+                })
+        }
+
+    </script>
+    <script th:src="@{http://www.jq22.com/jquery/jquery-migrate-1.2.1.min.js}"></script>
+</js>
+
+</body>

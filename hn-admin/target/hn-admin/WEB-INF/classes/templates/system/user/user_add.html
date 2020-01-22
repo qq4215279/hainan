@@ -1,0 +1,52 @@
+<css>
+    <div  th:include="fragment/fargment :: treeCss"></div>
+    <link th:href="@{/static/plugin/webuploader/webuploader.css}" rel="stylesheet">
+</css>
+<body>
+<div class="ibox float-e-margins">
+    <div class="form-horizontal row" id="userInfoForm">
+        <input type="hidden" id="id" value="">
+        <input type="hidden" id="tempType" value="add">
+        <input type="hidden" id="deptid" th:value="${deptId}">
+        <input type="hidden" id="menuIds"/>
+        <div class="row">
+            <div class="col-sm-8 col-sm-offset-1">
+                <form:text id="account" label="账户" name="account" must="true" value=""></form:text>
+                <form:select id="sex" label="性别" name="sex" code="lib_sex"></form:select>
+                <form:text id="email" label="邮箱" name="email"></form:text>
+                <form:text id="name" label="姓名" name="name" must="true"></form:text>
+                <form:text id="phone" label="电话" name="phone"></form:text>
+                <form:text id="duty" label="职务" name="duty"></form:text>
+                <form:text id="dutyOfWork" label="工作职责" name="dutyOfWork"></form:text>
+                <form:check id="userType" label="基层平台管理员" name="userType"></form:check>
+                <form:select id="isResponsible" label="是否为部门负责人" name="isResponsible" code="lib_is_not"></form:select>
+                <div id="driverInfoContent">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">角色</label>
+                        <div class="col-sm-9">
+                            <div id="roleContent" class="menuContent">
+                                <ul id="roleTreeDemo" class="ztree tree-box"
+                                    style="width: 249px !important;"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row text-center">
+            <qx:btn id="ensure" class="btn btn-primary" fa="fa fa-check" onclick="UserInfoDlg.addSubmit()"
+                    label="确认"></qx:btn>
+            <qx:btn id="ensure" class="btn btn-default" fa="fa fa-eraser" onclick="UserInfoDlg.close()"
+                    label="取消"></qx:btn>
+        </div>
+    </div>
+</div>
+</body>
+
+<js>
+    <script th:src="@{/static/plugin/webuploader/webuploader.min.js}"></script>
+    <script th:src="@{/static/js/web-upload-object.js}"></script>
+    <div th:include="fragment/fargment :: treeJs"></div>
+    <script th:src="@{/static/modular/system/user/user_info.js}"></script>
+
+</js>

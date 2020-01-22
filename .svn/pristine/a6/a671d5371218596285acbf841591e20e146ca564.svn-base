@@ -1,0 +1,217 @@
+
+<body>
+
+<div class="container">
+
+    <form class="form-horizontal">
+        <div class="row">
+            <div class="col-sm-6">
+                <form:text id="one" label="姓名" name="one"></form:text>
+            </div>
+            <div class="col-sm-6">
+                <form:select id="account" label="性别" name="account"  code="lib_sex" must="true"></form:select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:select id="account" label="民族" name="ethnic"  code="lib_ethnic_group" must="true"></form:select>
+            </div>
+            <div class="col-sm-6">
+                <form:datetime id="three" label="出生年月" istime="false" must="true" format="yyyy-MM-dd" name="three"></form:datetime>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:select id="three" label="文化程度" name="degree"  code="lib_degree_code" must="true"></form:select>
+            </div>
+            <div class="col-sm-6">
+                <form:select id="three" label="政治面貌" name="degree"  code="lib_political_status" must="true"></form:select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:text id="one" label="籍贯" name="one"></form:text>
+            </div>
+            <div class="col-sm-6">
+                <form:text id="one" label="现任工会职务" name="one"></form:text>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:text id="one" label="本届任职起始时间" name="one"></form:text>
+            </div>
+
+            <div class="col-sm-6">
+                <form:select id="three" label="属专职/兼职" name="job_nature"  code="lib_job_nature" must="true"></form:select>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:figure id="two" label="身份证号码" name="two" max="100" min="10" value=""></form:figure>
+            </div>
+            <div class="col-sm-6">
+                <form:text id="one" label="现任其他职务" name="one"></form:text>
+            </div>
+        </div>
+
+
+        <div class="col-sm-6">
+            <form:text id="one" label="何时加入工会组织" name="one"></form:text>
+        </div>
+
+
+        <div class="row"></div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:text id="one" label="工会名称" name="one"></form:text>
+            </div>
+            <div class="col-sm-6">
+                <form:text id="one" label="电话" name="one"></form:text>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:text id="one" label="地址" name="one"></form:text>
+            </div>
+            <div class="col-sm-6">
+                <form:text id="one" label="邮编" name="one"></form:text>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:datetime id="three" label="工会组织成立时间" istime="false" must="true" format="yyyy-MM-dd" name="three"></form:datetime>
+            </div>
+
+            <div class="col-sm-6">
+                <form:datetime id="three" label="本届选举日期" istime="false" must="true" format="yyyy-MM-dd" name="three"></form:datetime>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:text id="one" label="审批单位" name="one"></form:text>
+            </div>
+            <div class="col-sm-6">
+                <form:text id="one" label="审批文号" name="one"></form:text>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:figure id="two" label="现职工人数" name="two" max="1000" min="1" value=""></form:figure>
+            </div>
+            <div class="col-sm-6">
+                <form:figure id="two" label="会员人数" name="two" max="1000" min="1" value=""></form:figure>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:figure id="two" label="专职工会干部数" name="two" max="1000" min="1" value=""></form:figure>
+            </div>
+            <div class="col-sm-6">
+                <form:text id="one" label="现任第   界工会主席姓名" name="one"></form:text>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:figure id="one" label="手机号码" name="one"></form:figure>
+            </div>
+            <div class="col-sm-6">
+                <form:figure id="one" label="上年结余累计（万元）" name="one"></form:figure>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:figure id="one" label="年会员缴纳会费收入（万元）" name="one"></form:figure>
+            </div>
+            <div class="col-sm-6">
+                <form:figure id="one" label="年2%拨交工会经费本级留成收入（万元）" name="one"></form:figure>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:figure id="one" label="其他收入（万元）" name="one"></form:figure>
+            </div>
+            <div class="col-sm-6">
+                <form:figure id="one" label="资金情况合计（万元）" name="one"></form:figure>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:figure id="one" label="固定资金（万元）" name="one"></form:figure>
+            </div>
+            <div class="col-sm-6">
+                <form:figure id="one" label="流动资金（万元）" name="one"></form:figure>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:figure id="one" label="其他" name="one"></form:figure>
+            </div>
+            <div class="col-sm-6">
+                <form:figure id="one" label="场所情况合计（万元）" name="one"></form:figure>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:figure id="one" label="办公场所（平方米）m^2" name="one"></form:figure>
+            </div>
+            <div class="col-sm-6">
+                <form:figure id="one" label="活动场所（平方米）m^2" name="one"></form:figure>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:figure id="one" label="其他场所" name="one"></form:figure>
+            </div>
+            <div class="col-sm-6">
+                <form:text id="one" label="承担民事责任能力状况" name="one"></form:text>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form:figure id="one" label="证书有效期" name="one"></form:figure>
+            </div>
+            <div class="col-sm-6">
+                <form:figure id="one" label="证书编号" name="one"></form:figure>
+            </div>
+        </div>
+
+        <div class="row text-center">
+            <qx:btn id="sure" class="btn btn-default" fa="fa fa-address-book" label="确认"></qx:btn>
+            <qx:btn id="back" class="btn btn-primary" fa="fa fa-address-book" label="返回"></qx:btn>
+        </div>
+
+
+    </form>
+</div>
+
+

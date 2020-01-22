@@ -1,0 +1,151 @@
+<css >
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+
+<style type="text/css">
+    .house{
+        font-size: 16px;
+        color: red;
+        margin-top: 15px;
+    }
+
+    .house i{
+        font-style: normal;
+    }
+</style>
+
+<body>
+<div class="form-horizontal">
+    <div class="row">
+        <div class="col-sm-3">
+            <search:input id="name" label="姓名" name="name" value="" type="text" placeholder="请输入姓名"></search:input>
+        </div>
+
+        <div class="col-sm-5">
+            <search:input id="num" label="身份证号码" name="num" value="" type="text" placeholder="请输入身份证号码"></search:input>
+        </div>
+
+        <div class="col-sm-1">
+            <qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="HouseholdApply.search()"></qx:btn>
+        </div>
+    </div>
+
+    <p class="house"><i class="fa fa-exclamation-triangle"></i>&nbsp;&nbsp;&nbsp;下面字段中出现【--】代表该字段为空</p>
+    <table id="HouseholdTable" data-mobile-responsive="true" data-click-to-select="true">
+    </table>
+
+</div>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+        /**
+         * 初始化表格对象
+         */
+        var HouseholdApply = {
+            id: "HouseholdTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        HouseholdApply.initColumn = function () {
+            return [
+
+                {field: 'selectItem', radio: true},
+                {title: '姓名', field: 'name', align: 'center', valign: 'middle'},
+                {title: '身份证号码', field: 'num', align: 'center', valign: 'middle'},
+                {title: '是否农业户口', field: 'household', align: 'center', valign: 'middle',formatter: initHouseHold},
+                {title: '是否认证会员', field: 'isbind', align: 'center', valign: 'middle',formatter: initIsBind},
+                {title: '单位名称', field: 'unit_name', align: 'center', valign: 'middle'},
+                {title: '工会名称', field: 'union_name', align: 'center', valign: 'middle'},
+                {title: '上级工会名称', field: 'p_name', align: 'center', valign: 'middle'},
+                {title: '操作', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        return '<a href="javascript:HouseholdApply.detail(' + row.id + ')">详情</a>';
+                    }
+                }
+            ];
+        }
+        //初始化列表户籍字段
+        function initHouseHold(value, row, index){
+            if(row.household == "00"){
+                return '是';
+            } else if (row.household == "01"){
+                return '否';
+            } else {
+                return '--';
+            }
+        }
+
+        //初始化列表绑定会员字段
+        function initIsBind(value, row, index){
+            if(row.isbind == 0){
+                return '否';
+            } else if (row.isbind == 1){
+                return '是';
+            } else {
+                return '--';
+            }
+        }
+
+        /**
+         * 点击查看会员操作
+         */
+        HouseholdApply.detail = function (id) {
+            var index = layer.open({
+                type: 2,
+                title: '查看详情',
+                area: ['100%', '100%'], //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: App.ctxPath + 'dept/member/detail?id='+id
+            });
+            this.layerIndex = index;
+        }
+
+
+        /**
+         * 检查是否选中
+         */
+        HouseholdApply.check = function () {
+            var selected = $('#' + this.id).bootstrapTable('getSelections');
+            if (selected.length == 0) {
+                App.info("请先选中表格的中某一记录！");
+                return false;
+            } else {
+                HouseholdApply.seItem = selected[0];
+                return true;
+            }
+        };
+
+        /**
+         * 查询表单提交参数对象
+         */
+        HouseholdApply.formParams = function () {
+            var queryData = {};
+            queryData['query_name'] = $("#name").val();
+            queryData['query_num'] = $("#num").val();
+            return queryData;
+        }
+
+        /**
+         * 查询列表
+         */
+        HouseholdApply.search = function () {
+            HouseholdApply.table.refresh({query: HouseholdApply.formParams()});
+        };
+
+        $(function () {
+            var pagetype = $("#pagetype").val();
+            var defaultColunms = HouseholdApply.initColumn();
+            var table = new BSTable(HouseholdApply.id, "/searchres/list", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(HouseholdApply.formParams());
+            HouseholdApply.table = table.init();
+        });
+    </script>
+</js>
+</body>

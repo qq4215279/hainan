@@ -1,0 +1,212 @@
+<body>
+<css>
+    <style>
+        .images {
+            width: 350px;
+            height: 150px;
+            position: relative;
+            margin-top: 10px;
+        }
+
+        .images .top-zz {
+            background: #d7d7d7;
+            opacity: 0.6;
+            width: 350px;
+            height: 20px;
+            position: absolute;
+            top: 10px;
+            z-index: 2;
+        }
+
+        .images img {
+            position: relative;
+            width: 350px;
+            height: 150px;
+            margin-top: 10px;
+        }
+
+        .images .fa-close {
+            position: absolute;
+            right: 5px;
+            top: 1px;
+            color: #000;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+    </style>
+</css>
+<div class="container">
+    <form class="form-horizontal col-sm-12">
+        <form:text id="title" label="荣誉名称" name="title"  must="true"></form:text>
+        <form:area id="content" label="荣誉简介" name="content" must="true"></form:area>
+        <form:datetime id="getTime" label="日期时间输入" istime="false" must="true" format="yyyy-MM-dd" name="getTime"></form:datetime>
+        <form:check id="isShow" label="是否将此条显示在列表" name="isShow"></form:check>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">荣誉证书</label>
+            <div class="col-sm-6" id="images">
+            </div>
+            <div class="col-sm-3">
+                <label for="imageFile" class="btn btn-info" style="display:inline-block;width:100px;"><i
+                        class="fa fa-upload">&nbsp;选择图片</i></label>
+                <input type="file" id="imageFile" style="display:none">
+            </div>
+        </div>
+
+        <div class="modal fade" id="imageLayer">
+            <div id="clipArea" style="height: 100%;">
+                <button id="clipBtn" type="button" class="btn btn-info col-sm-2"
+                        style="z-index:999; margin: 1px 5px;">
+                    <i class="fa fa-check"></i>&nbsp;截取
+                </button>
+                <button id="closeView" type="button" class="btn btn-danger col-sm-2"
+                        style="z-index:999; margin: 1px 5px;">
+                    <i class="fa fa-reply"></i>&nbsp;取消
+                </button>
+            </div>
+        </div>
+    </form>
+    <div class="row text-center">
+        <qx:btn class="btn btn-primary" fa="fa fa-reply" label="返回" onclick="back()"></qx:btn>
+        <qx:btn class="btn btn-primary" fa="fa fa-send" label="保存" onclick="submit()"></qx:btn>
+    </div>
+</div>
+<js>
+    <div  th:include="fragment/fargment :: clipJs"></div>
+    <script type="text/javascript">
+
+
+        clip();
+        var studioId = App.getQueryString("studioId");
+        var id = App.getQueryString("id");
+
+        if (id) {
+            App.loadingAjax({
+                url: App.ctxPath + "studio/honor/detail",
+                data: {id: id},
+                type: "POST",
+                success: function (res) {
+                    $("#title").val(res.data.title);
+                    $("#content").val(res.data.content);
+                    $("#getTime").val(res.data.getTime);
+                    if (res.isShow == 1) {
+                        $("#isShow").prop("checked", true);
+                    }
+                    $.each(res.data.images, function (idx, image) {
+                        showBanner(image);
+                    });
+                }, error: function (res) {
+                    App.info("服务器异常，请稍后重试");
+                }
+            });
+        }
+
+
+        function showBanner(image) {
+            var html = $('<div class="images"><div class="top-zz"><i class="fa fa-close"></i></div><img src=""><input type="hidden" class="images"></div>');
+            html.find("img").attr("src", image);
+            html.find("input").val(image);
+            $("#images").append(html);
+        }
+
+        function clip() {
+            var clip = {
+                area: "#clipArea",
+                ok: "#clipBtn",
+                layer: "#imageLayer",
+                closeView: "#closeView",
+                fileBtn: "#imageFile",
+                size: [500, 300],
+                done: function (dataURL) {
+                    showBanner(dataURL);
+                    $("#imageFile").val("");
+                }
+            };
+
+            new PhotoClip(clip.area, {
+                size: clip.size,
+                file: clip.fileBtn,
+                ok: clip.ok,
+                loadStart: function () {
+                    $(clip.layer).modal("show")
+                },
+                loadComplete: function () {
+
+                },
+                done: function (dataURL) {
+                    clip.done(dataURL);
+                    $(clip.layer).modal("hide")
+                },
+                fail: function (msg) {
+                }
+            });
+            $(clip.closeView).click(function () {
+                $(clip.layer).modal("hide");
+            });
+        }
+
+
+        /**
+         * 提交保存
+         */
+        function submit() {
+
+            var param = {
+                id: id,
+                studioId: studioId
+            };
+            if (!$("#title").val()) {
+                App.error("荣誉标题不能未空");
+                return;
+            }
+            param.title = $("#title").val();
+            if (!$("#content").val()) {
+                App.error("简介不能为空");
+                return;
+            }
+            param.content = $("#content").val();
+            if (!$("#getTime").val()) {
+                App.error("获奖时间不能为空");
+                return;
+            }
+            param.getTime = $("#getTime").val();
+            var images = "";
+            $("input.images").each(function () {
+                images += $(this).val() + "_";
+            })
+            param.images = images.substring(0, images.length - 1);
+            param.isShow = $("#isShow").is(":checked") ? 1 : 0;
+            App.loadingAjax({
+                url: App.ctxPath + "studio/honor/renew",
+                data: param,
+                type: "POST",
+                success: function (res) {
+                    if (res.code = 200) {
+                        layer.msg("操作成功", {icon: 1}, function () {
+                            back();
+                        });
+                    } else {
+                        App.error("操作失败! " + res.message + "!");
+                    }
+                }, error: function (res) {
+                    App.info("服务器异常，请稍后重试");
+                }
+            });
+        }
+
+        /**
+         * 返回
+         */
+        function back() {
+            var index = parent.layer.getFrameIndex(window.name);
+            parent.layer.close(index); //再执行关闭
+            parent.Honor.search();
+        }
+
+        $("#images").on("click", ".images .fa-close", function () {
+            $(this).parents(".images").remove();
+        })
+
+    </script>
+</js>
+</body>

@@ -1,0 +1,69 @@
+package com.gobestsoft.core.reids;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Calendar;
+
+/**
+ * redis 缓存对象
+ * create by gutongwei
+ * on 2018/10/16 下午4:55
+ */
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class RedisCacheModel implements Serializable {
+
+    public RedisCacheModel() {
+    }
+
+    /**
+     * @param data        缓存对象
+     * @param expiredTime 过期时间
+     */
+    public RedisCacheModel(Object data, Calendar expiredTime) {
+        this.data = data;
+        if (expiredTime == null) {
+            expiredTime = Calendar.getInstance();
+            expiredTime.add(Calendar.SECOND, 120);
+        }
+        this.expiredTime = expiredTime.getTimeInMillis();
+    }
+
+    /**
+     * @param data          缓存对象
+     * @param expiredSecond 超时秒
+     */
+    public RedisCacheModel(Object data, int expiredSecond) {
+        this.data = data;
+        Calendar nowTime = Calendar.getInstance();
+        nowTime.add(Calendar.SECOND, expiredSecond);
+        this.expiredTime = nowTime.getTimeInMillis();
+    }
+
+    /**
+     * 缓存对象
+     */
+    private Object data;
+
+
+    /**
+     * 过期时间
+     */
+    private long expiredTime;
+
+    /**
+     * 是否过期
+     *
+     * @return
+     */
+    public boolean isExpired() {
+        long now = Calendar.getInstance().getTimeInMillis();
+        if (now > expiredTime) {
+            return true;
+        }
+        return false;
+    }
+
+}

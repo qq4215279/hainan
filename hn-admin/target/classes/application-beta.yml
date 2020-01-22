@@ -1,0 +1,79 @@
+server:
+  port: 8087
+  contextPath: /hn-admin
+
+manage:
+  kaptchaOpen: false
+  fileUploadPath: C:\upload\hn\
+  ueditorConfigFile: config-beta.json
+  writeLog: true
+  articleAccess: http://39.108.88.223:8087/zt-api/show-page/show-article/
+
+admin:
+  phpSite: http://ghypt.hnszgh.org:9085/hainan
+
+uploadSite:
+  address: http://39.108.88.223:8087/hn-upload/ #图片资源路径
+
+spring:
+  jmx:
+    default-domain: hn-admin
+  datasource:
+    url : jdbc:mysql://39.108.88.223:12306/hngh_test?autoReconnect=true&useUnicode=true&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&characterEncoding=utf8
+    username : admin
+    password : gobest_123$%^&
+  aop:
+    proxy-target-class: true
+  http:
+      multipart.maxFileSize: 500Mb #max file size of upload
+      multipart.maxRequestSize: 500Mb #max file size of request
+  redis:
+      database: 0 # Redis database
+      host: 127.0.0.1 # Redis host
+      port: 6379  # Redis port
+      password: #Redis password
+      pool.max-active: 8
+      pool.max-wait: -1
+      timeout: 0
+  resources:
+     static-locations: classpath:/static/
+     chain:
+       cache: false
+  rabbitmq:
+      host: 127.0.0.1
+      port: 5672
+      username: guest
+      password: guest
+  thymeleaf:
+      mode: LEGACYHTML5
+      encoding: UTF-8
+      cache: false
+      check-template-location: true
+      enabled: true
+      prefix: classpath:/templates/
+mybatis-plus:
+  mapper-locations: classpath*:com/gobestsoft/common/**/mapping/*.xml
+  typeAliasesPackage: com.gobestsoft.common.modular.system.model
+  global-config:
+    id-type: 0  #0:数据库ID自增   1:用户输入id  2:全局唯一id(IdWorker)  3:全局唯一ID(uuid)
+    db-column-underline: false
+    refresh-mapper: true
+    key-generator: com.baomidou.mybatisplus.incrementer.PostgreKeyGenerator
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true #配置的缓存的全局开关
+    lazyLoadingEnabled: true #延时加载的开关
+    multipleResultSetsEnabled: true #开启的话，延时加载一个属性时会加载该对象全部属性，否则按需加载属性
+    call-setters-on-nulls: true
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #打印sql语句,调试用
+
+
+logging:
+  level.root: info
+  level.com.gobestsoft: debug
+  path: C:\logs\hn\admin\ #Save path of log
+  file: hn-admin #File name of save log
+
+jpush:
+  masterSecret: 0aa680cfa87caebfaefed69c
+  appKey: fc511b4b1553e251f7c7d6f3

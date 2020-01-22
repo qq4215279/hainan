@@ -1,0 +1,85 @@
+server:
+  port: 8090
+  contextPath: /hn-company
+
+manage:
+  kaptchaOpen: false
+  fileUploadPath: /share_server/upload
+  ueditorConfigFile: config.json
+  writeLog: false
+  articleAccess: http://ghypt.hnszgh.org:9081/hn-api/show-page/show-article/
+
+
+admin:
+uploadSite:
+  address: http://ghypt.hnszgh.org:9082/ #图片资源路径
+
+spring:
+  jmx:
+    default-domain: hn-company
+  datasource:
+    url : jdbc:mysql://192.168.37.20:3306/hn_app?autoReconnect=true&useUnicode=true&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&characterEncoding=utf8
+    username : admin
+    password : Gobest123$%^
+  aop:
+    proxy-target-class: true
+  http:
+      multipart.maxFileSize: 100Mb #max file size of upload
+      multipart.maxRequestSize: 100Mb #max file size of request
+  redis:
+      database: 0
+      host: 192.168.37.13
+      port: 6379
+      password: Gobest123$%^
+      pool.max-active: 8
+      pool.max-wait: -1
+      timeout: 0
+  resources:
+     static-locations: classpath:/static/
+     chain:
+       cache: false
+  rabbitmq:
+      host: 192.168.37.15
+      port: 5672
+      username: admin
+      password: admin
+  thymeleaf:
+      mode: LEGACYHTML5
+      encoding: UTF-8
+      cache: false
+      check-template-location: true
+      enabled: true
+      prefix: classpath:/templates/
+  mail:
+    protocol: smtp
+    host: smtp.qq.com
+    port: 25
+    username: 353478929@qq.com
+    password: anykvrzsbjxfbiac
+    default-encoding: utf-8
+mybatis-plus:
+  mapper-locations: classpath*:com/gobestsoft/common/**/mapping/*.xml
+  typeAliasesPackage: com.gobestsoft.common.modular.system.model
+  global-config:
+    id-type: 0  #0:数据库ID自增   1:用户输入id  2:全局唯一id(IdWorker)  3:全局唯一ID(uuid)
+    db-column-underline: false
+    refresh-mapper: true
+    key-generator: com.baomidou.mybatisplus.incrementer.PostgreKeyGenerator
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true #配置的缓存的全局开关
+    lazyLoadingEnabled: true #延时加载的开关
+    multipleResultSetsEnabled: true #开启的话，延时加载一个属性时会加载该对象全部属性，否则按需加载属性
+    call-setters-on-nulls: true
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #打印sql语句,调试用
+
+
+logging:
+  level.root: error
+  level.com.gobestsoft: error
+  path: /logs/ #Save path of log
+  file: hn-company #File name of save log
+
+jpush:
+  masterSecret: 0aa680cfa87caebfaefed69c
+  appKey: fc511b4b1553e251f7c7d6f3

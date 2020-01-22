@@ -1,0 +1,74 @@
+package com.gobestsoft.admin.modular.system.controller;
+
+import com.gobestsoft.common.modular.system.model.User;
+import com.gobestsoft.mamage.basic.BaseController;
+import com.google.code.kaptcha.Constants;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+/**
+ * create by gutongwei
+ * on 2018/8/7 上午9:54
+ */
+@Controller
+public class WorkLoginController extends BaseController {
+
+    /**
+     * 登录页
+     *
+     * @return
+     */
+    @RequestMapping(value = "/login")
+    public String login(Model model) {
+        Object tip = getSessionAttribute(LOGIN_TIP);
+        if (tip != null && StringUtils.isNotEmpty(tip.toString())) {
+            model.addAttribute(LOGIN_TIP, tip);
+        }
+        model.addAttribute("isKaptcha", manageProperties.getKaptchaOpen());
+        addSessionAttribute(LOGIN_TIP, null);
+        return "login";
+    }
+
+
+    /**
+     * 点击登录执行的动作
+     */
+    @RequestMapping(value = "/loginVail", method = RequestMethod.POST)
+    public String loginVail(Model model) {
+
+        String username = getPara("username");
+        String password = getPara("password");
+        String remember = getPara("remember");
+
+        //验证验证码是否正确
+        if (manageProperties.getKaptchaOpen()) {
+            String kaptcha = getPara("kaptcha");
+            String code = (String) getSession().getAttribute(Constants.KAPTCHA_SESSION_KEY);
+            if (!code.equals(kaptcha)) {
+                addSessionAttribute(LOGIN_TIP, "验证码错误");
+                return REDIRECT + "/login";
+            }
+        }
+
+        User user = userService.user(username, password,"0");
+        if (user == null) {
+            addSessionAttribute(LOGIN_TIP, "账号或密码错误");
+            return REDIRECT + "/login";
+        }
+
+        // 弱口令校验
+        if(userService.getIsWeak(password)){
+            model.addAttribute("account",username);
+            model.addAttribute("oldPwd",password);
+            return "/user_chpwd_page";
+        }
+
+        cacheLoginUser(userService.getLoginUser(user), "on".equals(remember));
+        return REDIRECT + "/";
+
+    }
+
+}

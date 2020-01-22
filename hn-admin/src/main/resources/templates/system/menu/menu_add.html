@@ -1,0 +1,48 @@
+<css>
+    <link th:href="@{/static/plugin/ztree/zTreeStyle.css}" rel="stylesheet">
+    <link th:href="@{/static/plugin/ztree/zTreeStyle.css}" rel="stylesheet">
+    <link th:href="@{/static/css/_fstyle.css}" rel="stylesheet">
+</css>
+<body>
+    <input type="hidden" id="id" value="">
+    <input type="hidden" id="pcode" value="">
+    <form class="row" id="menuInfoForm">
+        <div class="col-sm-6 form-horizontal">
+            <form:select id="ismenu" label="是否是菜单" name="ismenu" code="lib_is_not"></form:select>
+            <form:text id="name" label="名称" name="name"></form:text>
+            <form:text id="code" label="编号" name="code"></form:text>
+            <form:text id="pcodeName" label="父级编号" name="pcodeName" readonly="true"
+                       onclick="MenuInfoDlg.showMenuSelectTree();return false;"></form:text>
+            <div id="pcodeTreeDiv" style="display: none; position: absolute; z-index: 200;">
+                <ul id="pcodeTree" class="ztree tree-box" style="width:244px !important;"></ul>
+            </div>
+        </div>
+        <div id="side-menu" class="col-sm-6 form-horizontal">
+            <form:select id="platform" label="菜单显示范围" name="platform" code="lib_menu_platform"></form:select>
+            <form:text id="url" label="请求地址" name="url"></form:text>
+            <form:figure id="sort" label="排序" name="sort"></form:figure>
+            <form:text id="icon" label="图标" name="icon"></form:text>
+        </div>
+    </form>
+    <div class="row text-center">
+        <qx:btn id="ensure" class="btn btn-primary" fa="fa fa-check" label="提交"
+                onclick="MenuInfoDlg.addSubmit()"></qx:btn>
+        <qx:btn id="cancel" class="btn btn-default" fa="fa fa-eraser" label="取消"
+                onclick="MenuInfoDlg.close()"></qx:btn>
+    </div>
+</body>
+<js>
+    <script th:src="@{/static/plugin/ztree/jquery.ztree.all.min.js}"></script>
+    <script th:src="@{/static/plugin/ztree/ztree-object.js}"></script>
+    <script th:src="@{/static/modular/system/menu/menu_info.js}"></script>
+    <script>
+        $("#ismenu").change(function () {
+            var isMenu = $(this).val();
+            if (parseInt(isMenu) == 1) {
+                $("#side-menu").show();
+            } else if (parseInt(isMenu) == 0) {
+                $("#side-menu").hide();
+            }
+        });
+    </script>
+</js>

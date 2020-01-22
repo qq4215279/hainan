@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding" addBOMForNewFiles="with NO BOM">
+    <file url="file://$PROJECT_DIR$/hn-admin" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hn-api" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hn-common" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hn-company" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hn-core" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hn-mail" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hn-manage" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hn-parent" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jpush" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/rabbitmq" charset="UTF-8" />
+  </component>
+</project>

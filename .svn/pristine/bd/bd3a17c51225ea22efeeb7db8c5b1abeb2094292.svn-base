@@ -1,0 +1,66 @@
+package com.gobestsoft.admin.modular.schedule;
+
+
+import com.gobestsoft.common.modular.dept.dao.MemberDao;
+import com.gobestsoft.core.reids.RedisUtils;
+import com.gobestsoft.core.util.UUIDUtil;
+import com.gobestsoft.mamage.moudle.law.service.LawSupportService;
+import com.gobestsoft.mamage.moudle.srv.service.SrvStraitenedService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+@EnableScheduling
+@Component
+@Slf4j
+public class MessageSchedule {
+
+    @Autowired
+    LawSupportService lawSupportService;
+
+
+    @Autowired
+    SrvStraitenedService srvStraitenedService;
+
+    @Autowired
+    MemberDao memberDao;
+
+    @Autowired
+    RedisUtils redisUtils;
+
+    /**
+     * 审核超时提醒
+     */
+    @Scheduled(cron = "0 0 3 * * ?")
+    public void sendAuditExpireMessage(){
+
+//        5天超时未审
+        try {
+            String uuid = UUIDUtil.getUUID();
+            if(redisUtils.tryGetDistributedLock("sendAuditExpireMessage",uuid,10)){
+
+//                lawSupportService.sendExpireNotice(5);
+
+                srvStraitenedService.sendExpireFirstNotice(5);
+
+                srvStraitenedService.sendExpireFinalNotice(5);
+
+                memberDao.updateMemberCountTable1();
+
+                memberDao.updateMemberCountTable2();
+
+                redisUtils.releaseLock("sendAuditExpireMessage",uuid);
+            }
+
+        }catch (Exception e){
+
+            log.info(e.getMessage());
+
+        }
+
+
+    }
+
+}

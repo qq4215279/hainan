@@ -1,0 +1,77 @@
+<body>
+<div class="container">
+   <div class="form-horizontal" id="ReChangeForm">
+    	<div class="row" >
+    		<div class="col-sm-2"></div>
+    		<div class="col-sm-4">
+    			<form:text id="deptName" label="工会名称" name="deptName" value="${deptLegalApply.deptName}" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="name" label="法定代表人" value="${deptLegalApply.name}" name="name" disabled="true"></form:text>
+    		</div>
+    	</div>
+    	<div class="row" >
+    		<div class="col-sm-2"></div>
+    		<div class="col-sm-4">
+    			<form:text id="unitTel" label="联系电话" value="${deptLegalApply.unitTel}" name="unitTel" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="unitAddress" label="住所地址" value="${deptLegalApply.unitAddress}" name="unitAddress" disabled="true"></form:text>
+			</div>
+		</div>
+		<div class="row" >
+    		<div class="col-sm-2"></div>
+    		<div class="col-sm-4">
+    			<form:text id="cerNo" label="工会法人资格证书统一社会信用代码" name="cerNo" value="${deptLegalApply.cerNo}" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="agentName" label="经办人" name="agentName" value="${deptLegalApply.agentName}" disabled="true"></form:text>
+    		</div>
+    	</div>
+		<div class="row" >
+    		<div class="col-sm-2"></div>
+    		<div class="col-sm-4">
+    			<form:text id="agentMobile" label="经办人手机" name="agentMobile" value="${deptLegalApply.agentMobile}" disabled="true"></form:text>
+    		</div>
+    		<div class="col-sm-4">
+    			<form:text id="agentCertificateNo" label="经办人身份证号码" name="agentCertificateNo" value="${deptLegalApply.agentCertificateNo}" disabled="true"></form:text>
+    		</div>
+    	</div>
+		<div class="row" >
+    		<div class="col-sm-2"></div>
+    		<div class="col-sm-8">
+    			<form:area id="lossNatice" label="遗失声明公示情况" name="lossNatice" value="${deptLegalApply.lossNatice}" disabled="true"></form:area>
+    		</div>
+    	</div>
+    	<div class="row" >
+    		<div class="col-sm-2"></div>
+    		<div class="col-sm-8">
+    			<form:area id="lossReason" label="遗失原因" name="lossReason" value="${deptLegalApply.lossReason}" disabled="true"></form:area>
+    		</div>
+    	</div>
+    	<div class="row text-center">
+			<qx:btn id="close" class="btn btn-warning" onclick="ReChangeDlg.close()" 
+					fa="fa fa-eraser" label="取消"></qx:btn>
+    	</div>
+    	<br/>
+    </div>
+</div>
+</body>
+<js>
+<script type="text/javascript">
+/**
+ * 初始化表单验证
+ */
+var ReChangeDlg = {
+   LegalReChangeData: {},
+   validateFields: {
+   }
+}
+/**
+ * 关闭此对话框
+ */
+ ReChangeDlg.close = function() {
+    parent.layer.close(window.parent.LegalReChange.layerIndex);
+}
+</script>
+</js>

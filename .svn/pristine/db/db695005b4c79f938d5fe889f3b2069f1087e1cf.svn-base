@@ -1,0 +1,284 @@
+package com.gobestsoft.mamage.moudle.system.controller;
+
+import com.baomidou.mybatisplus.plugins.Page;
+import com.gobestsoft.common.modular.dept.model.DeptMember;
+import com.gobestsoft.common.modular.dept.model.PersonInfo;
+import com.gobestsoft.common.modular.system.model.SysMsg;
+import com.gobestsoft.core.util.ToolUtil;
+import com.gobestsoft.mamage.basic.BaseController;
+import com.gobestsoft.mamage.basic.tips.Tip;
+import com.gobestsoft.mamage.exception.BizExceptionEnum;
+import com.gobestsoft.mamage.exception.BusinessException;
+import com.gobestsoft.mamage.moudle.dept.service.DeptMemberService;
+import com.gobestsoft.mamage.moudle.dept.service.DeptOrganizationService;
+import com.gobestsoft.mamage.moudle.dept.service.PersonInfoService;
+import com.gobestsoft.mamage.moudle.system.service.MsgService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+@Controller
+@RequestMapping("/sysMsg")
+public class MsgController extends BaseController {
+
+    private String PREFIX = "/system/msg/";
+    private final static String xls = ".xls";
+    private final static String xlsx = ".xlsx";
+
+    @Resource
+    MsgService msgService;
+    @Resource
+    DeptMemberService memberService;
+    @Resource
+    PersonInfoService personInfoService;
+    @Resource
+    DeptOrganizationService organizationService;
+
+
+    /**
+     * 新增方法
+     *
+     * @param model
+     * @param result
+     * @return
+     */
+    @RequestMapping("/addMsg")
+    @ResponseBody
+    public Tip add(
+            @RequestParam("toDeptId") Integer toDeptId
+            , @RequestParam("isOpen") String isOpen
+            , @RequestParam("content") String content
+            , @RequestParam("type") String type
+    ) {
+        msgService.insertMsg(toDeptId, isOpen, content, type);
+        return success();
+    }
+
+
+    /**
+     * 跳转到首页
+     *
+     * @param model
+     * @param unionId 所属工会组织id（sys_dept表id）
+     * @return
+     */
+    @RequestMapping("/msg")
+    public String index() {
+        return PREFIX + "msg";
+    }
+
+    /**
+     * 多条件分页查询
+     *
+     * @return
+     */
+    @RequestMapping("/list")
+    @ResponseBody
+    public Object list(
+            @RequestParam(required = false) String type
+//                       @RequestParam(required = false) String deptNo,
+//                       @RequestParam(required = false) String memberCard,
+//                       @RequestParam(required = false) String unionName,
+//                       @RequestParam(required = false) Integer unionId
+    ) {
+        Page<SysMsg> page = defaultPage();
+        List<SysMsg> msgList = msgService.msgList(page, type, getLoginUser().getDeptId());
+        page.setRecords(msgList);
+        return super.packForBT(page);
+    }
+
+    /**
+     * 跳转到新增页面
+     *
+     * @param model
+     * @param unionId 所属工会组织id（sys_dept表id）
+     * @return
+     */
+    @RequestMapping("/add")
+    public String add(Model model, @RequestParam("unionId") Integer unionId) {
+        if (ToolUtil.isEmpty(unionId)) {
+            unionId = getLoginUser().getDeptId();
+        }
+        model.addAttribute("unionId", unionId);
+        return PREFIX + "member_add";
+    }
+
+    /**
+     * 保存方法
+     *
+     * @param model
+     * @param result
+     * @return
+     */
+    @RequestMapping("/save")
+    @ResponseBody
+    public Tip save(@Valid PersonInfo model, @RequestParam("unionId") Integer unionId, BindingResult result) {
+        if (result.hasErrors()) {
+            throw new BusinessException(BizExceptionEnum.REQUEST_NULL);
+        }
+
+        if (memberService.hasMemberIn(model.getCertificateNum())) {
+            return fail("会员身份证已重复");
+        }
+
+        memberService.insertMember(model, unionId, getLoginUser());
+        return success();
+    }
+
+    /**
+     * 跳转到编辑页面
+     *
+     * @param id
+     * @param model
+     * @return
+     */
+    @RequestMapping("/edit")
+    public String edit(@RequestParam("id") Integer id, Model model) {
+        if (ToolUtil.isEmpty(id)) {
+            throw new BusinessException(BizExceptionEnum.REQUEST_NULL);
+        }
+        DeptMember member = memberService.selectById(id);
+        model.addAttribute("deptMember", member);
+        if (member != null) {
+            PersonInfo personInfo = personInfoService.selectById(member.getPersonId());
+            model.addAttribute("personInfo", personInfo);
+        }
+        return PREFIX + "member_edit";
+    }
+
+    /**
+     * 更新方法
+     *
+     * @param result
+     * @return
+     */
+    @RequestMapping("/update")
+    @ResponseBody
+    public Tip update(@Valid PersonInfo person, @RequestParam("memberId") Integer memberId, BindingResult result) {
+        if (result.hasErrors() || ToolUtil.isEmpty(person.getId())) {
+            throw new BusinessException(BizExceptionEnum.REQUEST_NULL);
+        }
+        memberService.updateMemberById(person, memberId, getLoginUser().getId());
+        return success();
+    }
+
+    /**
+     * 删除方法
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping("/remove")
+    @ResponseBody
+    public Tip remove(@RequestParam("id") Integer id) {
+        if (ToolUtil.isEmpty(id)) {
+            throw new BusinessException(BizExceptionEnum.REQUEST_NULL);
+        }
+        DeptMember deptMember = memberService.selectById(id);
+        if (ToolUtil.isEmpty(deptMember)) {
+            throw new BusinessException(BizExceptionEnum.REQUEST_NULL);
+        }
+        memberService.removeMemberAndPerson(id, deptMember.getPersonId());
+        return success();
+    }
+
+    /**
+     * 跳转到详情页面
+     *
+     * @param id
+     * @param model
+     * @return
+     */
+    @RequestMapping("/detail")
+    public String detail(@RequestParam("id") Integer id, Model model) {
+        if (ToolUtil.isEmpty(id)) {
+            throw new BusinessException(BizExceptionEnum.REQUEST_NULL);
+        }
+        DeptMember member = memberService.selectById(id);
+        if (member != null) {
+            PersonInfo personInfo = personInfoService.selectById(member.getPersonId());
+            model.addAttribute("deptMember", personInfo);
+        }
+
+        return PREFIX + "member_detail";
+    }
+
+    /**
+     * 跳转到批量导入会员信息页面
+     */
+    @RequestMapping(value = "member_upload")
+    public String memberUpload(@RequestParam(value = "unionId", required = false) Integer unionId, Model model) {
+        if (unionId == null) {
+            model.addAttribute("unionId", getLoginUser().getDeptId());
+        } else {
+            model.addAttribute("unionId", unionId);
+
+        }
+        return PREFIX + "member_upload";
+    }
+
+    /**
+     * 批量导入会员
+     *
+     * @throws IOException
+     * @throws Exception
+     */
+    @RequestMapping(value = "/upload")
+    @ResponseBody
+    public Tip upload(@RequestParam("uploadFile") MultipartFile uploadFile, @RequestParam(value = "unionId", required = false) Integer unionId, HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        // 判断文件是否为空
+//        if (uploadFile == null)
+//            return tip(500, "文件为空！", null);
+//        // 获取上传文件名,包括路径
+//        String name = uploadFile.getOriginalFilename();
+//        if (!name.toLowerCase().endsWith(xls) && !name.toLowerCase().endsWith(xlsx)) {
+//            return tip(500, "上传文件不是excel文件！", null);
+//        }
+//        long size = uploadFile.getSize();
+//        if ((name == null || name.equals("")) && size == 0) {
+//            return tip(500, "文件为空！", null);
+//        }
+//        InputStream is = uploadFile.getInputStream();
+//
+//        try {
+//            HSSFWorkbook workbook = null;
+//            if (name.toLowerCase().endsWith(xls)) {
+//                workbook = memberService.uploadMember(xls, is, getLoginUser().getId(), unionId == null ? getLoginUser().getDeptId() : unionId);
+//            } else if (name.toLowerCase().endsWith(xlsx)) {
+//                workbook = memberService.uploadMember(xlsx, is, getLoginUser().getId(), unionId == null ? getLoginUser().getDeptId() : unionId);
+//            }
+//            //输出Excel文件
+//            String fileName = UploadConstants.EXPORT_EXCEL + new String(UUIDUtil.getUUID().getBytes("utf-8"), "utf-8") + ".xls";
+//            String filepath = manageProperties.getFileUploadPath();
+//            File file = new File(filepath);
+//            if (!file.getParentFile().exists()) {
+//                file.getParentFile().mkdirs();
+//            }
+//            String pathName = filepath + fileName;
+//            FileOutputStream output = new FileOutputStream(pathName);
+//            workbook.write(output);
+//            output.flush();
+//
+//            return tip(200, "导入成功", WebSiteUtil.getBrowseUrl(fileName));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        return success();
+
+    }
+
+}

@@ -1,0 +1,56 @@
+<title th:text="${article.title}" xmlns:th="http://www.springframework.org/schema/mvc"></title>
+<body xmlns:th="http://www.springframework.org/schema/mvc">
+<link rel="stylesheet" th:href="@{/static/css/article.h5.css}"/>
+<div id="article">
+    <h1 class="head" th:text="${article.title}"></h1>
+    <p class="create-area">
+        <span th:text="${publishTime}"></span>
+    </p>
+    <article th:if=" ${article.info_type==1 }" th:include="fragment/course :: mp3" class="attachment"></article>
+    <article th:if=" ${article.info_type==2 }" th:include="fragment/course :: mp4" class="attachment"></article>
+    <div class="content" th:utext="${article.content}"></div>
+    <p th:if="${article.source_from != ''}" class="create-area" th:text="'来源：'+ ${article.source_from}"></p>
+    <p th:if="${article.author != ''}" class="create-area" th:text="'编辑：'+ ${article.author}"></p>
+</div>
+<script th:src="@{/static/js/jquery-1.11.0.min.js}"></script>
+<script th:src="@{/static/js/jquery.lazyload.min.js?v=1.9.1}"></script>
+<script th:src="@{/static/js/app.js}"></script>
+
+
+<script th:inline="javascript">
+    var cxtPath = [[${apiPath}]];
+</script>
+
+<script>
+
+    var images = document.getElementsByTagName("img");
+    //修改所有图片为默认
+    for (var i = 0; i < images.length; i++) {
+        var image = images[i];
+        var date_src = image.getAttribute("src");
+        image.setAttribute("data-original", date_src);
+        image.setAttribute("src", ctxPath + "static/image/image-default.png");
+    }
+
+    $(function () {
+
+        $("img").lazyload({effect: "fadeIn"});
+        app.setTokenCallback(function (token) {
+            $.ajax({
+                type:"post",
+                url: cxtPath + "/user/completeIntegralTask?taskId=4",
+                headers: {
+                    token: token
+                }
+            });
+        });
+        app.isLoginCallback=app.getTokenCallback();
+        app.isLogin();
+
+    })
+
+
+
+
+</script>
+</body>

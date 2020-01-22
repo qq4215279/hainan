@@ -1,0 +1,80 @@
+<body>
+<div class="container">
+    <form id="modifyPassword" class="form-horizontal">
+        <form:password label="旧密码" name="oldPwd" id="oldPwd"></form:password>
+        <form:password label="新密码" name="newPwd" id="newPwd"></form:password>
+        <form:password label="确认新密" name="rePwd" id="rePwd"></form:password>
+        <div class="row text-center">
+            <qx:btn id="sure" class="btn btn-primary" fa="fa fa-eraser" label="确认"></qx:btn>
+        </div>
+    </form>
+</div>
+<js>
+
+    <script>
+
+        var validateFields = {
+            oldPwd: {
+                validators: {
+                    notEmpty: {
+                        message: '旧密码不能为空'
+                    }
+                }
+            },
+            newPwd: {
+                validators: {
+                    notEmpty: {
+                        message: '新密码不能为空'
+                    }
+                }
+            },
+            rePwd: {
+                validators: {
+                    notEmpty: {
+                        message: '请再次输入新密'
+                    },
+                    callback: {
+                        message: "两次密码不一样",
+                        callback: function (rePwd) {
+                            var newPwdVal = $("#newPwd").val();
+                            if (rePwd != newPwdVal) {
+                                return false;
+                            }
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        $(function () {
+            $('#modifyPassword').bootstrapValidator({
+                fields: validateFields
+            });
+
+            $("#sure").click(function () {
+
+                var param = {
+                    oldPwd: $("#oldPwd").val(),
+                    newPwd: $("#newPwd").val(),
+                    rePwd: $("#rePwd").val()
+                }
+                App.loadingAjax({
+                    url: App.ctxPath + "changePwd",
+                    type:"post",
+                    data: param,
+                    success: function (data) {
+                        if (data.code == 200) {
+                            App.success("修改成功，请重新登录!", function () {
+                                parent.window.location.reload();
+                            })
+                        }
+                    }
+                });
+
+
+            });
+        })
+    </script>
+</js>
+</body>

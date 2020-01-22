@@ -1,0 +1,39 @@
+<body>
+<div class="container">
+    <div class="row form-horizontal" id="ChangeForm">
+        <div class="row">
+            <br/>
+            <input id="id" type="hidden" th:value="${lawCommonProblem.id}"/>
+            <input id="createTime" type="hidden" th:value="${lawCommonProblem.createTime}"/>
+                <div class="row">
+
+                    <div class="col-sm-8">
+                        <form:text id="title" label="法律问题标题" name="title" value="${lawCommonProblem.title}"
+                        ></form:text>
+                    </div>
+                </div>
+            <br/>
+                <div class="row">
+                    <div class="col-sm-8">
+                        <form:area id="content" label="法律问题描述" name="content" value="${lawCommonProblem.content}"
+                        ></form:area>
+                    </div>
+                </div>
+
+
+            <br/>
+            <br/>
+                <div class="row text-center">
+                    <qx:btn id="save" class="btn btn-success" onclick="ChangeDlg.addSubmit()"
+                            fa="fa fa-eraser" label="保存"></qx:btn>
+                    <qx:btn id="close" class="btn btn-danger" fa="fa fa-eraser" onclick="ChangeDlg.close()" label="返回"></qx:btn>
+                </div>
+                <br/>
+            </div>
+
+    </div>
+</div>
+</body>
+<js>
+    <script th:src="@{/static/modular/law/problem/problem_edit.js}"></script>
+</js>

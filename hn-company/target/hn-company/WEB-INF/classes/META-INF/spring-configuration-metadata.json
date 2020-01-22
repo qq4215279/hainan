@@ -1,0 +1,11 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "com.gobestsoft.company.properties.CompanyProperties",
+      "name": "company",
+      "type": "com.gobestsoft.company.properties.CompanyProperties"
+    }
+  ],
+  "properties": []
+}

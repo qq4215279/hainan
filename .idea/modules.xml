@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/hn-admin/hn-admin.iml" filepath="$PROJECT_DIR$/hn-admin/hn-admin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hn-api/hn-api.iml" filepath="$PROJECT_DIR$/hn-api/hn-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hn-common/hn-common.iml" filepath="$PROJECT_DIR$/hn-common/hn-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hn-company/hn-company.iml" filepath="$PROJECT_DIR$/hn-company/hn-company.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hn-core/hn-core.iml" filepath="$PROJECT_DIR$/hn-core/hn-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hn-mail/hn-mail.iml" filepath="$PROJECT_DIR$/hn-mail/hn-mail.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hn-manage/hn-manage.iml" filepath="$PROJECT_DIR$/hn-manage/hn-manage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hn-parent/hn-parent.iml" filepath="$PROJECT_DIR$/hn-parent/hn-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/hn-zgh-cloud.iml" filepath="$PROJECT_DIR$/.idea/hn-zgh-cloud.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jpush/jpush.iml" filepath="$PROJECT_DIR$/jpush/jpush.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rabbitmq/rabbitmq.iml" filepath="$PROJECT_DIR$/rabbitmq/rabbitmq.iml" />
+    </modules>
+  </component>
+</project>

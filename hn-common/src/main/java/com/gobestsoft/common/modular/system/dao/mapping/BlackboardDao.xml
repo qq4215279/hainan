@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.system.dao.BlackboardDao">
+
+    <select id="getMemberCountByDeptId" resultType="java.lang.Integer">
+        SELECT
+        ifnull(sum(member_count),0)
+        FROM sys_dept dm
+        LEFT JOIN t_member_count pin ON pin.dept_id = dm.id
+        WHERE dm.id=${deptId}
+    </select>
+    <!--<select id="getMemberCountByDeptId" resultType="java.lang.Integer">
+      SELECT COUNT(0) FROM dept_member AS T1
+      INNER JOIN person_info AS T2 ON T1.person_id=T2.id
+      WHERE T1.dept_id=${deptId}
+    </select>-->
+
+
+    <select id="getSubordinateDeptCount" resultType="java.lang.Integer">
+        SELECT COUNT(0) FROM sys_dept WHERE pid=${deptId}
+    </select>
+
+    <select id="getMemberCardCountByDeptId" resultType="java.lang.Integer">
+      SELECT COUNT(0) FROM dept_member AS T1
+      INNER JOIN person_info AS T2 ON T1.person_id=T2.id
+      WHERE T1.dept_id=${deptId} AND  (T1.station_card IS NOT NULL OR T1.station_card != '')
+    </select>
+
+    <select id="getMemberCountAndSubordinateByDeptId" resultType="java.lang.Integer">
+        SELECT
+            ifnull(member_whole_count,0)
+        FROM t_member_count
+        WHERE dept_id =${deptId}
+    </select>
+    <!--<select id="getMemberCountAndSubordinateByDeptId" resultType="java.lang.Integer">
+        SELECT
+          COUNT(0)
+        FROM dept_member
+        INNER join sys_dept on sys_dept.id=dept_member.dept_id
+        INNER join person_info on person_info.id=dept_member.person_id
+        LEFT JOIN sys_user ON sys_user.uid=dept_member.create_user
+       where
+        dept_member.dept_id IN (SELECT id FROM sys_dept where id=${deptId} or pids like '%,${deptId}%')
+    </select>-->
+
+
+    <select id="memberStatistics" resultType="java.util.Map">
+        SELECT
+        (SELECT COUNT(0) FROM person_info AS T1 INNER JOIN dept_member T2 ON T1.id=T2.person_id WHERE T1.sex=1)AS men,
+        (SELECT COUNT(0) FROM person_info AS T1 INNER JOIN dept_member T2 ON T1.id=T2.person_id WHERE T1.sex=2)AS women
+    </select>
+
+    <select id="registerMember" resultType="java.util.Map">
+        SELECT
+        (SELECT COUNT(0) FROM app_user)AS registerCount,
+        (SELECT COUNT(0) FROM person_info AS T1 INNER JOIN dept_member T2 ON T1.id=T2.person_id )AS memberCount,
+        (SELECT COUNT(0) FROM person_info AS T1 INNER JOIN dept_member T2 ON T1.id=T2.person_id
+        INNER JOIN app_user on app_user.member_id = T2.id)AS bindUserCount
+    </select>
+
+
+
+
+    <select id="lastYearMonthStatistics" resultType="java.util.Map">
+        <foreach collection="months" item="month" separator="UNION ALL">
+            SELECT '${month.month}' AS month,
+            (SELECT COUNT(0) FROM app_user WHERE create_time &gt;= '${month.startTime}' AND create_time &lt;='${month.endTime}')AS
+            registerCount,
+            (SELECT COUNT(0) FROM person_info AS T1 INNER JOIN dept_member T2 ON T1.id=T2.person_id
+            WHERE create_time &gt;= '${month.startTime}' AND create_time &lt;='${month.endTime}')AS memberCount,
+            (SELECT COUNT(0) FROM person_info AS T1 INNER JOIN dept_member T2 ON T1.id=T2.person_id
+            INNER JOIN app_user on app_user.member_id = T2.id
+            and app_user.create_time &gt;= '${month.startTime}' AND app_user.create_time &lt;='${month.endTime}')AS bindUserCount
+        </foreach>
+        ORDER BY month DESC
+    </select>
+
+
+    <select id="memberTop10Statistics" resultType="java.util.Map">
+        SELECT T1.memberCount,T2.fullname,
+        (SELECT COUNT(0) FROM person_info AS P1 INNER JOIN dept_member D1 ON P1.id=D1.person_id WHERE P1.sex=1 AND D1.dept_id=T1.dept_id)AS men,
+        (SELECT COUNT(0) FROM person_info AS P1 INNER JOIN dept_member D1 ON P1.id=D1.person_id WHERE P1.sex=2 AND D1.dept_id=T1.dept_id)AS women
+        FROM (SELECT dept_id,COUNT(1) AS memberCount from dept_member GROUP BY dept_id)AS T1
+        INNER JOIN sys_dept AS T2 ON T1.dept_id=T2.id
+        ORDER BY memberCount DESC  LIMIT 10
+    </select>
+
+    <select id="provincialUnionsTop10" resultType="com.gobestsoft.common.constant.model.OrganizationRankData">
+        select sys_dept.id,
+        sys_dept.simplename as name
+        from sys_dept
+        INNER JOIN dept_organization on sys_dept.id=dept_organization.dept_id
+        where dept_type = 0 and level=2
+        order by sys_dept.level,sys_dept.sort,sys_dept.id
+    </select>
+
+    <select id="selectByMember" resultType="java.util.HashMap">
+        SELECT ifnull(member_whole_count,0) as cnt, dm.id as dept_id,fullname from sys_dept dm left join  t_member_count pin on pin.dept_id=dm.id
+        where `level`=2
+        and dm.id in
+        <foreach collection="list" open="(" close=")" separator="," item="dept">
+            #{dept}
+        </foreach>
+        ORDER BY cnt desc LIMIT 0,10
+    </select>
+
+
+    <select id="selectByMemberMore" resultType="java.util.HashMap">
+        SELECT ifnull(member_whole_count,0) as cnt, dm.id as dept_id,fullname from sys_dept dm left join  t_member_count pin on pin.dept_id=dm.id
+        where `level`=2
+        and dm.id in
+        <foreach collection="list" open="(" close=")" separator="," item="dept">
+            #{dept}
+        </foreach>
+        ORDER BY cnt desc LIMIT 11,99
+    </select>
+
+
+    <select id="grassrootsEnterprisesTop10" resultType="java.util.Map">
+        SELECT T1.memberCount,T2.fullname,
+        (SELECT COUNT(0) FROM person_info AS P1 INNER JOIN dept_member D1 ON P1.id=D1.person_id WHERE P1.sex=1 AND D1.dept_id=T1.dept_id)AS men,
+        (SELECT COUNT(0) FROM person_info AS P1 INNER JOIN dept_member D1 ON P1.id=D1.person_id WHERE P1.sex=2 AND D1.dept_id=T1.dept_id)AS women
+        FROM (SELECT dept_id,COUNT(1) AS memberCount from dept_member GROUP BY dept_id)AS T1
+        INNER JOIN sys_dept AS T2 ON T1.dept_id=T2.id
+        WHERE T2.`level`<![CDATA[>=]]>3
+        ORDER BY memberCount DESC  LIMIT 10;
+    </select>
+
+    <select id="joinOrganizationTop5" resultType="java.util.Map">
+        SELECT COUNT(1) AS memberCount,T2.fullname from dept_member AS T1
+        INNER JOIN sys_dept AS T2 ON T1.dept_id=T2.id
+        WHERE T1.create_time &gt;= #{startTime} AND T1.create_time &lt;=#{endTime} GROUP BY T1.dept_id order by memberCount DESC limit 5
+    </select>
+
+    <select id="organizationalRank" resultType="com.gobestsoft.common.constant.model.OrganizationRankData">
+        <foreach collection="months" item="month" separator="UNION ALL">
+        SELECT '${month.month}' AS month,sys_dept.id,sys_dept.simplename AS NAME from sys_dept INNER JOIN dept_organization  on sys_dept.id=dept_organization.dept_id where sys_dept.dept_type = 0
+        and sys_dept.level=2 and dept_organization.create_time &gt;=  ${month.startTime} AND dept_organization.create_time &lt;=${month.endTime}
+    </foreach>
+        ORDER BY month DESC
+    </select>
+
+    <select id="organizationalRanks" resultType="java.lang.Integer">
+        SELECT
+        count(0)
+        FROM
+        sys_dept AS d1
+        INNER JOIN dept_organization ON d1.id = dept_organization.dept_id
+        WHERE
+        d1.pids LIKE CONCAT('%,',#{pid}, ',%')
+        OR d1.pid = #{pid}
+    </select>
+
+    <select id="organizationalRank2" resultType="com.gobestsoft.common.constant.model.OrganizationRankData">
+        <foreach collection="months" item="month" separator="UNION ALL">
+            SELECT '${month.month}' AS month,sys_dept.id,sys_dept.simplename AS NAME from sys_dept INNER JOIN dept_organization  on sys_dept.id=dept_organization.dept_id where sys_dept.dept_type = 0
+            and sys_dept.level=2  and  dept_organization.create_time &lt;=${month.endTime}
+        </foreach>
+        ORDER BY month DESC
+    </select>
+
+
+    <select id="memberRank" resultType="java.util.Map">
+        SELECT '${month.month}' AS month,
+         COUNT(0) AS memberCount
+            FROM dept_member INNER JOIN person_info on dept_member.person_id=person_info.id
+            WHERE create_time &gt;= '${month.startTime}' AND create_time &lt;='${month.endTime}'
+    </select>
+
+    <select id="getMemberInfoByNation" resultType="java.util.Map">
+        select count(t.id) as value,ifnull(dict.name,'其他')as name from dept_member t inner join person_info p on p.id = t.person_id
+        left join sys_dict dict on dict.code is not null and dict.group_code='lib_ethnic_group'
+        and dict.code = p.nation
+        group by name
+
+    </select>
+    <!--按年龄查询会员人数-->
+    <select id="getMemberInfoByAge" resultType="java.util.Map">
+        select count(1) as value from dept_member t inner join person_info p on p.id = t.person_id
+        <if test="startTime!=null and startTime!=''" >
+            and SUBSTRING(p.certificate_num,7,8)   >=   #{startTime}
+        </if>
+        <if test="endTime!=null and endTime!=''" >
+            and SUBSTRING(p.certificate_num,7,8)   &lt;   #{endTime}
+        </if>
+
+    </select>
+
+
+    <!--分组查询学历人数-->
+    <select id="getMemberInfoByEducation" resultType="java.util.Map">
+        select count(t.id) as value,ifnull(sys_dict.name,'其他')as name from dept_member t inner join person_info p on p.id = t.person_id
+        left join sys_dict on sys_dict.code is not null and sys_dict.group_code='lib_education_code'
+        and sys_dict.code = p.education
+        group by p.education
+
+    </select>
+    <!--农民工比例-->
+    <select id="getMemberInfoByFarmer" resultType="java.util.Map">
+         select count(1) as value,
+        (case when p.is_farmer =1 then '农民工' else '职工' end)as name from person_info p
+        INNER JOIN dept_member on p.id = dept_member.person_id
+        INNER join sys_dict dict on dict.group_code ='lib_is_not' and dict.code= p.is_farmer and dict.`code`!=''
+
+        group by p.is_farmer
+
+
+    </select>
+    <!--查询户籍分布，需要java重新处理-->
+    <select id="getMemberInfoByDocile" resultType="java.util.Map">
+
+          select count(t.id) as value,ifnull(p.domicile,'其他')as name
+        from dept_member t inner join person_info p on p.id = t.person_id
+        group by p.domicile
+
+    </select>
+    <!--根据性别分组查询人数-->
+    <select id="getMemberCountBySex" resultType="java.util.Map">
+
+        select count(t.id) as value,dict.name   as name
+        from dept_member t inner join person_info p on p.id = t.person_id
+        INNER join sys_dict dict on dict.group_code ='lib_sex' and dict.code= p.sex and p.sex is not null
+        group by p.sex
+    </select>
+
+
+
+    <select id="selectMemberCount" resultType="Integer">
+        select count(1) from person_info,dept_member
+        where person_info.id = dept_member.person_id
+
+    </select>
+    <!--查询会员户口-->
+    <select id="selectHouseHoldMemberByDate"  resultType="Integer">
+        select count(0) as value,
+        LEFT(dept_member.create_time,8) as createTime
+        from dept_member
+        where
+        exists( select 1 from person_info
+                where person_info.id=dept_member.person_id
+                <if test="household !=null and household != '' ">
+                    AND  IFNULL(person_info.household,'01') =#{household}
+                </if>
+              )
+        <if test="date!=null and date!=''">
+            and  dept_member.create_time &gt;= concat(#{date},'000000')
+            and  dept_member.create_time &lt;= concat(#{date},'235959')
+        </if>
+
+    </select>
+
+    <select id="szghRehomeUnionsTop10" resultType="java.util.Map">
+        select
+            p5.simplename,
+            count(dept_id) as cnt
+            from sys_dept p5
+        INNER JOIN
+        (SELECT
+            p3.dept_id
+        FROM
+            dept_member p3
+            INNER JOIN (
+                SELECT
+                    p1.id as perid
+                FROM
+                    person_info p1
+                where
+                EXISTS(
+                select 1 from
+                wp_ticket_back p2
+                where
+                p1.certificate_num = p2.idcard
+                    )) AS per_wp_1
+                ON p3.person_id = per_wp_1.perid) as per_wp_2
+
+                ON p5.id = per_wp_2.dept_id
+        GROUP BY p5.id
+        ORDER BY cnt desc
+        LIMIT 0,10
+    </select>
+
+    <select id="szgzUnderUnionsTop10" resultType="java.util.Map">
+        SELECT ifnull(rehome_cnt,0) as cnt,fullname
+        from sys_dept dm
+        left join t_member_count pin on pin.dept_id=dm.id
+        where `level`=2
+        ORDER BY cnt desc
+    </select>
+
+    <select id="szghAllRehomeStat" resultType="java.util.Map">
+        select
+            p5.simplename as fullname,
+            count(dept_id) as cnt
+            from sys_dept p5
+        INNER JOIN
+        (SELECT
+            p3.dept_id
+        FROM
+            dept_member p3
+            INNER JOIN (
+                SELECT
+                    p1.id as perid
+                FROM
+                    person_info p1
+                where
+                EXISTS(
+                select 1 from
+                wp_ticket_back p2
+                where
+                p1.certificate_num = p2.idcard
+                    )) AS per_wp_1
+                ON p3.person_id = per_wp_1.perid) as per_wp_2
+
+                ON p5.id = per_wp_2.dept_id
+        where per_wp_2.dept_id IN (SELECT id FROM sys_dept where id=${deptId} or pids like '%,${deptId}%' or pids like '%${deptId},%')
+        GROUP BY p5.id
+        ORDER BY cnt desc
+    </select>
+
+    <select id="szgzUnderUnionsMore" resultType="java.util.Map">
+        SELECT ifnull(rehome_cnt,0) as cnt,fullname
+        from sys_dept dm
+        left join t_member_count pin on pin.dept_id=dm.id
+        where `level`=2
+        ORDER BY cnt desc
+        limit 11,99
+    </select>
+
+    <select id="getTotalCnt" resultType="java.lang.Integer">
+        select count(1) from wp_ticket_back
+    </select>
+
+    <select id="getAllTotalCnt" resultType="java.lang.Integer">
+        select sum(cnt) as cnt from (select
+            p5.id,
+            p5.simplename,
+            count(dept_id) as cnt
+            from sys_dept p5
+        INNER JOIN
+        (SELECT
+            p3.dept_id
+        FROM
+            dept_member p3
+            INNER JOIN (
+                SELECT
+                    p1.id as perid
+                FROM
+                    person_info p1
+                where
+                EXISTS(
+                select 1 from
+                wp_ticket_back p2
+                where
+                p1.certificate_num = p2.idcard
+                    )) AS per_wp_1
+                ON p3.person_id = per_wp_1.perid) as per_wp_2
+
+                ON p5.id = per_wp_2.dept_id
+        where per_wp_2.dept_id IN (SELECT id FROM sys_dept where id=${deptId} or pids like '%,${deptId}%' or pids like '%${deptId},%')
+        GROUP BY p5.id
+        ORDER BY cnt desc) as abc
+    </select>
+
+    <select id="getUnionbyCnt" resultType="java.lang.Integer">
+        select count(cnt) as cnt from (select
+            p5.id,
+            p5.simplename,
+            count(dept_id) as cnt
+            from sys_dept p5
+        INNER JOIN
+        (SELECT
+            p3.dept_id
+        FROM
+            dept_member p3
+            INNER JOIN (
+                SELECT
+                    p1.id as perid
+                FROM
+                    person_info p1
+                where
+                EXISTS(
+                select 1 from
+                wp_ticket_back p2
+                where
+                p1.certificate_num = p2.idcard
+                    )) AS per_wp_1
+                ON p3.person_id = per_wp_1.perid) as per_wp_2
+
+                ON p5.id = per_wp_2.dept_id
+        where per_wp_2.dept_id IN (SELECT id FROM sys_dept where id=${deptId} or pids like '%,${deptId}%' or pids like '%${deptId},%')
+        GROUP BY p5.id
+        ORDER BY cnt desc) as abc
+    </select>
+
+    <select id="getAllMemCnt" resultType="java.lang.Integer">
+        SELECT ifnull(member_whole_count,0) as cnt from sys_dept dm left join  t_member_count pin on pin.dept_id=dm.id
+        where `level`=2
+        and dm.id = ${deptId}
+    </select>
+
+    <select id="getAllAuthMemCnt" resultType="java.lang.Integer">
+        SELECT
+            count(1) as cnt
+        FROM
+            dept_member
+        WHERE
+            dept_id IN ( SELECT id FROM sys_dept WHERE id = ${deptId} OR pids LIKE '%,${deptId}%' OR pids LIKE '%${deptId},%' )
+            AND dept_member.isBind = 1
+    </select>
+
+    <select id="getAllFarmerCnt" resultType="java.lang.Integer">
+        SELECT
+            COUNT(1)
+        FROM
+            person_info per
+        WHERE
+            id IN (SELECT dept_member.person_id FROM dept_member WHERE dept_id in ( SELECT id FROM sys_dept WHERE id = ${deptId} OR pids LIKE '%,${deptId}%' OR pids LIKE '%${deptId},%' ) )
+            AND per.household = 00
+    </select>
+
+    <select id="getAllDeptId" resultType="java.lang.Integer">
+        SELECT t_member_count.dept_id
+        FROM t_member_count join sys_dept on t_member_count.dept_id=sys_dept.id
+    </select>
+
+    <update id="adjustMemberCount">
+        update t_member_count
+        set member_count=(
+            SELECT COUNT(0) FROM dept_member AS T1
+            INNER JOIN person_info AS T2 ON T1.person_id=T2.id
+            WHERE T1.dept_id=${deptId}
+        ),
+        member_whole_count=(
+            SELECT
+                COUNT(0)
+            FROM dept_member
+            INNER join sys_dept on sys_dept.id=dept_member.dept_id
+            INNER join person_info on person_info.id=dept_member.person_id
+            LEFT JOIN sys_user ON sys_user.uid=dept_member.create_user
+            where
+            dept_member.dept_id IN (SELECT id FROM sys_dept where id=${deptId} or pids like '%,${deptId}%')
+        )
+        where dept_id=${deptId}
+    </update>
+
+    <select id="getRealNameData" resultType="java.lang.Integer">
+        select count(1) as num from sys_dept where pid=${deptId} or pids like '%,${deptId}%'
+
+        union all
+
+        select count(1) as num from dept_member
+        join person_info on dept_member.person_id=person_info.id
+        LEFT JOIN sys_user ON sys_user.uid = dept_member.create_user
+        where dept_id in(
+            select id from sys_dept where id=${deptId} or pid=${deptId} or pids like '%,${deptId}%'
+        )
+
+        union all
+
+        select count(1) as num from dept_member
+        join person_info on dept_member.person_id=person_info.id
+        LEFT JOIN sys_user ON sys_user.uid = dept_member.create_user
+        where dept_id in(
+            select id from sys_dept where id=${deptId} or pid=${deptId} or pids like '%,${deptId}%'
+        )
+        and is_farmer=1
+
+        union all
+
+        select count(1) as num from dept_member
+        join person_info on dept_member.person_id=person_info.id
+        LEFT JOIN sys_user ON sys_user.uid = dept_member.create_user
+        where dept_id in(
+            select id from sys_dept where id=${deptId} or pid=${deptId} or pids like '%,${deptId}%'
+        )
+        and isBind=1
+    </select>
+
+    <insert id="insertRealNameData" parameterType="java.util.List">
+        insert into sys_tongji_real_data
+        (org_id,org_name,org_num,mem_num,far_num,ver_num,per_num)
+        values
+        <foreach collection="list" item="pojo" separator=",">
+            (#{pojo.orgId},
+            #{pojo.orgName},
+            #{pojo.orgNum},
+            #{pojo.memNum},
+            #{pojo.farNum},
+            #{pojo.verNum},
+            #{pojo.perNum})
+        </foreach>
+    </insert>
+
+    <select id="getRealDataCount" resultType="java.lang.Integer">
+        select count(1) from sys_tongji_real_data where org_id=#{orgId}
+    </select>
+
+    <update id="updateRealData" parameterType="map">
+        update sys_tongji_real_data
+        set
+            org_name=#{orgName},org_num=#{orgNum},mem_num=#{memNum}
+            ,far_num=#{farNum},ver_num=#{verNum},per_num=#{perNum}
+        where
+            org_id=#{orgId}
+    </update>
+
+    <select id="getCacheRealData" resultType="java.util.LinkedHashMap">
+        select org_name,org_num,mem_num,far_num,ver_num,per_num from sys_tongji_real_data order by org_id
+    </select>
+</mapper>

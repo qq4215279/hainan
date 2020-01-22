@@ -1,0 +1,147 @@
+<css >
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+
+<body>
+<div class="form-horizontal">
+    <input type="hidden" id="pagetype" th:value="${pagetype}">
+    <div class="row">
+        <div class="col-sm-3">
+            <search:input id="deptName" label="工会名称" name="deptName" value="" type="text" placeholder="请输入工会全称"></search:input>
+        </div>
+
+        <div class="col-sm-5" th:if="${pagetype == '3'}">
+            <search:input id="orgcode" label="工会法人信用代码" name="orgcode" value="" type="text" placeholder="请输入工会法人和其他组织统一社会信用代码"></search:input>
+        </div>
+
+        <div class="col-sm-1">
+            <qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="OrganizeApply.search()"></qx:btn>
+        </div>
+    </div>
+
+    <table id="OrganizeTable" data-mobile-responsive="true" data-click-to-select="true">
+    </table>
+
+</div>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+        /**
+         * 初始化表格对象
+         */
+        var OrganizeApply = {
+            id: "OrganizeTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        OrganizeApply.initColumn = function () {
+            return [
+
+                {field: 'selectItem', radio: true},
+                {title: '工会名称', field: 'unionName', align: 'center', valign: 'middle'},
+                {title: '单位名称', field: 'unitName', align: 'center', valign: 'middle'},
+                {title: '创建时间', field: 'createTime', align: 'center', valign: 'middle',formatter: initTimeField},
+                {title: '操作', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        return '<a href="javascript:OrganizeApply.del(' + row.deptId + ",'" + row.unionName + "'" + ')">删除</a>';
+                    }
+                }
+            ];
+        }
+        //初始化列表的时间类型的字段
+        function initTimeField(value, row, index){
+            var time = row.createTime;
+            if(time){
+                return time.substring(0,4)+"-"+time.substring(4,6)+"-"+time.substring(6,8)+" "+time.substring(8,10)+":"+time.substring(10,12);
+            }
+        }
+
+        /**
+         * 点击删除
+         */
+        OrganizeApply.del = function(deptId, deptName) {
+            var pagetype = $("#pagetype").val();
+
+            if(pagetype == "2"){
+                if (this.check()) {
+                    var fun = function () {
+                        var ajax = new $ax(App.ctxPath + "repeat/delOrganize?deptName=" + deptName, function (data) {
+                            App.success("成功删除！", '');
+                        }, function (data) {
+                            App.error("删除失败!");
+                        });
+                        ajax.start();
+                        OrganizeApply.table.refresh({query: OrganizeApply.formParams()});
+                    }
+                    App.confirm("确定要删除吗？", fun);
+                }
+            }
+
+            if(pagetype == "3"){
+                if (this.check()) {
+                    var fun = function () {
+                        var ajax = new $ax(App.ctxPath + "repeat/delOrganizeCode?deptId=" + deptId, function (data) {
+                            if(data.message != '' && data.message != null){
+                                App.error(data.message);
+                            } else {
+                                App.success("成功删除！", '');
+                            }
+                        }, function (data) {
+                                App.error("删除失败!");
+                        });
+                        ajax.start();
+                        OrganizeApply.table.refresh({query: OrganizeApply.formParams()});
+                    }
+                    App.confirm("确定要删除组织吗？", fun);
+                }
+            }
+        };
+
+
+        /**
+         * 检查是否选中
+         */
+        OrganizeApply.check = function () {
+            var selected = $('#' + this.id).bootstrapTable('getSelections');
+            if (selected.length == 0) {
+                App.info("请先选中表格的中某一记录！");
+                return false;
+            } else {
+                OrganizeApply.seItem = selected[0];
+                return true;
+            }
+        };
+
+        /**
+         * 查询表单提交参数对象
+         */
+        OrganizeApply.formParams = function () {
+            var queryData = {};
+            queryData['query_deptname'] = $("#deptName").val();
+            queryData['query_orgcode'] = $("#orgcode").val();
+            return queryData;
+        }
+
+        /**
+         * 查询列表
+         */
+        OrganizeApply.search = function () {
+            OrganizeApply.table.refresh({query: OrganizeApply.formParams()});
+        };
+
+        $(function () {
+            var pagetype = $("#pagetype").val();
+            var defaultColunms = OrganizeApply.initColumn();
+            var table = new BSTable(OrganizeApply.id, "/repeat/list?type=" + pagetype, defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(OrganizeApply.formParams());
+            OrganizeApply.table = table.init();
+        });
+    </script>
+</js>
+</body>

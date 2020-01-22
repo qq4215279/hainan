@@ -1,0 +1,143 @@
+<css >
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+	<form class="col-sm-12" id="search">
+		<div class="form-horizontal">
+			<div class="row">
+				<div class="col-sm-4">
+					<search:select label="消息类型" name="categoryId"
+	                               code="msg_type"></search:select>
+				</div>
+				<div class="col-sm-4">
+					<search:select label="消息范围" name="appoint"
+	                               code="msg_range"></search:select>
+				</div>
+				<div class="col-sm-3">
+					<qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="Message.search()"></qx:btn>
+					<qx:btn  class="btn btn-primary" fa="fa fa-close" label="重置" permission="" onclick="Message.reset()"></qx:btn>
+				</div>
+			</div>
+			<div class="hidden-xs" id="messageTableToolbar" role="group">
+				<qx:btn class="btn btn-primary" fa="fa fa-plus" label="发布消息" onclick="Message.send()"></qx:btn>
+			</div>
+			<table id="messageTable" data-mobile-responsive="true" data-click-to-select="true">
+			</table>
+		</div>
+	</form>
+</body>
+
+<js>
+<div th:include="fragment/fargment :: bootstrapTableJs"></div>
+<script type="text/javascript">
+
+    /**
+     * 角色管理的单例
+     */
+    var Message = {
+        tableId: "messageTable",	//表格id
+        seItem: null,
+        table: null,
+        layerIndex: -1
+    };
+
+    /**
+     * 初始化表格的列
+     */
+    Message.initColumn = function () {
+        var columns = [
+            {title: 'id', field: 'id', visible: false, align: 'center', valign: 'middle'},
+            {title: '标题', field: 'title', align: 'center', valign: 'middle'},
+            {title: '内容', field: 'content', align: 'center', valign: 'middle'},
+            {title: '消息类型', field: 'categoryName', align: 'center', valign: 'middle'},
+            {title: '消息范围', field: 'appoint', align: 'center', valign: 'middle'},
+            {title: '推送消息', field: 'is_push', align: 'center', valign: 'middle'},
+            {title: '创建时间', field: 'create_time', align: 'center', valign: 'middle'},
+            {
+                title: '创建人',
+                field: 'name',
+                align: 'center',
+                valign: 'middle',
+                formatter: function (value, row, index) {
+                    if (value) {
+                        return value;
+                    }
+                    return "海南省总工会";
+                }
+            },
+            {
+                title: '操作', field: 'opt', visible: true, align: 'center', valign: 'middle',
+                formatter: function (value, row, index) {
+                    return '<a href="javascript:void(0);" onclick="Message.watch(\'' + row.id + '\')"><i class="fa fa-eye"></i>查看</a>';
+                }
+            }]
+        return columns;
+    };
+
+    /**
+     * 重置查询框
+     */
+    Message.reset = function () {
+        $('#search')[0].reset();
+    }
+
+    /**
+     * 搜索用户
+     */
+    Message.search = function () {
+        var param = {};
+        param.categoryId = $("#categoryId").val();
+        param.appoint = $("#appoint").val();
+        Message.table.refresh({query: param});
+    }
+
+    /**
+     * 发布消息
+     */
+     /**
+      * 点击新增
+      */
+      Message.send = function () {
+         var index = layer.open({
+             type: 2,
+             title: '发布消息',
+             area: ['100%', '100%'], //宽高
+             fix: false, //不固定
+             maxmin: true,
+             content: App.ctxPath + '/msg/send'
+         });
+         this.layerIndex = index;
+     };
+//     Message.send = function () {
+//         var index = Feng.openIframe({title: "发布消息", url: Feng.ctxPath + '/msg/send'});
+//     }
+
+    /**
+     * 查看消息
+     */
+     Message.watch = function (id) {
+         var index = layer.open({
+             type: 2,
+             title: '查看消息',
+             area: ['100%', '100%'], //宽高
+             fix: false, //不固定
+             maxmin: true,
+             content: App.ctxPath + '/msg/send?id=' + id
+         });
+         this.layerIndex = index;
+     };
+//     Message.watch = function (id) {
+//         var index = Feng.openIframe({title: "查看消息", url: Feng.ctxPath + '/msg/send?id=' + id});
+//     }
+
+    $(function () {
+        var defaultColumn = Message.initColumn();
+        var table = new BSTable(Message.tableId, "/msg/list", defaultColumn);
+        table.setPaginationType("server");
+        table.setShowColumns(false);
+        Message.table = table.init();
+    });
+
+
+</script>
+</js>

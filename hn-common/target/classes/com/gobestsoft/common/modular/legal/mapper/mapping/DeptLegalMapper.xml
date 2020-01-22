@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.legal.mapper.DeptLegalMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.legal.model.DeptLegal">
+		<id column="id" property="id" />
+		<result column="dept_id" property="deptId" />
+		<result column="name"   property="name"    />
+		<result column="sex" property="sex" />
+		<result column="nation"   property="nation"/>
+		<result column="birthday" property="birthday" />
+		<result column="education"   property="education"    />
+		<result column="political_outlook" property="politicalOutlook" />
+		<result column="native_place" property="nativePlace" />
+		<result column="work_position"   property="workPosition"    />
+		<result column="tnure_start_date" property="tnureStartDate" />
+		<result column="tnure_end_data"   property="tnureEndData"    />
+		<result column="part_time_job" property="partTimeJob" />
+		<result column="certificate_no"   property="certificateNo"    />
+		<result column="other_position" property="otherPosition" />
+		<result column="join_time"   property="joinTime"    />
+		<result column="election_date" property="electionDate" />
+		<result column="del_flg"   property="delFlg"    />
+	</resultMap>
+	
+	<!-- 根据deptId,查询法人基本信息 -->
+	<select id="selectDeptLegalByDeptId" resultMap="BaseResultMap">
+		select * from dept_legal where dept_legal.dept_id = #{deptId}
+		and del_flg=0
+	</select>
+	
+
+
+</mapper>

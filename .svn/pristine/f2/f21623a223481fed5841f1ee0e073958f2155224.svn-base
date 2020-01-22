@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dao.mapper.SrvLawSupportMapper">
+
+
+    <resultMap id="BaseResultMap" type="HashMap">
+        <id column="id" property="id"/>
+        <result column="type" property="type"/>
+        <result column="cause" property="cause"/>
+        <result column="shape" property="shape"/>
+        <result column="name" property="name"/>
+        <result column="sex" property="sex"/>
+        <result column="nation" property="nation"/>
+        <result column="birthday" property="birthday"/>
+        <result column="certificate_num" property="certificateNum"/>
+        <result column="mobile" property="mobile"/>
+        <result column="occupation" property="occupation"/>
+        <result column="domicile_place" property="domicilePlace"/>
+        <result column="person_type" property="personType"/>
+        <result column="work_unit" property="workUnit"/>
+        <result column="unit_address" property="unitAddress"/>
+        <result column="address" property="address"/>
+        <result column="home_address" property="homeAddress"/>
+        <result column="zip_code" property="zipCode"/>
+        <result column="tel" property="tel"/>
+        <result column="familyNumber" property="familyNumber"/>
+        <result column="monthly_income" property="monthlyIncome"/>
+        <result column="family_monthly_income" property="familyMonthlyIncome"/>
+        <result column="family_monthly_avg_income" property="familyMonthlyAvgIncome"/>
+        <result column="family_income_condition" property="familyIncomeCondition"/>
+        <result column="case_type" property="caseType"/>
+        <result column="case_reason" property="caseReason"/>
+        <result column="case_money" property="caseMoney"/>
+        <result column="case_situation" property="caseSituation"/>
+        <result column="evidence" property="evidence"/>
+        <result column="create_uid" property="createUid"/>
+        <result column="create_time" property="createTime"/>
+        <result column="status" property="status"/>
+        <result column="expire_time" property="expireTime"/>
+        <result column="sys_attachments" property="sysAttachments"/>
+    </resultMap>
+    
+    
+    <!-- 通用版全部字段-->
+	<sql id="commonColumns">
+	    srv_law_support.id,
+	    srv_law_support.type,
+	    srv_law_support.cause,
+	    srv_law_support.shape,
+	    srv_law_support.name,
+	    srv_law_support.sex,
+	    srv_law_support.birthday,
+	    srv_law_support.nation,
+	    srv_law_support.certificate_num,
+	    srv_law_support.occupation,
+	    srv_law_support.mobile,
+	    srv_law_support.domicile_place,
+	    srv_law_support.person_type,
+	    srv_law_support.work_unit,
+	    srv_law_support.unit_address,
+	    srv_law_support.address,
+	    srv_law_support.home_address,
+	    srv_law_support.zip_code,
+	    srv_law_support.tel,
+	    srv_law_support.family_number,
+	    srv_law_support.monthly_income,
+	    srv_law_support.family_monthly_income,
+	    srv_law_support.family_monthly_avg_income,
+	    srv_law_support.family_income_condition,
+	    srv_law_support.case_type,
+	    srv_law_support.case_reason,
+	    srv_law_support.case_money,
+	    srv_law_support.case_situation,
+	    srv_law_support.evidence,
+	    srv_law_support.income,
+	    srv_law_support.residence_booklet as residenceBooklet,
+	    srv_law_support.create_time,
+	    srv_law_support.create_uid,
+	    srv_law_support.status,
+	    srv_law_support.expire_time,
+	    srv_law_support.sys_attachments
+	</sql>
+
+
+	<!-- 对应selectByCondition方法，条件查询（姓名,状态） -->
+	<select id="selectByCondition" resultMap="BaseResultMap">
+
+		select temp.* from (
+		SELECT
+
+		distinct(srv_law_support.id) support_id,
+		sys_user.account AS account,
+		srv_law_support_log.id AS supportLogId,
+		srv_law_support_log.status AS logStatus,
+		srv_law_support.id,
+		srv_law_support.type,
+		srv_law_support.cause,
+		srv_law_support.shape,
+		srv_law_support.NAME,
+		srv_law_support.sex,
+		srv_law_support.birthday,
+		srv_law_support.nation,
+		srv_law_support.certificate_num,
+		srv_law_support.occupation,
+		srv_law_support.mobile,
+		srv_law_support.domicile_place,
+		srv_law_support.person_type,
+		srv_law_support.work_unit,
+		srv_law_support.unit_address,
+		srv_law_support.address,
+		srv_law_support.home_address,
+		srv_law_support.zip_code,
+		srv_law_support.tel,
+		srv_law_support.family_number,
+		srv_law_support.monthly_income,
+		srv_law_support.family_monthly_income,
+		srv_law_support.family_monthly_avg_income,
+		srv_law_support.family_income_condition,
+		srv_law_support.case_type,
+		srv_law_support.case_reason,
+		srv_law_support.case_money,
+		srv_law_support.case_situation,
+		srv_law_support.evidence,
+		srv_law_support.create_time,
+		srv_law_support.create_uid,
+		srv_law_support.status,
+		srv_law_support.expire_time,
+		srv_law_support.sys_attachments
+		FROM
+		srv_law_support
+		LEFT JOIN sys_user ON sys_user.uid = srv_law_support.create_uid
+		INNER JOIN srv_law_support_log ON srv_law_support_log.support_id = srv_law_support.id
+		<where>
+			<if test="name != null and name != ''">
+				AND srv_law_support.name like '%${name}%'
+			</if>
+			<if test="status != null and status != ''">
+				and srv_law_support.status = #{status}
+			</if>
+			<if test="type != null and type != ''">
+				and srv_law_support.type = #{type}
+			</if>
+			<if test="workUnit != null and workUnit != ''">
+				AND srv_law_support.work_unit like '%${workUnit}%'
+			</if>
+			<if test="deptId!=null and deptId!=''">
+				and srv_law_support_log.check_dept_id = #{deptId}
+			</if>
+
+		</where>
+		ORDER BY
+
+		srv_law_support_log.create_time desc
+
+		)temp  group by temp.support_id order by temp.create_time desc
+
+
+	</select>
+	
+	<select id="lawSupportDetail" resultType="java.util.Map">
+	     SELECT 
+	     causeDict.`name` AS cause_name,
+	     shapeDict.`name` AS shape_name,
+	     sexDict.`name` AS sex_name,
+	     nationDict.`name` AS nation_name,
+	     personTypeDict.`name` AS person_type_name,
+	     caseTypeDict.`name` AS case_type_name,
+	     <include refid="commonColumns"></include>
+	     FROM srv_law_support
+	     LEFT JOIN sys_dict causeDict ON causeDict.`code` = srv_law_support.cause AND causeDict.group_code = 'lib_cause'
+	     LEFT JOIN sys_dict shapeDict ON shapeDict.`code` = srv_law_support.shape AND shapeDict.group_code = 'lib_support_shape'
+	  	 LEFT JOIN sys_dict sexDict ON sexDict.`code` = srv_law_support.sex   AND sexDict.group_code = 'lib_sex'
+         LEFT JOIN sys_dict nationDict ON nationDict.`code` = srv_law_support.nation AND nationDict.group_code = 'lib_ethnic_group'
+         LEFT JOIN sys_dict personTypeDict ON personTypeDict.`code` = srv_law_support.person_type AND personTypeDict.group_code = 'lib_person_type'
+         LEFT JOIN sys_dict caseTypeDict ON caseTypeDict.`code` = srv_law_support.case_type AND caseTypeDict.group_code = 'lib_case_type'
+	     WHERE srv_law_support.id = #{id}
+	</select>
+	
+	
+	<select id="selectSupportListByUser" resultType="java.util.Map">
+		SELECT
+		t.id,
+		t.shape support_shape,
+		d.name as support_shape_name,
+		t.create_time,
+		t.status,
+		t.commit_flag,
+		(select log.comment  from  srv_law_support_log log where log.support_id = t.id and  log.status in (2,3) order by status asc,log.check_date desc limit 1) audit_comment,
+		expire_time
+		FROM
+		srv_law_support t
+		left join sys_dict d on d.group_code='lib_support_shape' and d.code= t.shape
+		where t.create_uid=#{uid}
+		order by create_time desc
+</select>
+
+	<select id="selectSonDept" resultType="java.util.Map">
+
+		select id deptId, fullname
+		from sys_dept
+		where pid =#{pid} order by sys_dept.id
+
+	</select>
+
+	<update id="updateAuditDeptId" >
+
+		update srv_law_support_log
+		set comment =#{transfer_reason},
+		status=4,
+		transfer_dept_id=#{transfer_dept_id},
+		transfer_time= date_format(now(),'%Y%m%d')
+		where exists (
+			select id from srv_law_support where id=#{support_id} and status =1
+		)
+		and support_id=#{support_id}
+
+	</update>
+
+	<!--查询所有已经过期的申请-->
+	<select id="selectExpireAudit" resultType="java.util.Map">
+
+		select temp.id,temp.create_uid
+		from (
+			select t.id,count(log.id)log_count,t.create_uid from srv_law_support t left join srv_law_support_log log
+				on log.support_id = t.id and log.status in(2,3)
+
+				where t.status=1
+				and t.create_time <![CDATA[<]]> date_format(date_sub(now(),INTERVAL #{day} day),'%Y%m%d%H%i%s')
+				group by t.id
+
+		)temp where temp.log_count=0
+
+
+	</select>
+
+	<update id="updateExpireAudit" parameterType="list">
+		update srv_law_support set status=3
+		where id in
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		and status=1
+	</update>
+
+	<update id="updateExpireLog" parameterType="list">
+		update srv_law_support_log set status=3,comment='审核超时，申请被退回，请重新提交申请',
+		check_date =date_format(now(),'%Y%m%d%H%i%s')
+		where support_id in
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		and status=1
+
+	</update>
+
+	<select id="selectCityDept" resultType="com.gobestsoft.common.modular.system.model.Dept">
+
+		select t.* from sys_dept t where (
+		 exists
+				(select  1 from sys_dept t1 where t1.pids like concat('%,',t.id,'%')  and t1.id = #{id})
+				or id = #{id}
+		)
+		and t. level = 2 limit 1
+	</select>
+</mapper>

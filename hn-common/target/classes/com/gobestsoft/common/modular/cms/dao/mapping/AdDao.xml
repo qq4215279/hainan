@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.cms.dao.AdDao">
+
+    <!-- 对应selectByCondition方法，条件查询，无分页（状态，标题，开始日期，结束日期） -->
+    <resultMap type="com.gobestsoft.common.modular.cms.model.Ad" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="coverPath" column="cover_path"/>
+        <result property="coverUrl" column="cover_url"/>
+        <result property="columnId" column="column_id"/>
+        <result property="linkUrl" column="link_url"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="sort" column="sort"/>
+        <result property="createUser" column="create_user"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateUser" column="updateUser"/>
+        <result property="updateTime" column="updateTime"/>
+        <result property="status" column="status"/>
+        <result property="hitNum" column="hit_num"/>
+        <result property="tags" column="tags"/>
+        <result property="logo" column="logo"/>
+        <result property="companyName" column="company_name"/>
+        <result property="type" column="type"/>
+    </resultMap>
+
+    <!-- 条件查询 集合 -->
+    <select id="selectByCondition" resultMap="BaseResultMap">
+        SELECT
+		t1.*
+        FROM
+		cms_ad t1
+        WHERE 1=1 
+       	AND t1.title like CONCAT('%',#{title},'%')
+       	<if test="companyName != null and companyName != '' ">
+            AND t1.company_name like CONCAT('%',#{companyName},'%')
+        </if>
+        <if test="columnId != -1">
+            AND t1.column_id = #{columnId}
+        </if>
+        <if test="status != null and status != -2 ">
+            AND t1.status = #{status}
+        </if>
+		<if test="type != null and type != -1 ">
+            AND t1.type = #{type}
+        </if>
+        <if test="begDate != null and begDate != ''">
+            AND start_time &gt; #{begDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND end_time &lt; #{endDate}
+        </if>
+        ORDER BY t1.type DESC,t1.sort ASC,t1.id DESC
+    </select>
+    
+    <!-- 主键查询 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+		t1.*
+        FROM
+		cms_ad t1
+		WHERE id = #{id}
+    </select>
+
+
+    <!-- 对应insert方法，新增一条 -->
+    <insert id="insert" parameterType="com.gobestsoft.common.modular.cms.model.Ad">
+		INSERT INTO cms_ad (
+			title,
+			cover_path,
+			cover_url,
+			link_url,
+			sort,
+			create_user,
+			create_time,
+			status,
+			type
+		)
+		VALUES(
+			#{title},
+			#{coverPath},
+			#{coverUrl},
+			#{linkUrl},
+			#{sort},
+			#{createUser},
+			#{createTime},
+			#{status},
+			#{type}
+		)
+	</insert>
+
+    <!-- 对应update方法，修改一条 -->
+    <update id="update" parameterType="com.gobestsoft.common.modular.cms.model.Ad">
+        UPDATE cms_ad
+        SET
+        title = #{title},
+        <if test="coverPath != null and coverPath != ''">
+            cover_path = #{coverPath},
+        	cover_url = #{coverUrl},
+        </if>
+        link_url= #{linkUrl},
+        sort = #{sort},
+        update_user = #{updateUser},
+        update_time = #{updateTime},
+        type = #{type}
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 对应delete方法，修改一条 -->
+    <update id="delete" >
+        UPDATE cms_ad
+		SET del_flg = 1
+		WHERE id = #{id }
+    </update>
+    
+    <!-- 对应updateStatus方法，修改一条 -->
+    <update id="updateStatus" >
+        UPDATE cms_ad
+		SET status = #{status}
+		WHERE id = #{id}
+    </update>
+
+
+
+</mapper>

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.cms.dao.CourseDao">
+
+    <!--条件查询 集合-->
+    <select id="selectNormalCourseList" resultType="com.gobestsoft.common.modular.cms.model.Course">
+        SELECT t.*
+        FROM cms_course t
+        WHERE
+        t.del_Flg = 0
+        AND pid = 0
+        AND type = #{type}
+        <if test="status != null and status != -1">
+            AND t.status = #{status}
+        </if>
+        <if test="title != null and title != ''">
+            AND t.title LIKE CONCAT('%',#{title},'%')
+        </if>
+        ORDER BY t.create_time DESC
+    </select>
+
+    <select id="selectSeriesCourseList" resultType="com.gobestsoft.common.modular.cms.model.Course">
+        SELECT t.*
+        FROM cms_course t
+        WHERE
+        t.del_Flg = 0
+        AND pid = #{id}
+        <if test="status != null and status != -1">
+            AND t.status = #{status}
+        </if>
+        <if test="title != null and title != ''">
+            AND t.title LIKE CONCAT('%',#{title},'%')
+        </if>
+        ORDER BY t.create_time DESC
+    </select>
+
+    <!-- 对应addArticle方法，新增一条资讯 -->
+    <insert id="addCourse" parameterType="com.gobestsoft.common.modular.cms.model.Course">
+        INSERT INTO cms_course (
+        pid,
+        type,
+        title,
+        cover,
+        content,
+        attachment,
+        info_type,
+        status,
+        sort,
+        org_id,
+        create_user,
+        create_time,
+        update_user,
+        update_time,
+        is_share,
+        is_topic,
+        is_topic_check,
+        is_like,
+        is_collect,
+        del_flg
+        )
+        VALUES(
+        #{pid},
+        #{type},
+        #{title},
+        #{cover},
+        #{content},
+        #{attachment},
+        #{infoType},
+        #{status},
+        #{sort},
+        #{orgId},
+        #{createUser},
+        #{createTime},
+        #{updateUser},
+        #{updateTime},
+        #{isShare},
+        #{isTopic},
+        #{isTopicCheck},
+        #{isLike},
+        #{isCollect},
+        #{delFlg}
+        )
+    </insert>
+
+    <update id="updateCourseStatusById">
+        UPDATE cms_course
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <update id="delCourse">
+        UPDATE cms_course
+        SET del_flg = 1
+        WHERE id = #{id}
+    </update>
+
+    <!-- 主键查询 -->
+    <select id="selectById" resultType="com.gobestsoft.common.modular.cms.model.Course">
+        SELECT * FROM cms_course
+        WHERE id = #{id}
+    </select>
+
+    <!-- 对应updateCourse方法，修改一条课程信息 -->
+    <update id="updateCourse" parameterType="com.gobestsoft.common.modular.cms.model.Course">
+        UPDATE cms_course
+        SET
+        title = #{title},
+        <if test="cover != null and cover != ''">
+            cover = #{cover},
+        </if>
+        content = #{content},
+        <if test="sort != null and sort != 0">
+            sort= #{sort},
+        </if>
+        <if test="orgId != null ">
+            org_id = #{orgId},
+        </if>
+        update_user= #{updateUser},
+        update_time= #{updateTime},
+        attachment=#{attachment},
+        info_type=#{infoType},
+        is_share=#{isShare},
+        is_topic=#{isTopic},
+        is_like=#{isLike},
+        is_collect=#{isCollect}
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 主键查询 -->
+    <select id="selectCoursePage" resultType="map">
+        SELECT id,type,title,cover,content,info_type,status,org_id,create_user,create_time FROM cms_course
+        <where>
+        	<if test="title != null and title != ''">
+	            and title like '%${title}%'
+	        </if>
+	        <if test="courseType != null ">
+	            and type = #{courseType}
+	        </if>
+        </where>
+    </select>
+
+    <!-- 女子学堂关联课程 -->
+    <select id="selectWomenList" resultType="com.gobestsoft.common.modular.cms.model.Course">
+        SELECT *
+        FROM cms_course m
+        WHERE exists(SELECT *
+        FROM r_course_women r
+        WHERE r.course_id = m.id)
+        AND m.del_flg = 0
+        <if test="status != null and status != -1">
+            AND m.status = #{status}
+        </if>
+        <if test="title != null and title != ''">
+            AND m.title LIKE CONCAT('%',#{title},'%')
+        </if>
+        ORDER BY m.create_time DESC
+    </select>
+
+    <!-- 女子学堂关联课程 -->
+    <select id="selectSelectList" resultType="com.gobestsoft.common.modular.cms.model.Course">
+        SELECT *
+        FROM cms_course m
+        WHERE not exists(SELECT *
+        FROM r_course_women r
+        WHERE r.course_id = m.id)
+        AND m.del_flg = 0
+        <if test="status != null and status != -1">
+            AND m.status = #{status}
+        </if>
+        <if test="title != null and title != ''">
+            AND m.title LIKE CONCAT('%',#{title},'%')
+        </if>
+        <if test="status != null and status != -1">
+            AND m.status = #{status}
+        </if>
+        <if test="begDate != null and begDate != ''">
+            AND m.create_time &gt;= #{begDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND m.create_time &lt;= #{endDate}
+        </if>
+        ORDER BY m.create_time DESC
+    </select>
+
+    <insert id="insertWomenCourse">
+        INSERT INTO r_course_women (
+        course_id
+        )
+        VALUES(
+        #{id}
+        )
+    </insert>
+
+    <delete id="deleteWomenCourse">
+        delete from r_course_women
+        where course_id = #{id}
+    </delete>
+
+</mapper>

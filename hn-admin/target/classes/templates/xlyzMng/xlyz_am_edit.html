@@ -1,0 +1,200 @@
+<css xmlns:form="http://www.w3.org/1999/html" xmlns:form="http://www.w3.org/1999/html"
+     xmlns:form="http://www.w3.org/1999/html">
+<!--    <link th:href="@{http://xiumi.us/connect/ue/v5/xiumi-ue-v5.css}" rel="stylesheet">-->
+    <link th:href="@{/static/css/fileUpload.css}" rel="stylesheet">
+</css>
+<body>
+<div class="container">
+    <div class="form-horizontal" id="bannerForm">
+        <form class="form-horizontal col-sm-8 col-sm-offset-1" id="add-form">
+        <input type="hidden" id="id" th:value="${bean.id}"/>
+        <input type="hidden" id="targetId"/>
+                <form:text label="标题" id="title" name="title" type="text" must="true" value="${bean.title}"></form:text>
+                <form:img id="cover" name="cover" label="封面" must="true" width="1035" height="240" defImg="${bean.cover}"></form:img>
+                <form:file name="attachment" width="300px" must="true" value="${bean.attachment}"></form:file>
+            <div class="form-group" id="spArea" >
+                <label class="col-sm-4 control-label">
+                    音频文件
+                </label>
+                <div class="col-sm-8" id="ypfiles">
+                    <div><span th:attr ="data-filename=${bean.attachment}" th:text="${bean.attachment}">音频文件</span><i class="fa fa-close"></i></div>
+                </div>
+            </div>
+            <form:figure id="play_time" name="play_time" value="${bean.playTime}"  min="0" label="播放时长" placeholder="播放时长（秒）"></form:figure>
+            <div class="row text-center">
+                <div class="hr-line-dashed"></div>
+                <qx:btn fa="fa fa-check" label="提交" permission="" onclick="BannerDlg.addSubmit()"></qx:btn>
+                <qx:btn fa="fa fa-eraser" label="取消" permission="" onclick="BannerDlg.close()"></qx:btn>
+            </div>
+
+
+        </form>
+
+    </div>
+</div>
+</body>
+<js>
+    <div th:include="fragment/fargment :: clipJs"></div>
+    <div th:include="fragment/fargment :: fileUploadJs"></div>
+    <script th:src="@{/static/js/jquery.formHelp.js}"></script>
+    <!--<script th:src="@{/static/ueditor/ueditor.config.js}"></script>-->
+    <!--<script th:src="@{/static/ueditor/ueditor.all.js}"></script>-->
+    <script type="text/javascript">
+        /**
+         * 画面初期处理
+         */
+        var ue;
+        $(function () {
+            // 详细信息form验证
+            App.initValidator("bannerForm", BannerDlg.validateFields);
+        });
+
+
+
+        // 列表展示类型 radio 选择响应
+
+
+
+        /**
+         * 初始化详情内容
+         */
+        var BannerDlg = {
+            BannerData: {},
+            zTreeInstance: null,
+            validateFields: {
+                title: {
+                    validators: {
+                        notEmpty: {
+                            message: '标题不能为空。'
+                        }
+                    }
+                }
+            }
+        };
+
+        /**
+         * Banner详细信息设定
+         */
+        BannerDlg.collectData = function () {
+            this.BannerData['id'] = $('#id').val();
+            this.BannerData['title'] = $('#title').val();
+            this.BannerData['cover'] = $('#cover').val();
+            this.BannerData['attachment'] = $('[data-filename]').attr('data-filename');
+            this.BannerData['playTime'] = $('#play_time').val();
+        }
+
+        /**
+         * 验证数据
+         */
+        BannerDlg.validate = function () {
+            $('#bannerForm').data("bootstrapValidator").resetForm();
+            $('#bannerForm').bootstrapValidator('validate');
+            return $("#bannerForm").data('bootstrapValidator').isValid();
+        };
+
+        /**
+         * 清空数据
+         */
+        BannerDlg.clearData = function () {
+            this.BannerData = {};
+        };
+
+        /**
+         * 【提交】按钮响应
+         */
+        BannerDlg.addSubmit = function () {
+            // 使用serializeJson方法的时候引用jquery.formHelp.js文件
+            this.clearData();
+            this.collectData();
+            if (!this.validate()) {
+                errorFocus();
+                return;
+            }
+            if(!BannerDlg.BannerData['attachment']){
+                App.error("还未上传音频附件");
+                return;
+            }
+            if(!BannerDlg.BannerData['playTime']){
+                App.error("还未填写播放时长");
+                return;
+            }
+            //提交信息
+            var ajax = new $ax(App.ctxPath + "xlyzMng/updateAudio", function (data) {
+                App.success("添加成功!");
+                window.parent.ObjBanner.search();
+                BannerDlg.close();
+            }, function (data) {
+                App.error("添加失败!" + data.responseJSON.message + "!");
+            });
+            ajax.set(BannerDlg.BannerData);
+            ajax.start();
+        };
+
+        /**
+         * 【取消】按钮响应 关闭当前窗口
+         */
+        BannerDlg.close = function () {
+            parent.layer.close(window.parent.ObjBanner.layerIndex);
+        };
+
+
+
+        /**
+         * 视频/音频上传
+         */
+
+        var uploadStatus=0;
+        $("#fileupload").fileupload({
+            url: App.ctxPath + '/xlyzMng/upload?type=yp',
+            start: function (e) {
+                uploadStatus=1;
+                $("#jumpUrl").val('');
+                $('#progressText').html('0%');
+                $('#progressText').css('color', 'black')
+                $('#progress .progress-bar').css('width', '0%');
+            },
+            progressall: function (e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $('#progressText').html(progress + '%')
+                $('#progress .progress-bar').css('width', progress + '%');
+            },
+            done: function (e, data) {
+                var file = data.result;
+                var fileName =file.fileName;
+                var index = fileName.lastIndexOf(".");
+                var suffix =  fileName.substr(index);
+                if(".mp3" != suffix){
+                    $('#progressText').html('error');
+                    $('#progressText').css('color', 'red')
+                    return App.error("请上传MP3类型格式的文件");
+                }
+                uploadStatus=0;
+                $('#progressText').html('complete');
+                $('#progressText').css('color', 'green')
+                $('#spArea').css("display","block");
+                addyp(data.result);
+            },
+            fail: function (e, data) {
+                $('#progressText').html('error');
+                $('#progressText').css('color', 'red')
+            }
+        });
+
+        function addyp(file) {
+            $("#ypfiles").html('');
+            var area=$('<div>' + '<span data-filename = "' + file.fileName + '">'+'音频附件'+'</span><i class="fa fa-close" ></i></div>');
+            $("#ypfiles").append(area);
+            $('#attachment').val(file.fileName);
+            $('#play_time').val(file.duration);
+
+        }
+        $("#ypfiles").on("click",".fa-close",function () {
+            $(this).parent().remove();
+            $('#attachment').val('');
+            $('#play_time').val('');
+        })
+
+
+
+    </script>
+</js>

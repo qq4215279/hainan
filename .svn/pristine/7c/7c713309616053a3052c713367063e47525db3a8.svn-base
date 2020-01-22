@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.bigdata.dao.LastYearMonthStatisticsDao">
+
+
+    <select id="statisticsOne" resultType="com.gobestsoft.common.modular.bigdata.dao.model.LastYearMonthStatistics">
+        SELECT
+          (SELECT COUNT(0) FROM app_user WHERE create_time &gt;= #{startTime} AND create_time &lt;=#{endTime})AS
+        registerCount,
+          (SELECT COUNT(0) FROM person_info AS T1 INNER JOIN dept_member T2 ON T1.id=T2.person_id
+        WHERE create_time &gt;= #{startTime} AND create_time &lt;=#{endTime})AS memberCount,
+          (SELECT COUNT(0) FROM person_info AS T1 INNER JOIN dept_member T2 ON T1.id=T2.person_id
+        INNER JOIN app_user on app_user.member_id = T2.id
+        and app_user.create_time &gt;= #{startTime} AND app_user.create_time &lt;=#{endTime})AS bindUserCount
+    </select>
+
+</mapper>

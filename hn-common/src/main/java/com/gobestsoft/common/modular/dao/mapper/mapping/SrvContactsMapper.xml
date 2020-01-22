@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dao.mapper.SrvContactsMapper">
+
+    <resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.dao.model.SrvContactsPojo">
+        <id column="id" property="id"/>
+        <result column="target_id" property="targetId"/>
+        <result column="name" property="name"/>
+        <result column="relation" property="relation"/>
+        <result column="type" property="type"/>
+        <result column="sex" property="sex"/>
+        <result column="political_status" property="politicalStatus"/>
+        <result column="education" property="education"/>
+        <result column="certificate_num" property="certificateNum"/>
+        <result column="age" property="age"/>
+        <result column="medical_insurance" property="medicalInsurance"/>
+        <result column="health" property="health"/>
+        <result column="monthly_income" property="monthlyIncome"/>
+        <result column="identity" property="identity"/>
+        <result column="unit" property="unit"/>
+        <result column="tel" property="tel"/>
+
+    </resultMap>
+
+    
+    <insert id="insertAll" parameterType="java.util.List">
+        INSERT INTO srv_contacts (target_id,type,name,relation,sex,political_status,education,certificate_num,age,medical_insurance,health,monthly_income,identity,unit,tel,school_type)
+        VALUES
+        <foreach collection="pojos" item="pojo" separator=",">
+            (#{pojo.targetId},#{pojo.type},#{pojo.name},#{pojo.relation},#{pojo.sex},#{pojo.politicalStatus},#{pojo.education},#{pojo.certificateNum},#{pojo.age},#{pojo.medicalInsurance},#{pojo.health},#{pojo.monthlyIncome},#{pojo.identity},#{pojo.unit},#{pojo.tel},#{pojo.schoolType})
+        </foreach>
+    </insert>
+    
+    <select id="contactsList" resultMap="BaseResultMap">
+          SELECT 
+          srv_contacts.id,
+          srv_contacts.target_id,
+          srv_contacts.type,
+          srv_contacts.name,
+          srv_contacts.age,
+          srv_contacts.relation,
+          d1.name relation_name,
+          srv_contacts.unit,
+          srv_contacts.tel,
+          monthly_income
+          FROM srv_contacts
+          left join sys_dict d1 on d1.code = srv_contacts.relation and d1.group_code='lib_family_relationship'
+
+          WHERE target_id = #{targetId} AND type = #{type}
+    </select>
+    
+</mapper>

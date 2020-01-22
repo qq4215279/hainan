@@ -1,0 +1,37 @@
+<css>
+	<link th:href="@{/static/plugin/ztree/zTreeStyle.css}" rel="stylesheet">
+	<link th:href="@{/static/plugin/ztree/zTreeStyle.css}" rel="stylesheet">
+</css>
+<body>
+
+<div class="form-horizontal">
+	<div class="row">
+		<div class="col-sm-3">
+			<search:input label="用户名称" name="condition" value=""
+						  placeholder="名称" type="text"></search:input>
+		</div>
+		<div class="col-sm-3">
+			<qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="Dept.search()"></qx:btn>
+		</div>
+		<div class="hidden-xs" id="DeptTableToolbar" role="group">
+			<qx:btn  class="btn btn-primary" fa="fa fa-plus" label="添加" permission="/dept/add" onclick="Dept.openAddDept()"></qx:btn>
+			<qx:btn  class="btn btn-primary" fa="fa fa-edit" label="修改" permission="/dept/update" onclick="Dept.openDeptDetail()"></qx:btn>
+			<qx:btn  class="btn btn-primary" fa="fa fa-remove" label="删除" permission="/dept/delete" onclick="Dept.delete()"></qx:btn>
+		</div>
+	</div>
+	<table id="DeptTable" data-mobile-responsive="true" data-click-to-select="true">
+	</table>
+
+</div>
+
+</body>
+
+<js>
+	<script th:src="@{/static/plugin/ztree/jquery.ztree.all.min.js}"></script>
+	<script th:src="@{/static/plugin/jquery-treegrid/js/jquery.treegrid.min.js}"></script>
+	<script th:src="@{/static/plugin/jquery-treegrid/js/jquery.treegrid.bootstrap3.js}"></script>
+	<script th:src="@{/static/plugin/jquery-treegrid/extension/jquery.treegrid.extension.js}"></script>
+	<script th:src="@{/static/js/tree-table-object.js}"></script>
+	<script th:src="@{/static/js/ztree/ztree-object.js}"></script>
+	<script th:src="@{/static/modular/system/dept/dept.js}"></script>
+</js>

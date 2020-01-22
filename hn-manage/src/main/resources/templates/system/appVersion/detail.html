@@ -1,0 +1,178 @@
+<body>
+<div class="container">
+    <form class="form-horizontal" id="infoForm" method="post" th:action="@{/appVersion/add}">
+        <form:select id="vType" label="设备类型" name="vType" code="app_platform_type" must="true" value="${pojo.vType}"></form:select>
+        <form:figure id="versionCode" label="版本号" name="versionCode" must="true" value="${pojo.versionCode}"></form:figure>
+        <form:text id="versionName" label="版本名称" name="versionName" must="true"  value="${pojo.versionName}"></form:text>
+        <form:area id="description" label="内容描述" name="description" must="true" value="${pojo.description}"></form:area>
+        <form:select id="forceUpgrade" label="强制更新" name="forceUpgrade" code="app_platform_force_upgrade" value="${pojo.forceUpgrade}"
+                     must="true"></form:select>
+        <div class="form-group" id="apkArea" style="display: none;">
+            <label for="apk" class="col-sm-4 control-label">
+                <label style="color: red; position: inherit;top: 2px;">*</label>安卓安装包
+            </label>
+            <div class="col-sm-8">
+                <input id="apk" type="file" name="apk" class="btn btn-primary"/>
+            </div>
+        </div>
+        <div th:if="${ pojo!=null && !#strings.isEmpty(pojo.downloadAddress)}" style="margin-top: 20px;">
+            <img th:src="@{/static/img/android.jpg}" style="width: 30px;">
+            <a th:href="${pojo.downloadAddress}" th:text="${pojo.versionName} + '--下载地址' "></a>
+        </div>
+    </form>
+    <div class="row text-center">
+        <qx:btn class="btn btn-primary" fa="fa fa-check" label="发布" onclick="InfoDlg.submit()"></qx:btn>
+        <qx:btn class="btn btn-primary" fa="fa fa-close" label="返回" onclick="InfoDlg.close()"></qx:btn>
+    </div>
+</div>
+
+<js>
+    <script th:src="@{/static/js/jquery.form.js}"></script>
+    <script type="text/javascript">
+
+
+        /**
+         * 初始化详情对话框
+         */
+        var InfoDlg = {
+            infoData: {},
+            zTreeInstance: null,
+            validateFields: {
+                vType: {
+                    validators: {
+                        notEmpty: {
+                            message: '设备不能为空'
+                        }
+                    }
+                },
+                versionCode: {
+                    validators: {
+                        notEmpty: {
+                            message: '版本号不能为空'
+                        },
+                        stringLength: {
+                            max: 6
+                        }
+                    }
+                },
+                versionName: {
+                    validators: {
+                        notEmpty: {
+                            message: '版本名称不能为空'
+                        },
+                        stringLength: {
+                            max: 50
+                        }
+                    }
+                },
+                description: {
+                    validators: {
+                        notEmpty: {
+                            message: '内容描述不能为空'
+                        },
+                        stringLength: {
+                            max: 1000
+                        }
+                    }
+                },
+                forceUpgrade: {
+                    validators: {
+                        notEmpty: {
+                            message: '是否强制不能为空'
+                        },
+                        stringLength: {
+                            max: 2
+                        }
+                    }
+                }
+            }
+        };
+
+        /**
+         * 关闭此对话框
+         */
+        InfoDlg.close = function () {
+            parent.layer.close(window.parent.OptAppVersion.layerIndex);
+        }
+
+        /**
+         * 验证数据是否为空
+         */
+        InfoDlg.validate = function () {
+            $('#infoForm').data("bootstrapValidator").resetForm();
+            $('#infoForm').bootstrapValidator('validate');
+            return $("#infoForm").data('bootstrapValidator').isValid();
+        }
+
+
+        /**
+         *重置验证规则
+         */
+        function resetValidator() {
+            $('#infoForm').data('bootstrapValidator').destroy();
+            $('#infoForm').data('bootstrapValidator', null);
+
+            if ($("#vType").val() == 0) {
+                InfoDlg.validateFields.downloadAddress = {
+                    validators: {
+                        notEmpty: {
+                            message: '下载地址不能为空'
+                        },
+                        stringLength: {
+                            max: 400
+                        }
+                    }
+                }
+            } else {
+                delete InfoDlg.validateFields.downloadAddress;
+            }
+            App.initValidator("infoForm", InfoDlg.validateFields);
+        }
+
+
+        /**
+         * 提交
+         */
+        InfoDlg.submit = function () {
+
+            if (!this.validate()) {
+                return;
+            }
+
+            if ($("#vType").val() == "0" && !$("#apk").val()) {
+                App.error("请上传安卓安装包");
+                return;
+            }
+            App.showLoading();
+            $("#infoForm").submit();
+        }
+
+        //绑定FORM提交后事件
+        $("#infoForm").ajaxForm(function (data) {
+            App.closeLoading();
+            if (data.code == 200) {
+                App.success("提交成功", function () {
+                    InfoDlg.close();
+                })
+            }
+        });
+
+        /**
+         * 画面初期处理
+         */
+        $(function () {
+            App.initValidator("infoForm", InfoDlg.validateFields);
+
+            $("#vType").change(function () {
+                var vType = $(this).val();
+                if (vType == "0") {
+                    $("#apkArea").show();
+                } else {
+                    $("#apkArea").hide();
+                }
+            });
+        });
+
+    </script>
+</js>
+</body>

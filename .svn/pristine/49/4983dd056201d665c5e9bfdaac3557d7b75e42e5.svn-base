@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.system.dao.MsgDao">
+	<resultMap type="com.gobestsoft.common.modular.system.model.SysMsg" id="selResultMap">
+		<result property="id" column="id"/>
+		<result property="content" column="content"/>
+		<result property="toDeptId" column="to_dept_id"/>
+		<result property="isOpen" column="is_open"/>
+		<result property="type" column="type"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+	
+	<select id="msgList" resultMap="selResultMap">
+		SELECT * from sys_message where to_dept_id = #{deptId}	
+		<if test="type != null and type != ''">
+            AND type = #{type}
+        </if>
+		order by is_open asc, create_time desc
+	</select>
+</mapper>

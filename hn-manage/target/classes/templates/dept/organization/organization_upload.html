@@ -1,0 +1,112 @@
+<css>
+    <div th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="container">
+    <div class="form-horizontal" id="organizationForm">
+        <input type="hidden" id="id" value="">
+        <div class="row">
+            <div class="col-sm-12">
+                <label>先下载这个导入模板：<a th:href="@{/static/templates/deptOrganizationTemplates.xlsx}" target="_blank">海南组织信息导入模板.xlsx</a></label>
+                <label>&nbsp;然后按格式填好表格，再把填好的表导入系统</label>
+                <form th:action="@{/dept/organization/upload}" method="post"
+                      enctype="multipart/form-data" name="uploadForm" id="uploadForm">
+                    <div class="form-group">
+                        <input class="btn btn-primary" style="margin-left: 15px;" type="file" id="uploadFile"
+                               name="uploadFile"
+                               accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+                    </div>
+                    <qx:btn class="btn btn-primary" fa="fa fa-check" label="导入"
+                            onclick="OrganizationDlg.upload()"></qx:btn>
+                    <qx:btn class="btn btn-primary" fa="fa fa-eraser" label="取消"
+                            onclick="OrganizationDlg.close()"></qx:btn>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div style="margin-top: 10px;">
+        <p>填表说明：</p>
+        <p>1、此表所列项目均为必填项，按照单位和工会统一社会信用代码证书（组织机构代码证书）上有相应项目填写；</p>
+        <p>2、“工会负责人”填写工会法定代表人；</p>
+        <p>3、具体请查看《工会组织信息采集表说明书》，填写过程中如有疑问，请联系省总工会基层工作部。</p>
+    </div>
+    <div th:include="dept/import_table :: importTable"></div>
+</div>
+</body>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script th:src="@{/static/js/jquery.form.js}"></script>
+    <script type="text/javascript">
+        /**
+         * 工会信息管理详情对话框（可用于添加对话框）
+         */
+        var OrganizationDlg = {
+            organization: {}
+        };
+
+        /**
+         * 清除数据
+         */
+        OrganizationDlg.clearData = function () {
+            this.organization = {};
+        };
+        /**
+         * 设置对话框中的数据
+         */
+        OrganizationDlg.set = function (key) {
+            this.organization[key] = (typeof value == "undefined") ? $("#" + key).val() : value;
+            return this;
+        };
+        /**
+         * 收集数据
+         */
+        OrganizationDlg.collectData = function () {
+            this.set('uploadFile');
+        };
+
+        /**
+         * 验证数据是否为空
+         */
+        OrganizationDlg.validate = function () {
+            $('#organizationForm').data("bootstrapValidator").resetForm();
+            $('#organizationForm').bootstrapValidator('validate');
+            return $("#organizationForm").data('bootstrapValidator').isValid();
+        };
+        /**
+         * 提交导入工会信息
+         */
+        OrganizationDlg.upload = function () {
+            if (!$("#uploadFile").val()) {
+                App.error("请选择文件");
+                return;
+            }
+            var index = layer.load(1, {
+                shade: [0.1, '#fff'] //0.1透明度的白色背景
+            });
+            //提交FORM表单
+            $("#uploadForm").submit();
+
+
+        };
+
+        //绑定FORM提交后事件
+        $("#uploadForm").ajaxForm(function (data) {
+            App.closeLoading();
+            if (data.code == 200) {
+                Import.refresh();
+            }
+        });
+
+        /**
+         * 关闭此对话框
+         */
+        OrganizationDlg.close = function () {
+            parent.layer.close(window.parent.OptOrganization.layerIndex);
+        };
+
+
+        var importType = 0;
+    </script>
+
+    <script th:include="dept/import_table :: importTableJs"></script>
+</js>

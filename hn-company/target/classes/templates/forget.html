@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit"/>
+
+    <title>找回密码</title>
+
+    <link rel="shortcut icon" th:href="@{/static/favicon.ico}">
+    <link th:href="@{/static/plugin/bootstrap-3.3.7/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/static/plugin/font-awesome-4.7.0/css/font-awesome.min.css}" rel="stylesheet">
+    <link th:href="@{/static/css/animate.css}" rel="stylesheet">
+    <link th:href="@{/static/css/style.css}" rel="stylesheet">
+    <link th:href="@{/static/css/login.css}" rel="stylesheet">
+    <link th:href="@{/static/css/company_login.css}" rel="stylesheet">
+    <style>
+        .rg {
+            display: inline-block;
+            width: 45%;
+            height: 35px;
+            text-align: center;
+            line-height: 35px;
+            color: #1ab394;
+            font-size: 24px;
+        }
+    </style>
+    <script>
+        if (window.top !== window.self) {
+            window.top.location = window.location;
+        }
+    </script>
+    <script th:src="@{/static/js/jquery-1.12.4.min.js}"></script>
+    <script th:src="@{/static/plugin/layer/layer.js}"></script>
+    <script th:src="@{/static/js/App.js}"></script>
+    <style>
+        .demo-class {
+            color: #000;
+        }
+    </style>
+</head>
+<body class="signin">
+<!--  class="gray-bg" -->
+
+<div class="middle-box text-center loginscreen  animated fadeInDown" style="width: 800px">
+    <div style="padding: 100px 0px;">
+        <div style="background: rgba(255,255,255,0.5); padding: 20px;border-radius: 20px;">
+            <div>
+                <span class="rg rg-active">找回密码</span>
+            </div>
+            <form class="m-t" role="form" method="post">
+                <div class="form-group">
+                    <input type="text" name="account" id="account" tabindex="1" class="form-control input_control"
+                           placeholder="请输入账号(工会全称)" style="font-size:16px;" required="">
+                </div>
+
+                <div class="form-group">
+                    <input type="text" name="email" id="email" tabindex="1" class="form-control input_control"
+                           placeholder="请输入激活时填写的邮箱" style="font-size:16px;" required="">
+                </div>
+
+                <div class="form-group" style="float: left;">
+                    <div class="col-sm-8"
+                         style="padding-left: 0px; padding-right: 0px;">
+                        <input class="form-control input_control" type="text" name="kaptcha" id="code"
+                               placeholder="请输入图片中的数字" required="">
+                    </div>
+                    <div class="col-sm-4"
+                         style="padding-left: 0px; padding-right: 0px;">
+                        <img th:src="@{/kaptcha}" id="kaptcha"  width="100%"  height="35px"
+                              style="padding-left: 30px;"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <input type="text" name="checkcode" id="checkcode" tabindex="1" class="form-control input_control"
+                                   placeholder="请输入邮箱验证码" style="font-size:16px;" required="">
+                            <div style="text-align: left;color:red;margin-top: 15px">
+                                <p><i class="glyphicon glyphicon-info-sign"></i>请在邮箱中查看验证码</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <input type="button" name="register-check" id="register-check"
+                                   onclick="doGetCode()" tabindex="4"
+                                   class="btn btn-primary block full-width m-b" value="获取验证码">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input type="password" name="first_password" id="first_password"
+                           tabindex="3" class="form-control input_control"
+                           placeholder="输入密码"/>
+                </div>
+                <div style="text-align: left">
+                    <p><i class="glyphicon glyphicon-info-sign"></i>请输入6-16位数字、字母或常用符号，字母区分大小写</p>
+                    <p><i class="glyphicon glyphicon-info-sign"></i>必须包含数字和字母</p>
+                </div>
+
+                <div class="form-group">
+                    <input type="password" name="confirm_password" id="confirm_password" tabindex="4"
+                           class="form-control input_control" placeholder="再次输入密码" required=""/>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <input type="button" name="register-submit" id="register-submit"
+                                   tabindex="4" onclick="doForget()"
+                                   class="btn btn-primary block full-width m-b" value="提交"
+                                   style="line-height: 4vh!important;">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+<div class="signup-footer"
+     style="position: relative;;bottom: 0px; left: 0px; width: 100%; text-align: center; margin: 0;">
+    <p>
+        <img th:src="@{/static/img/gobestsoft_logo.png}" style="width: 50px; height: 25px;"> <span><a
+            href="http://www.gobestsoft.com" target="_blank">www.gobestsoft.com</a>
+				© 2017 | All Rights Reserved 上海建朗信息科技有限公司 沪ICP备12017260号-1 </span>
+    </p>
+</div>
+
+<script th:inline="javascript">
+    var ctxPath = /*[[@{/}]]*/ '';
+</script>
+<script>
+    function checkMail() {
+        var acctemp = $("#account").val();
+        if(!acctemp){
+            layer.msg("请输入账号");
+            $("#account").focus();
+            return false;
+        }
+
+        var temp = $("#email").val();
+        if (!temp) {
+            layer.msg("邮箱不能为空");
+            $("#email").focus();
+            return false;
+        }
+
+        //对电子邮件的验证
+        var myreg = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        if (!myreg.test(temp)) {
+            layer.msg("邮箱格式不正确.");
+            $("#email").focus();
+            return false;
+        }
+
+        var tempcode = $("#code").val();
+        if (!tempcode) {
+            layer.msg("请输入图片中的数字");
+            $("#code").focus();
+            return false;
+        }
+
+        return true;
+    }
+
+    function checkCode() {
+        var tempCheck = $("#checkcode").val();
+        if (!tempCheck) {
+            layer.msg("请输入验证码");
+            $("#checkcode").focus();
+            return false;
+        }
+
+        var tempPwd1 = $("#first_password").val();
+        if (!tempPwd1) {
+            layer.msg("请输入密码");
+            $("#first_password").focus();
+            return false;
+        }
+
+        var tempPwd2 = $("#confirm_password").val();
+        if (!tempPwd2) {
+            layer.msg("请再次输入密码");
+            $("#confirm_password").focus();
+            return false;
+        }
+
+        return true;
+
+    }
+
+    function doGetCode() {
+        if (!checkMail()) {
+            return
+        }
+
+        var email = document.getElementById("email").value;
+        var account = document.getElementById("account").value;
+        //提交信息
+        App.loadingAjax({
+            url: ctxPath + "/getEmailCode",
+            type: "post",
+            data: {sendto: email, account: account},
+            success: function (result) {
+                if(result.code == 200){
+                    layer.msg("发送成功", {icon: 6});
+                }
+            }, error: function () {
+                layer.msg("发送失败,服务器异常");
+            }
+        });
+        var obj = $("#register-check");
+        settime(obj);
+    }
+
+    var countdown=60;
+    function settime(obj) {//验证码倒计时
+        if (countdown == 0) {
+            obj.attr('disabled',false);
+            obj.val("获取验证码");
+            countdown = 60;
+            return;
+        } else {
+            obj.attr('disabled',true);
+            obj.val("重新发送(" + countdown + ")");
+            countdown--;
+        }
+        setTimeout(function() {
+                    settime(obj) }
+                ,1000)
+    }
+
+    //密码强度检查
+    function CheckStrength(pwd) {
+        var m = 0;
+        if (/\d/.test(pwd)) {
+            m++;
+        }
+        if (/[A-Z]/.test(pwd)) {
+            m++;
+        }
+        if (/[a-z]/.test(pwd)) {
+            m++;
+        }
+        return m;
+    }
+
+    function doForget() {
+
+        if (!checkMail()) {
+            return
+        }
+
+        if(!checkCode()){
+            return
+        }
+
+        var account = document.getElementById("account").value;
+        var password = document.getElementById("first_password").value;
+        var password2 = document.getElementById("confirm_password").value;
+        var vercode = document.getElementById("checkcode").value;
+
+        if (password != password2) {
+            layer.msg('密码不一致！');
+            return false;
+        }
+        if (password.length < 6) {
+            layer.msg('密码长度不能小于6位！');
+            $("#first_password").focus();
+            return false;
+        }
+        if (CheckStrength(password) < 2) {
+            layer.msg('密码必须包含数字字母！');
+            $("#first_password").focus();
+            return false;
+        }
+
+        //提交信息
+        App.loadingAjax({
+            url: ctxPath + "/getResetPwd",
+            type: "post",
+            dataType: "json",
+            data: {account: account, password: password, vercode: vercode},
+            success: function (result) {
+                if (result.code == 200) {
+                    layer.msg("修改密码成功,即将跳转登录页", {time: 1200}, function () {
+                        window.location.href = ctxPath + "/login";
+                    });
+                } else {
+                    layer.msg("修改密码失败," + result.message);
+                    $('#register-submit').attr('onclick', 'doForget();');
+                }
+            }, error: function () {
+                layer.msg("修改密码失败,服务器异常");
+                $('#register-submit').attr('onclick', 'doForget();');
+            }
+        });
+
+    }
+
+    $(function () {
+        $("#kaptcha").on('click', function () {
+            $("#kaptcha").attr('src', ctxPath + '/kaptcha?' + Math.floor(Math.random() * 100)).fadeIn();
+        });
+
+        $("#checkcode").focus(function () {
+            //判断校对验证码
+            var code = document.getElementById("code").value;
+            App.loadingAjax({
+                url: ctxPath + "/getDefaultKaptcha",
+                type: "post",
+                data: {code: code},
+                success: function (result) {
+                    if(result.code == 203){
+                        layer.msg(result.message, {icon: 5});
+                    }
+                },error: function () {
+                    layer.msg("服务器异常");
+                }
+
+            });
+        })
+    })
+
+</script>
+</body>
+</html>

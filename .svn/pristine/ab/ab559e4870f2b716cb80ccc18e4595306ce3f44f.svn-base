@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.cms.dao.AdvertisementDao">
+
+	<resultMap type="com.gobestsoft.common.modular.cms.model.Advertisement"
+		id="advertisementMap">
+		<id column="id" property="id" />
+		<result column="title" property="title" />
+		<result column="cover_path" property="cover" />
+		<result column="jump_url" property="link" />
+		<result column="hit_num" property="hit_num" />
+		<result column="create_user" property="create_by" />
+		<result column="create_time" property="create_time" />
+		<result column="tags" property="tags" />
+		<result column="company_name" property="company_name" />
+		<result column="logo" property="logo" />
+		<result column="type" property="type" />
+	</resultMap>
+
+	<select id="getAdvertisement" resultMap="advertisementMap">
+		SELECT
+		id,title,cover_path,link_url,hit_num,create_user,create_time,logo,company_name,type,tags
+		FROM cms_ad WHERE
+		start_time
+		&lt;= #{startTime} AND end_time &gt;= #{endTime}
+		<if test=" type!=null ">
+			AND type=${type}
+		</if>
+		<if test=" showedIds!=null and showedIds!=''">
+			AND id NOT IN (${showedIds})
+		</if>
+	</select>
+
+
+	<select id="getAdvertisementByArticleId" resultMap="advertisementMap">
+		SELECT
+		id,title,cover_path,link_url,hit_num,create_user,create_time,logo,company_name,type,tags
+		FROM cms_ad WHERE
+		start_time
+		&lt;= #{startTime} AND end_time &gt;=
+		#{endTime}
+		AND (column_id IN (SELECT column_id FROM r_article_column WHERE
+		article_id=${articleId}) or column_id is null)
+		<if test=" type!=null ">
+			AND type=${type}
+		</if>
+	</select>
+
+
+	<update id="addAdvertisementHit">
+		UPDATE cms_ad SET hit_num=hit_num+1 WHERE
+		id=${id};
+	</update>
+
+</mapper>

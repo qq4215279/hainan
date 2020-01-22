@@ -1,0 +1,30 @@
+<css>
+	<div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="form-horizontal">
+	<div class="row">
+		<div class="col-sm-3">
+			<search:input label="用户名称" name="roleName" value=""
+						  placeholder="角色名称" type="text"></search:input>
+		</div>
+		<div class="col-sm-3">
+			<qx:btn id="btn2" class="btn btn-primary" fa="fa fa-search" label="搜索" role="" onclick="Role.search()"></qx:btn>
+		</div>
+	</div>
+	<div class="hidden-xs" id="roleTableToolbar" role="group">
+		<qx:btn id="" class="btn btn-primary" fa="fa fa-plus" label="添加" permission="role_add" onclick="Role.openAddRole()"></qx:btn>
+		<qx:btn id="" class="btn btn-primary" fa="fa fa-edit" label="修改" permission="role_edit" onclick="Role.openChangeRole()"></qx:btn>
+		<qx:btn id="" class="btn btn-primary" fa="fa fa-remove" label="删除" permission="role_remove" onclick="Role.delRole()"></qx:btn>
+		<qx:btn id="" class="btn btn-primary" fa="fa fa-user-secret" label="权限配置" permission="role_setAuthority" onclick="Role.assign()"></qx:btn>
+	</div>
+	<table id="roleTable" data-mobile-responsive="true" data-click-to-select="true">
+	</table>
+
+</div>
+</body>
+
+<js>
+	<div th:include="fragment/fargment :: bootstrapTableJs"></div>
+	<script th:src="@{/static/modular/system/role/role.js}"></script>
+</js>

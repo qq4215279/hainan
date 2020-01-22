@@ -1,0 +1,175 @@
+<css>
+    <div th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="container">
+    <div class="form-horizontal">
+        <div class="row">
+            <div class="col-sm-4">
+                <search:input label="姓名" name="query_name" value=""
+                              placeholder="姓名" type="text"></search:input>
+            </div>
+
+            <div class="col-sm-2">
+                <qx:btn id="sure" class="btn btn-primary" fa="fa fa-search" label="搜索"
+                        onclick="ObjBanner.search()"></qx:btn>
+            </div>
+        </div>
+    </div>
+
+    <div id="ObjBannerTableToolbar">
+        <qx:btn class="btn btn-primary" fa="fa fa-plus" label="新增" onclick="ObjBanner.openAdd()"></qx:btn>
+        <qx:btn class="btn btn-primary" fa="fa fa-pencil" label="编辑" onclick="ObjBanner.openEdit()"></qx:btn>
+        <qx:btn class="btn btn-primary" fa="fa fa-trash" label="删除" onclick="ObjBanner.del()"></qx:btn>
+    </div>
+    <table id="ObjBannerTable" data-mobile-responsive="true" data-click-to-select="true">
+    </table>
+
+</div>
+
+</body>
+
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script type="text/javascript">
+        /**
+         * Banner初始化
+         */
+        var ObjBanner = {
+            id: "ObjBannerTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+
+
+        ObjBanner.search = function () {
+
+            ObjBanner.table.refresh({query: ObjBanner.formParams()});
+        };
+        /**
+         * 初始化表格的列
+         */
+        ObjBanner.initColumn = function () {
+            return [
+                {field: 'selectItem', radio: true},
+                {title: '姓名', field: 'name', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {title: '性别', field: 'sex', visible: true, align: 'center', valign: 'middle', sortable: false,
+                    formatter: function (value, row, index) {
+                        return value==1?'男':'女';
+                    }
+                },
+                {title: '简介', field: 'summary', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {title: '排序', field: 'sort', visible: true, align: 'center', valign: 'middle', sortable: false},
+            ]
+        };
+
+        /**
+         * 删除功能
+         */
+        ObjBanner.del = function () {
+            if (this.check()) {
+                var selected = $('#' + this.id).bootstrapTable('getSelections');
+                var ids = "";
+
+                // 循环取得已选中的ID 并已',' 连接
+                for (var i = 0; i < selected.length; i++) {
+                    ids += selected[i].id + ",";
+                }
+                // 删除最后以为的','
+                ids = ids.left(ids.length - 1);
+
+                var fun = function () {
+                    //提交信息
+                    var ajax = new $ax(App.ctxPath + "xlyzMng/delete", function (data) {
+                        App.success("操作成功!");
+                        ObjBanner.table.refresh();
+                    }, function (data) {
+                        App.error("操作成功!" + data.responseJSON.message + "!");
+                    });
+
+                    ajax.set('id', ids);
+                    ajax.start();
+                }
+                App.confirm("确定要删除吗？", fun);
+            }
+        };
+
+        /**
+         * 启用功能
+         */
+
+        /**
+         * 禁用功能
+         */
+
+
+        /**
+         * 打开添加的窗口
+         */
+        ObjBanner.openAdd = function () {
+            var index = layer.open({
+                type: 2,
+                title: '新增心理咨询师',
+                area: ['100%', '100%'], //宽高
+                fix: true, //固定
+                maxmin: true,
+                content: App.ctxPath + 'xlyzMng/add'
+            });
+            layer.full(index);
+            this.layerIndex = index;
+        };
+
+        /**
+         * 打开修改的窗口
+         */
+        ObjBanner.openEdit = function () {
+            if (this.check()) {
+                var index = layer.open({
+                    type: 2,
+                    title: '编辑心理咨询师',
+                    area: ['100%', '100%'], //宽高
+                    fix: true, //固定
+                    maxmin: true,
+                    content: App.ctxPath + 'xlyzMng/edit?id=' + ObjBanner.seItem.id
+                });
+                layer.full(index);
+                this.layerIndex = index;
+            }
+        };
+
+        /**
+         * 检查是否选中
+         */
+        ObjBanner.check = function () {
+            var selected = $('#' + this.id).bootstrapTable('getSelections');
+            if (selected.length == 0) {
+                App.info("请先选中表格中的某一记录！");
+                return false;
+            } else {
+                ObjBanner.seItem = selected[0];
+                return true;
+            }
+
+        };
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        ObjBanner.formParams = function () {
+            var queryData = {};
+            queryData['query_name'] = $('[name="query_name"]').val();
+            return queryData;
+        }
+
+        $(function () {
+            var defaultColunms = ObjBanner.initColumn();
+            var table = new BSTable(ObjBanner.id, "xlyzMng/list", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(ObjBanner.formParams());
+            ObjBanner.table = table.init();
+        });
+    </script>
+
+</js>

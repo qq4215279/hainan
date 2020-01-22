@@ -1,0 +1,45 @@
+<css>
+    <link th:href="@{/static/plugin/ztree/zTreeStyle.css}" rel="stylesheet">
+    <link th:href="@{/static/plugin/ztree/zTreeStyle.css}" rel="stylesheet">
+</css>
+<body>
+    <div class="form-horizontal">
+        <div class="row">
+            <div class="col-sm-3">
+                <search:input label="菜单名称" name="menuName" value=""
+                              placeholder="菜单名称" type="text"></search:input>
+            </div>
+            <div class="col-sm-3">
+                <search:input label="层级" name="level" value=""
+                              placeholder="层级" type="text"></search:input>
+            </div>
+            <div class="col-sm-3">
+                <qx:btn id="btn2" class="btn btn-primary" fa="fa fa-search" label="搜索" permission=""
+                        onclick="Menu.search()"></qx:btn>
+            </div>
+        </div>
+        <div class="row" style="margin-tom: 20px;margin-bottom: 20px;">
+            <qx:btn class="btn btn-primary" fa="fa fa-plus" label="添加" permission="/menu/add"
+                    onclick="Menu.openAddMenu()"></qx:btn>
+            <qx:btn class="btn btn-primary" fa="fa fa-plus" label="修改" permission="/menu/edit"
+                    onclick="Menu.openChangeMenu()"></qx:btn>
+            <qx:btn class="btn btn-primary" fa="fa fa-remove" label="删除" permission="/menu/remove"
+                    onclick="Menu.delMenu()"></qx:btn>
+        </div>
+        <div class="row">
+            <table id="menuTable" data-mobile-responsive="true" data-click-to-select="true">
+            </table>
+        </div>
+
+    </div>
+</body>
+
+<js>
+    <script th:src="@{/static/plugin/ztree/jquery.ztree.all.min.js}"></script>
+    <script th:src="@{/static/plugin/jquery-treegrid/js/jquery.treegrid.min.js}"></script>
+    <script th:src="@{/static/plugin/jquery-treegrid/js/jquery.treegrid.bootstrap3.js}"></script>
+    <script th:src="@{/static/plugin/jquery-treegrid/extension/jquery.treegrid.extension.js}"></script>
+    <script th:src="@{/static/js/tree-table-object.js}"></script>
+    <script th:src="@{/static/js/ztree/ztree-object.js}"></script>
+    <script th:src="@{/static/modular/system/menu/menu.js}"></script>
+</js>

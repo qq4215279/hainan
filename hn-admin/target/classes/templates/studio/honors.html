@@ -1,0 +1,175 @@
+<css>
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="container">
+    <div class="form-horizontal">
+        <div class="row">
+            <div class="col-sm-6">
+                <search:input label="荣誉名称" name="title" value=""
+                              placeholder="荣誉名称" type="text"></search:input>
+            </div>
+            <div class="col-sm-6">
+                <qx:btn class="btn btn-primary" fa="fa fa-search" label="搜索" onclick="Honor.search()"></qx:btn>
+            </div>
+        </div>
+    </div>
+
+    <div id="HonorTableToolbar">
+        <qx:btn class="btn btn-primary" fa="fa fa-add" label="添加" onclick="Honor.add()"></qx:btn>
+        <qx:btn class="btn btn-primary" fa="fa fa-remove" label="删除" onclick="Honor.doDelete()"></qx:btn>
+    </div>
+    <table id="HonorTable" data-mobile-responsive="true" data-click-to-select="true">
+    </table>
+</div>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script type="text/javascript">
+
+        var studioId = App.getQueryString("studioId")
+        /**
+         * 初始化表格对象
+         */
+        var Honor = {
+            id: "HonorTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        Honor.initColumn = function () {
+            return [
+                {field: 'selectItem', checkbox: true},
+                {title: '荣誉名称', field: 'title', visible: true, align: 'center', valign: 'middle'},
+                {
+                    title: '创建人',
+                    field: 'create_user',
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: function (value, row, index) {
+                        if (value == null || value == '') {
+                            return "海南工会";
+                        }
+                        return value;
+                    }
+                },
+                {title: '创建时间', field: 'create_time', align: 'center', valign: 'middle'},
+                {
+                    title: '操作', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        return '<a href="javascript:Honor.detail(' + row.id + ')">查看</a>';
+                    }
+                }
+            ];
+        }
+
+        /**
+         * 检查是否选中
+         */
+        Honor.check = function () {
+            var selected = $('#' + this.id).bootstrapTable('getSelections');
+            if (selected.length == 0) {
+                App.info("请先选中表格中的某一记录！");
+                return false;
+            } else {
+                Honor.seItem = selected;
+                return true;
+            }
+        };
+
+        /**
+         * 跳转至查看详情页面
+         */
+        Honor.detail = function (id) {
+            var index = layer.open({
+                type: 2,
+                title: '查看详情',
+                area: ['100%', '100%'], //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: App.ctxPath + 'studio/honor?id=' + id + "&studioId=" + studioId
+            });
+        };
+
+        /**
+         * 跳转至查看详情页面
+         */
+        Honor.add = function () {
+            var index = layer.open({
+                type: 2,
+                title: '新增',
+                area: ['100%', '100%'], //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: App.ctxPath + 'studio/honor?studioId=' + studioId
+            });
+        };
+
+
+        /**
+         * 点击删除
+         */
+        Honor.doDelete = function () {
+            if (this.check()) {
+                var ids = "";
+                for (i = 0; i < Honor.seItem.length; i++) {
+                    ids += Honor.seItem[i].id + ",";
+                }
+                ids = ids.substring(0, ids.length - 1);
+                App.confirm("确定要删除吗？", function () {
+                    var index = layer.load(1, {
+                        shade: [0.1, '#fff'] //0.1透明度的白色背景
+                    });
+                    $.ajax({
+                        url: App.ctxPath + "studio/honor/deleteHonor",
+                        type: "POST",
+                        data: {ids: ids},
+                        success: function (data) {
+                            if (data.code = 200) {
+                                layer.msg("删除成功", {icon: 1}, function () {
+                                    Honor.search();
+                                });
+                            } else {
+                                App.error("删除失败！");
+                            }
+                        }, error: function (data) {
+                            App.error("服务器异常，请稍后重试！");
+                        }, complete: function () {
+                            layer.close(index);
+                        }
+                    })
+                });
+            }
+        };
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        Honor.formParams = function () {
+            var queryData = {};
+            queryData["studioId"] = studioId;
+            queryData['title'] = $("#title").val();
+            return queryData;
+        }
+
+        /**
+         * 查询列表
+         */
+        Honor.search = function () {
+            Honor.table.refresh({query: Honor.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = Honor.initColumn();
+            var table = new BSTable(Honor.id, "studio/honor/list", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(Honor.formParams());
+            Honor.table = table.init();
+        });
+    </script>
+</js>
+</body>

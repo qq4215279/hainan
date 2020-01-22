@@ -1,0 +1,209 @@
+/* .navbar-default .nav > li > a:hover, .navbar-default .nav > li > a:focus {
+                  background-color: #87CEFF;
+                  color: white;
+              } */
+
+.container-index {
+    overflow: hidden;
+    height: 100%;
+}
+
+.navbar-default {
+    background-color: #006699;
+}
+
+#logout-li {
+    margin-left: 10px;
+    border: 0;
+}
+
+#logout-li > a {
+    display: inline-block;
+    line-height: 45px !important;
+    width: 45px;
+    padding: 0;
+    font-size: 22px;
+}
+
+#logout-li > a:hover {
+    background-color: #70bcfb !important;
+    color: red;
+}
+
+.nav > li.active {
+    background: #f7f7f7; /*#c50f2e #820A02*/
+}
+
+.nav > li.active > a {
+    background-color: rgb(102, 178, 255);
+}
+
+.navbar-static-side {
+    background: rgb(255, 255, 255); /* #820A02 */
+}
+
+.page-tabs a.active {
+    background: #1ab394; /* #ba0018  #9F1107 #f6f6f6 rgb(232,237,244)*/
+    color: white;
+}
+
+.J_menuTab {
+    height: 44px !important;
+}
+
+.J_menuTab:hover {
+    background: #1ab394 !important; /*rgb(232,237,244)!important  */
+    color: white !important;
+}
+
+.page-tabs a i:hover {
+    color: #f7f7f7; /* #9F1107 */
+}
+
+.navbar-default .nav > li > a:hover, .navbar-default .nav > li > a:focus {
+    background-color: rgb(102, 178, 255); /*#e43c59 #d41e3d #9f1107*/
+    color: #f3f3f4;
+}
+
+.navbar-default .nav > .nav-header > a:hover {
+    background: none;
+}
+
+.nav > li > a {
+    color: #9d9d9d; /* #f3f3f4 */
+    font-size: 13px;
+}
+
+.nav-header {
+    /* padding: 33px 25px; sunbin */
+    padding: 0px 25px 43px 25px;
+    /* background: url("patterns/header-profile.png") no-repeat; */
+    background: rgb(255, 255, 255); /*#820A02  */
+    height: 40px;
+    display: block !important;
+    text-align: center;
+    /* padding: 0px 25px 43px 25px;
+            background: url("patterns/header-profile.png") no-repeat;
+            height:40px;
+            display:block !imporartant;
+            background: #c50f2e; */
+}
+
+.nav-header:hover {
+    background: rgb(102, 178, 255);
+}
+
+/* #side-menu>li> a:hover,#side-menu>li:hover{
+            background:#e43c59 !imporartant;
+        } */
+body.mini-navbar .nav-header {
+    padding: 0;
+    background-color: rgb(255, 255, 255); /*#c50f2e #ba0018*/
+}
+
+body.mini-navbar .nav-header:hover {
+    background-color: rgb(102, 178, 255);
+}
+
+.tab-menu-selected {
+    background-color: #97cefc !important; /* #820A02  */
+    color: #f3f3f4 !important;
+}
+
+.gz-title {
+    float: left;
+    font-size: 20px;
+    line-height: 50px;
+    padding-left: 50px;
+    margin-bottom: 0;
+    color: white; /*#820A02  */
+}
+
+.logi {
+    margin-right: 30px;
+}
+
+.nav-second-level > li > a:hover {
+    background: #97cefc !important;
+}
+
+.nav-third-level > li > a:hover {
+    background: #97cefc !important;
+}
+
+.nav-second-level > li.active > a {
+    background: #97cefc !important;
+}
+
+.nav li {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.count-info:hover {
+    background: #70bcfb !important;
+}
+
+/*   #page-wrapper{
+             margin-top:52px;
+          }
+          .top1{
+             position:fixed;
+             z-index:100000;
+             width:100%;
+             margin-left:0px;
+          }
+          .navbar-default{
+             margin-top:52px;
+          }
+          .content-tabs{
+            position:fixed;
+            top:52px;
+          } */
+#page-wrapper {
+    overflow-y: hidden;
+}
+
+#wrapper {
+    overflow: hidden;
+    margin-top: -1px;
+}
+
+.secr {
+    float: right;
+    margin-right: 15px !important;
+}
+
+.iconr {
+    width: 44px;
+    height: 44px;
+    border-left: 1px solid #f0f0f0;
+    float: right;
+    display: inline-block;
+    border-right: 1px solid #f0f0f0;
+    margin-right: -20px;
+}
+
+.section i {
+    font-size: 24px;
+    margin-top: 10px;
+}
+
+.circle1 {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: red;
+}
+
+#page-wrapper {
+    overflow: hidden;
+}
+
+#layui-layer-iframe1 {
+    height: 100% !important;
+}
+
+.fa-power-off:before {
+    position: absolute;
+    top: -14px;
+}

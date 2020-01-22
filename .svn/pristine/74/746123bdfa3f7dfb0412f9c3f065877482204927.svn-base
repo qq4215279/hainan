@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.system.dao.DeptDao">
+    <select id="tree" resultType="com.gobestsoft.core.node.ZTreeNode">
+		select id,pid as pId,simplename as name,
+		(
+		CASE
+		WHEN (pId = 0 OR pId IS NULL) THEN
+			'true'
+		ELSE
+			'false'
+		END
+		) as isOpen,dept_type as deptType ,
+		(
+		CASE
+		WHEN (dept_Type = 0 OR pId IS NULL) THEN
+			'pIcon01'
+		ELSE
+			'pIcon02'
+		END
+		) as iconSkin 
+		from sys_dept 
+		order by dept_type desc ,id
+	</select>
+
+    <select id="treebylevelTwo" resultType="com.gobestsoft.core.node.ZTreeNode">
+		select id,pid as pId,simplename as name,
+		(
+		CASE
+		WHEN (pId = 0 OR pId IS NULL) THEN
+			'true'
+		ELSE
+			'false'
+		END
+		) as isOpen,dept_type as deptType ,
+		(
+		CASE
+		WHEN (dept_Type = 0 OR pId IS NULL) THEN
+			'pIcon01'
+		ELSE
+			'pIcon02'
+		END
+		) as iconSkin
+		from sys_dept
+		where level = 2
+		order by dept_type desc ,id
+	</select>
+
+	<select id="existsBasicDeptTree" resultType="com.gobestsoft.core.node.ZTreeNode">
+		select id,pid as pId,simplename as name,
+		(
+		CASE
+		WHEN (pId = 0 OR pId IS NULL) THEN
+			'true'
+		ELSE
+			'false'
+		END
+		) as isOpen,dept_type as deptType ,
+		(
+		CASE
+		WHEN (dept_Type = 0 OR pId IS NULL) THEN
+			'pIcon01'
+		ELSE
+			'pIcon02'
+		END
+		) as iconSkin
+		from sys_dept WHERE level != 4
+		order by dept_type desc ,id
+	</select>
+
+    <select id="list" resultType="map">
+        select * from sys_dept
+        <if test="condition != null and condition != ''">
+            where simplename like CONCAT('%',#{condition},'%') or fullname like CONCAT('%',#{condition},'%')
+        </if>
+        order by sort ASC
+    </select>
+
+    <select id="selectGetDeptNo" resultType="int">
+	select id from sys_dept where dept_no = #{deptNo}
+	</select>
+	
+	<!-- 	查询最新的卡号 -->
+    <select id="selRecentNo" resultType="java.lang.String">
+		SELECT RIGHT(LEFT(station_card,LENGTH(station_card)-1),7) AS cardNo FROM dept_member WHERE station_card IS NOT NULL AND LENGTH(station_card)=13 ORDER BY  cardNo DESC LIMIT 1
+	</select>
+
+    <select id="selectDeptByPid" resultType="com.gobestsoft.common.modular.system.model.DeptTreeView">
+		select t.id,t.id as deptNo,t.simplename as pDeptName,t.chairman,COALESCE(tmp.userCount,0) as userCount
+		from sys_dept t
+		left join (select count(*) as userCount,org_id from org_member group by org_id) tmp
+		on tmp.org_id =t.id
+		where exists (select * from
+		(select id from sys_dept where root_flg !=1 and FIND_IN_SET(#{pDeptId},pids)) dept where t.pid=dept.id)
+		and t.root_flg='1'
+	</select>
+    <!-- <select id="belowTree" resultType="com.gobestsoft.core.node.ZTreeNode">
+        WITH recursive ztree
+        (id,pId,name,isOpen,deptType,iconSkin )
+        AS
+        (
+        SELECT
+                id,pid as pId,simplename as name,
+                (
+                CASE
+                WHEN (pId = 0 OR pId IS NULL) THEN
+                    'true'
+                ELSE
+                    'false'
+                END
+                ) as isOpen,dept_type as deptType,
+                (
+                CASE
+                WHEN (dept_Type = 0 OR pId IS NULL) THEN
+                    'pIcon01'
+                ELSE
+                    'pIcon02'
+                END
+                ) as iconSkin
+
+            FROM
+                sys_dept
+            WHERE
+                id =#{pid}
+        UNION ALL
+        SELECT
+                    mm.id,mm.pId,mm.simplename as name,
+                        (
+                        CASE
+                        WHEN (mm.pId = 0 OR mm.pId IS NULL) THEN
+                            'true'
+                        ELSE
+                            'false'
+                        END
+                        ) as isOpen,mm.dept_type as deptType,
+                        (
+                        CASE
+                        WHEN (mm.dept_Type = 0 OR mm.pId IS NULL) THEN
+                            'pIcon01'
+                        ELSE
+                            'pIcon02'
+                        END
+                        ) as iconSkin
+                FROM
+                    sys_dept AS mm
+        join ztree on mm.pid=ztree.id
+        )
+        SELECT
+          *
+        FROM ztree order by deptType desc,id
+    </select> -->
+
+    <select id="belowTree" resultType="com.gobestsoft.core.node.ZTreeNode">
+	SELECT id,pId,simplename NAME,
+	(CASE WHEN id = #{pid}
+	THEN 'true'
+	ELSE 'false'
+	END ) AS isOpen,
+	dept_type AS deptType,
+	(CASE WHEN dept_Type = 0
+	THEN 'pIcon01'
+	ELSE 'pIcon02' END ) AS iconSkin
+	FROM sys_dept
+	WHERE (id = #{pid} or FIND_IN_SET(#{pid},pids))
+	ORDER BY deptType DESC,LEVEL,sort,id
+	</select>
+
+	<select id="belowTree2" resultType="com.gobestsoft.core.node.ZTreeNode">
+		SELECT id,pId,simplename NAME,
+		'true' AS isOpen,
+		dept_type AS deptType,
+		(CASE WHEN dept_Type = 0
+		THEN 'pIcon01'
+		ELSE 'pIcon02' END ) AS iconSkin
+		FROM sys_dept
+		WHERE simplename like concat('%',#{dname},'%')
+		ORDER BY deptType DESC,LEVEL,sort,id
+	</select>
+
+    <select id="belowTreeNoDept" resultType="com.gobestsoft.core.node.ZTreeNode">
+	select id,pId,simplename name,(
+	CASE
+	WHEN pId = 0 THEN
+	'true'
+	ELSE
+	'false'
+	END
+	) as isOpen,dept_type as deptType,
+	(
+	CASE
+	WHEN dept_Type = 0 THEN
+	'pIcon01'
+	ELSE
+	'pIcon02'
+	END
+	) as iconSkin from sys_dept where dept_type = 0
+	and FIND_IN_SET(#{pid},pids) order by deptType desc,id
+	</select>
+
+    <!-- 根据登录用户orgId,获取当前工会的tree列表 -->
+    <select id="belowTreeByOrgId" resultType="com.gobestsoft.core.node.ZTreeNode">
+		select sys_dept.id,sys_dept.pId,
+		sys_dept.LEVEL,
+		sys_dept.simplename as name,
+		(CASE WHEN LEVEL = 8 THEN  'false' ELSE 'true' END ) as isParent,
+		(CASE WHEN sys_dept.id = #{parentId} THEN 'true' ELSE 'false' END ) as isOpen,
+		dept_type as deptType,
+		( CASE WHEN dept_Type = 0 THEN 'pIcon01' ELSE 'pIcon02' END ) as iconSkin
+		from sys_dept
+		INNER JOIN dept_organization on sys_dept.id=dept_organization.dept_id
+		where dept_type = 0
+
+		<if test="parentId!=null and parentId!=''">
+			and sys_dept.pid = ${parentId}
+		</if>
+		<if test="parentId==null || parentId==''">
+			<if test="deptId==1">
+				and (sys_dept.pid = 1 or sys_dept.pid is NULL )
+			</if>
+			<if test="deptId>1">
+				and (sys_dept.pid = #{deptId} or sys_dept.id =#{deptId} )
+			</if>
+		</if>
+		 order by sys_dept.level,sys_dept.sort,sys_dept.id
+	</select>
+
+	<select id="selectByDept" resultType="java.lang.Integer">
+		SELECT
+			count(0) 
+		FROM
+			sys_dept AS d1
+		INNER JOIN dept_organization ON d1.id = dept_organization.dept_id
+		WHERE
+			d1.pids LIKE CONCAT('%,',${parentId}, ',%')
+		OR dept_organization.p_id = ${parentId}
+	</select>
+
+	<select id="selectByMember" resultType="java.util.HashMap">
+		SELECT ifnull(member_whole_count,0) as cnt, dm.id as dept_id from sys_dept dm left join  t_member_count pin on pin.dept_id=dm.id
+		where dm.id in
+        <foreach collection="list" open="(" close=")" separator="," item="dept">
+				#{dept}
+			</foreach>
+
+	</select>
+
+    <select id="selectByOrgId" resultType="int">
+	select pid from sys_dept where id = #{orgId}
+	</select>
+
+    <select id="selectBypid" resultType="int">
+	select id from sys_dept where pid = #{orgId}
+	</select>
+
+    <select id="deptTree" resultType="com.gobestsoft.core.node.ZTreeNode">
+	select id,pid as pId,simplename as name,
+		(
+		CASE
+		WHEN (pId = 0 OR pId IS NULL) THEN
+			'true'
+		ELSE
+			'false'
+		END
+		) as isOpen,dept_type as deptType ,
+		(
+		CASE
+		WHEN (dept_Type = 0 OR pId IS NULL) THEN
+			'pIcon01'
+		ELSE
+			'pIcon02'
+		END
+		) as iconSkin 
+		from sys_dept where dept_type = '0'
+		order by dept_type desc ,id
+	</select>
+
+    <update id="updateDeptNo">
+		update sys_dept set dept_no = lpad(id, 6, '0') where dept_no is null
+	</update>
+
+    <update id="updatePDeptNo">
+		update sys_dept set p_dept_no = lpad(pid, 6, '0') where p_dept_no is null
+	</update>
+
+    <select id="getLevelByid" resultType="int">
+		select level from sys_dept where id = #{id}
+	</select>
+
+    <select id="selectBySimplename" resultType="com.gobestsoft.common.modular.system.model.Dept">
+	    SELECT * FROM sys_dept
+	    WHERE simplename = #{simplename} OR fullname = #{simplename}
+	</select>
+
+    <select id="selectById" resultType="com.gobestsoft.common.modular.system.model.Dept">
+	    SELECT * FROM sys_dept
+	    WHERE id=${id}
+	</select>
+
+    <select id="deptByPids" resultType="map">
+		select pids,level,org_type from sys_dept where id = #{pid}
+	</select>
+
+    <!-- 根据id,查询工会全称 -->
+    <select id="selectFullNameById" resultType="String">
+		select fullname from sys_dept where id = #{id}
+	</select>
+
+    <insert id="insertDept" useGeneratedKeys="true" keyProperty="id">
+	    INSERT INTO sys_dept(
+	    pid,
+		pids,
+		simplename,
+		fullname,
+		dept_type,
+		p_dept_name,
+		pic_name,
+		establish_date,
+		LEVEL,
+		org_type,
+		root_flg,
+		special_flg
+	    )
+	    VALUES
+		(
+		#{pid},
+		#{pids},
+		#{simplename},
+		#{fullname},
+		#{deptType},
+		#{pDeptName},
+		#{picName},
+		#{establishDate},
+		#{level},
+		#{orgType},
+		#{rootFlg},
+		#{specialFlg}
+		)
+	</insert>
+	
+	<!-- 根据sys_dept表id数组，获取对应层级的部门id -->
+	<select id="getDeptIdByOrgIdAndLevel" resultType="int">
+		select id from sys_dept where level=#{level} and id in 
+		<foreach collection="ids" index="index" item="i" open="("
+                 separator="," close=")">
+            #{i}
+        </foreach>
+	</select>
+
+	<!-- 根据登录用户orgId,获取当前工会的tree列表 -->
+	<select id="belowTreeByInfo" resultType="com.gobestsoft.core.node.ZTreeNode">
+		select sys_dept.id,
+			(case when
+				(pId = 0 OR pId IS NULL)
+				THEN 0
+				ELSE
+				sys_dept.pId
+				END) as pId,
+		sys_dept.fullname as name
+		from sys_dept
+		INNER JOIN dept_organization on sys_dept.id=dept_organization.dept_id
+		where dept_type = 0
+		and (sys_dept.id = #{orgId} or sys_dept.pids like '%,${orgId}%' or pids like '%${orgId},%') order by sys_dept.level,sys_dept.sort,sys_dept.id
+	</select>
+</mapper>

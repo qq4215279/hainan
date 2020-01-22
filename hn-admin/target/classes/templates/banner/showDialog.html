@@ -1,0 +1,170 @@
+<css xmlns:form="http://www.w3.org/1999/html" xmlns:form="http://www.w3.org/1999/html">
+<!--    <link th:href="@{http://xiumi.us/connect/ue/v5/xiumi-ue-v5.css}" rel="stylesheet">-->
+    <link th:href="@{/static/css/fileUpload.css}" rel="stylesheet">
+</css>
+<body>
+<div class="container">
+    <div class="form-horizontal" id="showDialogForm">
+        <div class="row">
+            <form class="form-horizontal col-sm-8 col-sm-offset-1" id="add-form">
+                <form:text label="标题" id="title" name="title" type="text" must="true" value="${result.title}"></form:text>
+                <form:text label="弹窗链接" id="jumpUrl" name="jumpUrl" type="text" must="true" value="${result.jumpUrl}"></form:text>
+                <div class="form-group clip-group">
+                    <label class="col-sm-4 control-label">封面图</label>
+                    <div class="col-sm-5" >
+                        <img th:src="${result.showImg}"  style="width:300px;height: auto" showImg>
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="btn btn-primary " for="uploadFile">
+                            <i class="fa fa-address-book"></i>
+                            上传图片
+
+                        </label>
+
+                        <input type="hidden" id="showImg" th:value="${result.showImg}" class="saveInput">
+
+                    </div>
+                </div>
+                <form:check id="isShow" label="是否显示" name="isShow" value="${result.isShow}"></form:check>
+                <form:check id="isForce" label="是否强制显示" name="isForce" value="${result.isForce}"></form:check>
+            </form>
+            <form th:action="@{/banner/uploadFile}" method="post"
+                  enctype="multipart/form-data" name="uploadForm" id="uploadForm">
+                <input type="file" style="display: none" id="uploadFile"  name="uploadFile" onchange="ShowDialogDlg.upload()" accept="image/jpeg, image/x-png, image/png, image/gif">
+            </form>
+        </div>
+        <div class="row text-center">
+            <div class="hr-line-dashed"></div>
+            <qx:btn fa="fa fa-check" label="保存" permission="" onclick="ShowDialogDlg.addSubmit()"></qx:btn>
+        </div>
+    </div>
+</div>
+</body>
+<js>
+    <div th:include="fragment/fargment :: fileUploadJs"></div>
+    <script th:src="@{/static/js/jquery.form.js}"></script>
+    <script th:src="@{/static/js/jquery.formHelp.js}"></script>
+    <script th:src="@{/static/ueditor/ueditor.config.js}"></script>
+    <script th:src="@{/static/ueditor/ueditor.all.js}"></script>
+
+    <script type="text/javascript">
+        /**
+         * 画面初期处理
+         */
+        $(function () {
+            // 详细信息form验证
+            App.initValidator("showDialogForm", ShowDialogDlg.validateFields);
+
+            var isShow = $("#isShow").val();
+            if(isShow == 0 && isShow != ""){
+                $("input[name='isShow']").attr("checked", true);
+            }
+
+            var isForce = $("#isForce").val();
+            if(isForce == 0 && isForce != ""){
+                $("input[name='isForce']").attr("checked", true);
+            }
+        });
+
+        /**
+         * 初始化详情内容
+         */
+        var ShowDialogDlg = {
+            ShowDialogData: {},
+            zTreeInstance: null,
+            validateFields: {
+                title: {
+                    validators: {
+                        notEmpty: {
+                            message: '标题不能为空。'
+                        },
+                        stringLength: {
+                            min: 2,
+                            max: 70,
+                            message: '标题长度必须在2到70个字符之间。'
+                        }
+                    }
+                },
+                jumpUrl: {
+                    validators: {
+                        notEmpty: {
+                            message: '弹窗链接不能为空。'
+                        }
+                    }
+                },
+            }
+        };
+
+        /**
+         * Banner详细信息设定
+         */
+        ShowDialogDlg.collectData = function () {
+            this.ShowDialogData['title'] = $('#title').val();
+            this.ShowDialogData['showImg'] = $('#showImg').val();
+            this.ShowDialogData['isShow'] = typeof $('input[name="isShow"]:checked').val() != "undefined" ? 0 : 1;
+            this.ShowDialogData['isForce'] = typeof $('input[name="isForce"]:checked').val() != "undefined" ? 0 : 1;
+            this.ShowDialogData['jumpUrl'] = $('#jumpUrl').val();
+        }
+
+        /**
+         * 验证数据
+         */
+        ShowDialogDlg.validate = function () {
+            $('#showDialogForm').data("bootstrapValidator").resetForm();
+            $('#showDialogForm').bootstrapValidator('validate');
+            return $("#showDialogForm").data('bootstrapValidator').isValid();
+        };
+
+        /**
+         * 清空数据
+         */
+        ShowDialogDlg.clearData = function () {
+            this.ShowDialogData = {};
+        };
+
+        /**
+         * 【提交】按钮响应
+         */
+        ShowDialogDlg.addSubmit = function () {
+            this.clearData();
+            this.collectData();
+            if (!this.validate()) {
+                errorFocus();
+                return;
+            }
+            //提交信息
+            var ajax = new $ax(App.ctxPath + "banner/showDialog", function (data) {
+                App.success("添加成功!");
+            }, function (data) {
+                App.error("添加失败!" + data.responseJSON.message + "!");
+            });
+            ajax.set(ShowDialogDlg.ShowDialogData);
+            ajax.start();
+        };
+
+
+        ShowDialogDlg.upload = function () {
+            if (!$("#uploadFile").val()) {
+                App.error("请选择文件");
+                return;
+            }
+            var index = layer.load(1, {
+                shade: [0.1, '#fff'] //0.1透明度的白色背景
+            });
+            //提交FORM表单
+            $("#uploadForm").submit();
+        };
+
+        //绑定FORM提交后事件
+        $("#uploadForm").ajaxForm(function (data) {
+            App.closeLoading();
+            if (data.code == 200) {
+                $('#showImg').val(data.data);
+                $('[showImg]').attr('src',data.data);
+                App.alert("上传成功")
+            }else{
+                App.error(data.message);
+            }
+        });
+    </script>
+</js>

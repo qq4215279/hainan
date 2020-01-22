@@ -1,0 +1,43 @@
+package com.gobestsoft.api.modular.appuser.service;
+
+import com.gobestsoft.api.modular.appuser.model.AppIntegralUpdateDto;
+import com.gobestsoft.common.modular.dao.mapper.AppIntegralMapper;
+import com.gobestsoft.common.modular.dao.mapper.AppIntegralUpdateMapper;
+import com.gobestsoft.common.modular.dao.model.AppIntegralPojo;
+import com.gobestsoft.common.modular.dao.model.AppIntegralUpdatePojo;
+import com.gobestsoft.core.util.DateUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+
+@Service
+public class AppUserIntegralService {
+
+    @Autowired
+    private AppIntegralMapper appIntegralMapper;
+    @Resource
+    private AppIntegralUpdateMapper appIntegralUpdateMapper;
+
+    public AppIntegralUpdatePojo selectOne(AppIntegralUpdatePojo pojo){
+        return appIntegralUpdateMapper.selectOne(pojo);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void alterIntegral(AppIntegralUpdateDto dto) {
+        // 订单记录
+        AppIntegralUpdatePojo pojo =
+                new AppIntegralUpdatePojo(dto.getAuid(), dto.getType(), dto.getJifen(), dto.getTid(), dto.getGoods());
+        this.appIntegralUpdateMapper.insert( pojo );
+        // 积分记录
+        AppIntegralPojo appIntegralPojo = new AppIntegralPojo();
+        appIntegralPojo.setAuid( dto.getAuid() );
+        appIntegralPojo.setCreateTime( DateUtil.getAllTime() );
+        appIntegralPojo.setTargetId( "11" );
+        appIntegralPojo.setType( 0 );
+        appIntegralPojo.setValue( dto.getJifen() );
+        this.appIntegralMapper.insert( appIntegralPojo );
+
+    }
+}

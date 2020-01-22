@@ -1,0 +1,46 @@
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body, html {
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+
+.gray-text {
+    color: #bcbcbc;
+    font-size: 14px;
+}
+
+.source {
+    padding: 10px;
+}
+
+.source header h1 {
+    font-size: 25px;
+}
+
+.source .content {
+    margin-top: 10px;
+}
+
+.source img {
+    width: 100% !important;
+    margin-top: 3px;
+}
+
+.attachment {
+    margin-top: 15px;
+    width: 100%;
+}
+
+.attachment image {
+    width: 100% !important;
+    margin-top: 12px;
+}
+
+.mp4 {
+    width: 100%;
+}

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dao.mapper.XlyzMapper">
+
+    <select id="selectBannerList" resultType="java.util.Map">
+
+        select
+        ifnull(jump_url,'')jump_url,title,cover,type,target_id
+        from app_banner
+        where
+        status=0
+        and
+        category=102
+        order by sort
+
+    </select>
+
+    <select id="selectMasterList" resultType="java.util.Map">
+        select
+        id,name,sex,avatar,summary,introduce
+        from
+        xlyz_master
+        where
+        del_flag=0
+        order by sort
+
+
+    </select>
+    <insert id="insert" parameterType="com.gobestsoft.common.modular.dao.model.XlyzMasterPojo">
+        insert into xlyz_master( name,sex,avatar,summary,introduce,sort)
+        values(
+        #{name},#{sex},#{avatar},#{summary},#{introduce},#{sort}
+        )
+    </insert>
+    <!--心理知识-->
+    <select id="selectArticles" resultType="java.util.Map">
+
+        select
+        t.id ,
+        t.title,
+        t.sub_title,
+        t.template_type,
+        t.cover_path,
+        t.info_type,
+        ifnull(t.jump_url ,'')jump_url,
+        t.thumbup_num,
+        t.create_time,
+        (case when t.is_on_top=1
+          and  t.is_on_top_overdue_time <![CDATA[>]]> date_format(now(),'%Y%m%d') then 1
+          else 0 end
+          )
+        as is_on_top_flag
+
+        from
+        cms_article t,r_article_category cate
+        where status=1
+        and t.del_flg=0
+        and t.published_status=1
+        and t.id= cate.article_id
+        and cate.category_id=122
+        order by is_on_top_flag desc,sort desc
+
+
+
+    </select>
+    <!--查询文章阅读量-->
+    <select id="selectArticleReading" resultType="java.util.Map" parameterType="list">
+        select
+        count(1) as counting,
+        article_id
+        from
+        cms_article_operation_log t
+        where t.type=1
+        and
+        article_id in
+        <foreach collection="list" separator="," open="(" close=")" item="item">
+            #{item}
+        </foreach>
+        group by article_id
+
+    </select>
+
+
+</mapper>

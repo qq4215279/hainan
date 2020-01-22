@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.system.mapper.DictMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.system.model.Dict">
+        <id column="id" property="id"/>
+        <result column="sort" property="sort"/>
+        <result column="pid" property="pid"/>
+        <result column="name" property="name"/>
+        <!-- 2017-11-30 caoy add start -->
+        <result column="group_code" property="groupCode"/>
+        <result column="code" property="code"/>
+        <!-- 2017-11-30 caoy add end -->
+    </resultMap>
+
+    <!-- 根据字典groupCode,查询出字典list集合 -->
+    <select id="getDicListByGroupCodes" resultMap="BaseResultMap">
+        select
+        id, sort, pid, name,group_code,code
+        from sys_dict
+        where  code is not null and code!='' and group_code in
+        <foreach collection="groupCodes" index="index" item="i" open="("
+                 separator="," close=")">
+            #{i}
+        </foreach>
+        order by id
+    </select>
+
+    <resultMap id="dictMap" type="com.gobestsoft.common.modular.system.model.DictModel">
+        <result column="name" property="name"/>
+        <result column="code" property="code"/>
+        <result column="group_code" property="group_code"/>
+        <collection property="dict" select="getChildDictionary" column="{pid=id,groupCode=group_code}"
+                    ofType="com.gobestsoft.common.modular.system.model.DictModel">
+            <result column="name" property="name"/>
+            <result column="code" property="code"/>
+            <result column="group_code" property="group_code"/>
+            <collection property="dict" select="getChildDictionary" column="{pid=id,groupCode=group_code}"
+                        ofType="com.gobestsoft.common.modular.system.model.DictModel">
+                <result column="name" property="name"/>
+                <result column="code" property="code"/>
+                <result column="group_code" property="group_code"/>
+                <collection property="dict" select="getChildDictionary" column="{pid=id,groupCode=group_code}"
+                            ofType="com.gobestsoft.common.modular.system.model.DictModel">
+                    <result column="name" property="name"/>
+                    <result column="code" property="code"/>
+                    <result column="group_code" property="group_code"/>
+                </collection>
+            </collection>
+        </collection>
+    </resultMap>
+
+
+
+    <select id="getDictionary" resultMap="dictMap">
+		SELECT id,name,code,group_code FROM sys_dict WHERE group_code=#{groupCode} AND pid=${pid} AND IFNULL(code,'')='' ORDER BY sort ASC
+	</select>
+
+</mapper>

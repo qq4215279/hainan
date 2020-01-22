@@ -1,0 +1,7 @@
+{
+  "cacheSeconds": 180,
+  "manRetireAge": 60,
+  "manRetireAge.Comment": "男士退休年龄",
+  "womanRetireAge": 55,
+  "womanRetireAge.Comment": "女士退休年龄"
+}

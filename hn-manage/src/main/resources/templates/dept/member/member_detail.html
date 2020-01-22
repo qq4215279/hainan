@@ -1,0 +1,173 @@
+<css xmlns:form="http://www.w3.org/1999/html" xmlns:form="http://www.w3.org/1999/html">
+</css>
+<body>
+<div class="form-horizontal" id="deptMemberForm">
+    <input type="hidden" id="personId" th:value="${deptMember.id}">
+    <div class="row">
+        <div class="col-sm-4">
+            <form:text label="姓名" id="name" name="name" value="${deptMember.name}" type="text"
+                       disabled="true"></form:text>
+            <form:select label="民族" id="nation" name="nation" code="lib_ethnic_group" value="${deptMember.nation}"
+                         type="text" disabled="true"></form:select>
+            <form:select label="证件类型" id="certificateType" name="certificateType" code="lib_identification_type"
+                         value="${deptMember.certificateType}" type="text" disabled="true"></form:select>
+            <form:select label="就业情况" id="workSituation" name="workSituation" code="lib_work_situation"
+                         value="${deptMember.workSituation}" type="text" disabled="true"></form:select>
+            <form:select label="会籍变化类型" id="memberChange" name="memberChange" code="lib_member_change"
+                         value="${deptMember.memberChange}" type="text" disabled="true"></form:select>
+            <form:select label="户籍类型" id="household" name="household" code="lib_household"
+                         value="${deptMember.household}" type="text" disabled="true"></form:select>
+            <form:text label="籍贯" id="nativePlace" name="nativePlace" value="${deptMember.nativePlace}" type="text"
+                       disabled="true"></form:text>
+        </div>
+        <div class="col-sm-4">
+            <form:select label="性别" id="sex" name="sex" code="lib_sex" value="${deptMember.sex}" type="text"
+                         disabled="true"></form:select>
+            <form:select label="政治面貌" id="politicalStatus" name="politicalStatus" code="lib_political_status"
+                         value="${deptMember.politicalStatus}" type="text" disabled="true"></form:select>
+            <form:text label="证件号" id="certificateNum" name="certificateNum" value="${deptMember.certificateNum}"
+                       type="text" disabled="true"></form:text>
+            <form:text label="工作单位" id="workUnit" name="workUnit" value="${deptMember.workUnit}" type="text"
+                       disabled="true"></form:text>
+            <form:datetime id="memberChangeDate" label="会籍变化日期" istime="false" format="yyyy-MM-dd"
+                           value="${deptMember.memberChangeDate}" name="memberChangeDate"
+                           disabled="true"></form:datetime>
+            <form:text label="出生地" id="homeplace" name="homeplace" value="${deptMember.homeplace}" type="text"
+                       disabled="true"></form:text>
+            <form:text label="户籍所在地" id="domicile" name="domicile" value="${deptMember.domicile}" type="text"
+                       disabled="true"></form:text>
+        </div>
+        <div class="col-sm-4">
+            <form:datetime label="出生日期" id="birthday" name="birthday" value="${deptMember.birthday}" format="yyyy-MM-dd"
+                           istime="false" type="text" disabled="true"></form:datetime>
+            <form:select label="学历" id="education" name="education" code="lib_education_code"
+                         value="${deptMember.education}" type="text" disabled="true"></form:select>
+            <form:text label="移动电话" id="mobile" name="mobile" value="${deptMember.mobile}" type="text"
+                       disabled="true"></form:text>
+            <form:select label="技能等级" id="technologyLevel" name="technologyLevel" code="lib_technology"
+                         value="${deptMember.technologyLevel}" type="text" disabled="true"></form:select>
+            <form:select label="会籍变化原因" id="memberChangeReason" name="memberChangeReason"
+                         code="lib_member_change_reason" value="${deptMember.memberChangeReason}" type="text"
+                         disabled="true"></form:select>
+            <form:select label="是否农民工" id="isFarmer" name="isFarmer" code="lib_is_not" value="${deptMember.isFarmer}"
+                         type="text" disabled="true"></form:select>
+            <form:text label="会员卡号" id="memberCard" name="memberCard" value="${member.stationCard}" type="text"
+                       disabled="true"></form:text>
+        </div>
+    </div>
+    <div class="row text-center" th:if="${pageType == 0}">
+        <qx:btn fa="fa fa-eraser" label="取消" permission="" onclick="DeptMemberDlg.close()"></qx:btn>
+    </div>
+
+    <div class="row text-center" th:if="${pageType == 1 || pageType == 2 || pageType == 3}">
+        <div class="row text-center" th:if="${deptMemberTransfer.outStatus == '-1' && pageType == 2}">
+            <div class="row text-center" style="margin: 10px;">
+                <label class="col-sm-2 col-sm-offset-2 control-label">审核意见</label>
+                <div class="col-sm-4">
+                    <textarea name="checkDesc" id="checkDesc" class="form-control" maxlength="200"
+                              style="width: 90%;height: 80px;resize: none;"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="row text-center" th:if="${deptMemberTransfer.outStatus == '-1' && pageType == 2}">
+            <qx:btn id="accepted" class="btn btn-primary" onclick="DeptMemberDlg.transferOutApproval(1)" fa="fa fa-check"
+                    label="通过"></qx:btn>
+            <qx:btn id="rejected" class="btn btn-danger" onclick="DeptMemberDlg.transferOutApproval(0)" fa="fa fa-eraser"
+                    label="拒绝"></qx:btn>
+            <qx:btn id="close1" class="btn btn-info" onclick="DeptMemberDlg.close()" fa="fa fa-eraser" label="取消"></qx:btn>
+        </div>
+        <div class="row text-center" th:if="${deptMemberTransfer.outStatus != '-1' && pageType == 2}">
+            <qx:btn id="close1" class="btn btn-info" onclick="DeptMemberDlg.close()" fa="fa fa-eraser" label="取消"></qx:btn>
+        </div>
+
+
+        <div class="row text-center" th:if="${deptMemberTransfer.status == '-1' && pageType == 3}">
+            <div class="row text-center" style="margin: 10px;">
+                <label class="col-sm-2 col-sm-offset-2 control-label">审核意见</label>
+                <div class="col-sm-4">
+                    <textarea name="checkDesc" id="checkDesc" class="form-control" maxlength="200"
+                              style="width: 90%;height: 80px;resize: none;"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="row text-center" th:if="${deptMemberTransfer.status == '-1' && pageType == 3}">
+            <qx:btn id="accepted" class="btn btn-primary" onclick="DeptMemberDlg.transferOutApproval(1)" fa="fa fa-check"
+                    label="通过"></qx:btn>
+            <qx:btn id="rejected" class="btn btn-danger" onclick="DeptMemberDlg.transferOutApproval(0)" fa="fa fa-eraser"
+                    label="拒绝"></qx:btn>
+            <qx:btn id="close1" class="btn btn-info" onclick="DeptMemberDlg.close()" fa="fa fa-eraser" label="取消"></qx:btn>
+        </div>
+        <div class="row text-center" th:if="${deptMemberTransfer.status != '-1' && pageType == 3 }">
+            <qx:btn id="close1" class="btn btn-info" onclick="DeptMemberDlg.close()" fa="fa fa-eraser" label="取消"></qx:btn>
+        </div>
+    </div>
+</div>
+</body>
+
+<script th:inline="javascript">
+    var pageType = [[${pageType}]];
+    var targetId = [[${targetId}]];
+</script>
+
+<js>
+    <script type="text/javascript">
+        $(function () {
+            //验证form表单
+            App.initValidator("deptMemberForm", DeptMemberDlg.validateFields);
+        });
+
+        /*
+         * 初始对话框
+         */
+        var DeptMemberDlg = {
+            recordData: {},
+            deptZtree: null,
+            pNameZtree: null,
+            validateFields: {}
+        }
+        /**
+         * 关闭此对话框
+         */
+        DeptMemberDlg.close = function () {
+            App.closeSelfIframe();
+        }
+
+
+        /**
+         * 通过与不通过
+         */
+        DeptMemberDlg.transferOutApproval = function (status) {
+            var url = "";
+            var data = {};
+            if (pageType == 2) {
+                url = App.ctxPath + "transfer/outApproval";
+                data = {
+                    id: targetId,
+                    checkDesc: $("#checkDesc").val(),
+                    status:status
+                };
+            }
+
+            if (pageType == 3) {
+                url = App.ctxPath + "transfer/inApproval";
+                data = {
+                    id: targetId,
+                    checkDesc: $("#checkDesc").val(),
+                    status:status
+                };
+            }
+
+            App.loadingAjax({
+                url: url,
+                data: data,
+                success: function (data) {
+                    App.info("审批成功!", function () {
+                        DeptMemberDlg.close();
+                    });
+                }
+            });
+
+        }
+    </script>
+
+</js>

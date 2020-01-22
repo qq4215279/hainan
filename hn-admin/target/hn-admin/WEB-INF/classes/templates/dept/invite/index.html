@@ -1,0 +1,140 @@
+<css>
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-3" style="margin-left: -15px">
+                                <search:input id="unitName" label="单位名称" name="unitName" value=""
+                                              type="text"></search:input>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:datetime id="begDate" label="发布时间" name="begDate"
+                                                 format="yyyy-MM-dd HH:mm:ss"></search:datetime>
+                            </div>
+                            <div class="col-sm-3" style="margin-left: -30px">
+                                <search:datetime id="endDate" label="至" name="endDate"
+                                                 format="yyyy-MM-dd HH:mm:ss"></search:datetime>
+                            </div>
+                            <div class="col-sm-1">
+                                <qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="OptInviteDept.search()"></qx:btn>
+                            </div>
+                        </div>
+                    </div>
+                    <table id="OptInviteDeptTable" data-mobile-responsive="true" data-click-to-select="true">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+        /**
+         * 初始化
+         */
+        var OptInviteDept = {
+            id: "OptInviteDeptTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        OptInviteDept.initColumn = function () {
+            return [
+                {field: 'selectItem', radio: true},
+                {title: '编号', field: 'id', visible: true, align: 'center', valign: 'middle',sortable: false},
+                {title: '单位名称', field: 'unit_name', align: 'center', valign: 'middle'},
+                {title: '会员人数', field: 'count', align: 'center', valign: 'middle'},
+                {title: '发布时间', field: 'create_time', align: 'center', valign: 'middle',sortable: false,
+                    formatter: function (value, row, index) {
+                        var a = row.create_time;
+                        if(typeof a == "undefined" || a == null){
+                            a = "--";
+                        }else{
+                            a = dateDisplay(row.create_time);
+                        }
+                        return a;
+                    }
+                },
+
+                {title: '操作', field: 'is_dept', align: 'center', valign: 'middle',
+                    formatter:function (value,row,index){
+						return '<a href="#" onclick="OptInviteDept.openDetail(\''+row.unit_name+'\')">查看信息</a>';
+					}
+                }
+            ]
+        };
+
+
+        /**
+         * 检查是否选中  xxxxxx
+         */
+        OptInviteDept.check = function () {
+            var selected = $('#'+this.id).bootstrapTable('getSelections');
+
+            if(selected.length == 0){
+                App.info("请先选中表格中的某一记录！");
+                return false;
+            }else{
+                OptInviteDept.seItem = selected[0];
+                return true;
+            }
+
+        };
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        OptInviteDept.formParams = function() {
+            var queryData = {};
+            queryData['unitName'] = $("#unitName").val();
+            queryData['begDate'] = $("#begDate").val();
+            queryData['endDate'] = $("#endDate").val();
+            return queryData;
+        }
+
+        /**
+         * 查询邀请入会列表
+         */
+        OptInviteDept.search = function () {
+
+            OptInviteDept.table.refresh({query: OptInviteDept.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = OptInviteDept.initColumn();
+            var table = new BSTable(OptInviteDept.id,  "/app/invite/list", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(OptInviteDept.formParams());
+            OptInviteDept.table = table.init();
+        });
+
+        /**
+         *查看详情
+         */
+        OptInviteDept.openDetail=function (unit_name){
+            var index = layer.open({
+			type : 2,
+			title : '查看信息',
+			area : [ '100%', '100%' ], //宽高
+			fix : false, //不固定
+			maxmin : true,
+			content : App.ctxPath + '/app/invite/detail/' + unit_name
+		});
+
+		this.layerIndex = index;
+        }
+    </script>
+</js>
+</body>

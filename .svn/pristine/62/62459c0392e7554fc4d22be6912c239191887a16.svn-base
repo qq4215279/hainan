@@ -1,0 +1,208 @@
+<css >
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <search:input id="name" label="姓名" name="name" value=""
+                                              type="text"></search:input>
+                            </div>
+                            <div class="col-sm-3">
+                                 <search:select label="状态" name="status"
+                                               code="lib_support_status" id="status"></search:select>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:input id="workUnit" label="工作单位" name="workUnit" value=""
+                                              type="text"></search:input>
+                            </div>
+                            <div class="col-sm-3">
+                                <qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="OptStraitened.search()"></qx:btn>
+	                        </div>
+                        </div>
+                    </div>
+                    <table id="OptStraitenedTable" data-mobile-responsive="true" data-click-to-select="true">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+    /**
+     * 初始化表格对象
+     */
+    var OptStraitened = {
+        id: "OptStraitenedTable",	//表格id
+        seItem: null,		//选中的条目
+        table: null,
+        layerIndex: -1
+    };
+
+    /**
+     * 初始化表格的列
+     *
+     */
+     OptStraitened.initColumn = function () {
+        return [
+            {field: 'selectItem', radio: true},
+            {title: '日志id', field: 'straitenedLogId', visible: false, align: 'center', valign: 'middle'},
+            {title: '姓名', field: 'name', visible: true, align: 'center', valign: 'middle'},
+            {title: '身份证号', field: 'certificateNum', align: 'center', valign: 'middle'},
+            {title: '当前工作单位', field: 'workUnit', align: 'center', valign: 'middle'},
+            {title: '状态', field: 'status', align: 'center', valign: 'middle' ,formatter: initStatusField},
+            {title: '创建时间', field: 'createTime', align: 'center', valign: 'middle',formatter: initCreateTimeField},
+            {title: '操作', align: 'center', valign: 'middle',
+                formatter: function (value, row, index) {
+                	if(row.logStatus == 1){
+                		return '<a href="javascript:OptStraitened.examine(' + row.id + "," + row.straitenedLogId + ')">审核</a>';
+                	}else{
+                		return '<a href="javascript:OptStraitened.detail(' + row.id + "," + row.straitenedLogId + ')">查看</a>';
+                	}
+                }
+            },
+            {title: '查看流程', align: 'center', valign: 'middle',
+                formatter: function (value, row, index) {
+                    return '<a href="javascript:OptStraitened.log(' + row.id + ')">审核流程</a>';
+                }
+            }
+        ];
+    }
+    
+     /**
+      *初始化状态
+      */
+     function initStatusField(value, row, index) {
+         if(row.status == 1&&row.logStatus==4){
+             return '已转办';
+         }
+         if(row.status == 4){
+             return '已重新提交';
+         }
+         if(row.status == 1){
+             return '待处理';
+         }else if(row.status == 2){
+             return '通过';
+         }else if(row.status == 3){
+             return '拒绝';
+         }else if(row.status == 0){
+             return '待查看';
+         }else{
+             return '-';
+         }
+     }
+     
+     /**
+      * 初始化列表的创建时间类型的字段
+      */
+      function initCreateTimeField(value, row, index){
+      	if(row.createTime){
+      		return returnTimeStr(row.createTime);
+      	}
+      }
+     
+      /**
+       * 返回组装好的日期字符串
+       */
+      function returnTimeStr(time) {
+     	 return time.substring(0,4)+"-"+time.substring(4,6)+"-"+time.substring(6,8);
+      }
+
+    /**
+     * 检查是否选中
+     */
+     OptStraitened.check = function () {
+        var selected = $('#' + this.id).bootstrapTable('getSelections');
+        if (selected.length == 0) {
+            App.info("请先选中表格中的某一记录！");
+            return false;
+        } else {
+        	OptStraitened.seItem = selected[0];
+            return true;
+        }
+    };
+    
+    /**
+     *点击审核进入审核页面
+     */
+    OptStraitened.examine = function (id, straitenedLogId){
+    	var index = layer.open({
+             type: 2,
+             title: '困难帮扶初级申请审核',
+             area: ['100%', '100%'], //宽高
+             fix: false, //不固定
+             maxmin: true,
+             content: App.ctxPath + 'srv/straitened/first_examine?id=' + id + "&straitenedLogId=" + straitenedLogId
+         });
+         this.layerIndex = index;
+    };
+    
+    
+    /**
+     * 点击查看详情操作
+     */
+     OptStraitened.detail = function (id, straitenedLogId) {
+        var index = layer.open({
+            type: 2,
+            title: '查看困难帮扶初级审核详情',
+            area: ['100%', '100%'], //宽高
+            fix: false, //不固定
+            maxmin: true,
+            content: App.ctxPath + 'srv/straitened/first_detail?id=' + id + "&straitenedLogId=" + straitenedLogId
+        });
+        this.layerIndex = index;
+    }
+    
+    /**
+     * 点击查看审核流程
+     */
+     OptStraitened.log = function (id) {
+    	 var index = layer.open({
+             type: 2,
+             title: '',
+             area: ['100%', '100%'], //宽高
+             fix: false, //不固定
+             maxmin: true,
+             content: App.ctxPath + 'srv/straitened/first_log?id='+id
+         });
+         this.layerIndex = index;
+     }
+    
+    /**
+     * 查询表单提交参数对象
+     *
+     */
+     OptStraitened.formParams = function () {
+        var queryData = {};
+        queryData['name'] = $("#name").val();
+        queryData['status'] = $("#status").val();
+        queryData['workUnit'] = $("#workUnit").val();
+        return queryData;
+    }
+
+    /**
+     * 查询列表
+     */
+     OptStraitened.search = function () {
+    	 OptStraitened.table.refresh({query: OptStraitened.formParams()});
+    };
+
+    $(function () {
+        var defaultColunms = OptStraitened.initColumn();
+        var table = new BSTable(OptStraitened.id, "srv/straitened/first_list", defaultColunms);
+        table.setPaginationType("server");
+        table.setQueryParams(OptStraitened.formParams());
+        OptStraitened.table = table.init();
+    });
+</script>
+</js>
+</body>

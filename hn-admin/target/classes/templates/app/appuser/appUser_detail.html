@@ -1,0 +1,69 @@
+<css xmlns:form="http://www.w3.org/1999/html" xmlns:form="http://www.w3.org/1999/html">
+    <div  include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal" id="deptMemberForm">
+        <input type="hidden" id="memberId" th:value="${appUser.member_id}">
+        <input type="hidden" id="isMember" th:value="${appUser.isMember}">
+			<div class="row">
+				<div class="col-sm-2"></div>
+	            <div class="col-sm-8">
+					<form:text label="手机号/账号" id="account" name="account" value="${appUser.account}" type="text" disabled="true"></form:text>
+					<form:text label="昵称" id="nickname" name="nickname" value="${appUser.nick_name}" type="text" disabled="true"></form:text>
+					<form:text label="创建时间" id="createTime" name="createTime" value="${appUser.create_time}" type="text" disabled="true"></form:datetime>
+					<form:select label="是否为会员" id="isMember" name="isMember" code="lib_is_not" value="${appUser.isMember}" type="text" disabled="true"></form:select>
+				</div>
+	        </div>
+            <div class="row btn-group-m-t">
+                <div class="col-sm-4 col-sm-offset-5">
+                	<qx:btn class="btn btn-primary" fa="fa fa-eye" label="会员详情" permission="" onclick="OptDeptMember.detail()" id="detailBtn" disabled="true"></qx:btn>
+					<qx:btn  fa="fa fa-eraser" label="取消" permission="" onclick="OptDeptMember.close()"></qx:btn>
+                </div>
+        </div>
+    </div>
+</div>
+</body>
+<js>
+  <script type="text/javascript" >
+
+  /* 
+   * 初始对话框
+   */
+   var OptDeptMember = {
+	    recordData: {},
+	    deptZtree: null,
+	    pNameZtree: null,
+	    validateFields: {}
+   }
+  
+   /**
+    * 点击查看会员操作
+    */
+    OptDeptMember.detail = function () {
+       var index = layer.open({
+           type: 2,
+           title: '查看详情',
+           area: ['100%', '100%'], //宽高
+           fix: false, //不固定
+           maxmin: true,
+           content: App.ctxPath + 'dept/member/detail?id='+$("#memberId").val()
+       });
+       this.layerIndex = index;
+   }
+  
+   /**
+    * 关闭此对话框
+    */
+    OptDeptMember.close = function() {
+       parent.layer.close(window.parent.OptAppUser.layerIndex);
+   }
+   
+   if($("#isMember").val() == 1) {
+	   $("#detailBtn").attr("disabled",false);
+   }
+   
+    </script>
+    
+</js>

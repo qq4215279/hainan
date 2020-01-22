@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.bigdata.dao.MemberStatisticsDao">
+
+
+    <select id="statisticsOne" resultType="com.gobestsoft.common.modular.bigdata.dao.model.MemberStatistics">
+        SELECT
+            (SELECT COUNT(0) FROM person_info AS T1 INNER JOIN dept_member T2 ON T1.id=T2.person_id
+            WHERE T1.sex=1
+                <if test="startTime !=null and startTime != '' ">
+                    AND T2.create_time &gt;= #{startTime}
+                </if>
+                <if test="endTime !=null and endTime != '' ">
+                    AND t2.create_time &lt;= #{endTime}
+                </if>
+            )
+            AS men,
+            (SELECT COUNT(0) FROM person_info AS T1 INNER JOIN dept_member T2 ON T1.id=T2.person_id
+            WHERE T1.sex=2
+                <if test="startTime !=null and startTime != '' ">
+                    AND T2.create_time &gt;= #{startTime}
+                </if>
+                <if test="endTime !=null and endTime != '' ">
+                    AND t2.create_time &lt;= #{endTime}
+                </if>
+            )
+            AS women
+    </select>
+
+</mapper>

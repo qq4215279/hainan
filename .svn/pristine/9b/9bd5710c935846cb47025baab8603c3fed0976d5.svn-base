@@ -1,0 +1,71 @@
+package com.gobestsoft.mamage.moudle.system.service;
+
+import com.gobestsoft.common.modular.system.dao.MsgDao;
+import com.gobestsoft.common.modular.system.model.SysMsg;
+import com.gobestsoft.core.util.DateUtil;
+import com.baomidou.mybatisplus.plugins.Page;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+/**
+ * 消息服务
+ */
+@Service
+@Transactional
+public class MsgService {
+	
+	@Resource
+	MsgDao msgDao;
+
+    /**
+     * 插入一条消息
+     * @param toDeptId 推送组织ID
+     * @param isOpen    是否推送
+     * @param content  消息内容
+     * @param type     消息类型：0：建会审批。1：入会审批。
+     * @param 
+     */
+    public void insertMsg(Integer toDeptId
+     	   				 ,String isOpen
+     	   				 ,String content
+     	   				 ,String type
+     	   				 ) {
+    	SysMsg sysMsg = new SysMsg();
+    	sysMsg.setToDeptId(toDeptId);
+    	sysMsg.setIsOpen(isOpen);
+    	sysMsg.setContent(content);
+    	sysMsg.setType(type);
+    	sysMsg.setCreateTime(DateUtil.getAllTime());
+    	msgDao.insert(sysMsg);
+    }
+
+    /**
+     * sysmsg条件查询
+     */
+    public List<SysMsg> msgList(Page<SysMsg> page,SysMsg dto){
+        List<SysMsg> resultList = msgDao.msgList(page, dto);
+        for (SysMsg sysMsg : resultList) {
+        	if (StringUtils.isNoneBlank(sysMsg.getCreateTime()) ) {
+        		sysMsg.setCreateTime(DateUtil.parseAndFormat(sysMsg.getCreateTime(), "yyyyMMddHHmmss", "yyyy-MM-dd HH:mm"));
+            }
+		}
+        return resultList;
+    }
+
+	public int changeIsOpen(int id){
+		int i = this.msgDao.changeIsOpen(id);
+		return i;
+	}
+
+    /**
+     * 详情
+     **/
+    public SysMsg selectById(Integer id){
+        return msgDao.selectById(id);
+    }
+}

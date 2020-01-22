@@ -1,0 +1,88 @@
+<body xmlns:th="http://www.w3.org/1999/xhtml">
+    <div class="ibox float-e-margins">
+        <div class="ibox-content">
+            <div class="form-horizontal" id="moneyForm">
+                <input type="hidden" th:value="${pojo.id}" id="opinionId"/>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <form:area id="content" label="建言内容" disabled="true" value="${pojo.content}" />
+                    </div>
+                    <div class="col-sm-12" th:if="${pojo.status == 1}">
+                        <form:area id="replyContent" value="${replyContent}" label="审核意见" must="true" />
+                    </div>
+                    <div class="col-sm-12" th:if="${pojo.status != 1}">
+                        <form:area id="replyContent" value="${replyContent}" label="审核意见" disabled="true" />
+                    </div>
+                    <div class="row text-center" th:if="${pojo.status == 1}">
+                        <qx:btn id="save" class="btn btn-success" onclick="OpinionDetail.submit(2)"
+                                fa="fa fa-eraser" label="通过"></qx:btn>
+                        <qx:btn id="submit" class="btn btn-danger" onclick="OpinionDetail.submit(0)"
+                                fa="fa fa-eraser" label="拒绝"></qx:btn>
+                        <qx:btn id="close" class="btn btn-warning" onclick="OpinionDetail.close()"
+                                fa="fa fa-eraser" label="取消"></qx:btn>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<js>
+    <script>
+        /**
+         * 初始化
+         */
+        let OpinionDetail = {
+            baseUrl: App.ctxPath + 'opinion',
+            queryData: {}
+        };
+
+        /**
+         * 清除数据
+         */
+        OpinionDetail.clearData = function () {
+            this.queryData = {};
+        };
+
+        /**
+         * 查询表单提交参数对象
+         */
+        OpinionDetail.collectData = function () {
+            this.queryData['opinionId'] = $("#opinionId").val();
+            this.queryData['replyContent'] = $("#replyContent").val();
+        };
+
+        /**
+         * 提交添加用户
+         */
+        OpinionDetail.submit = function(status) {
+
+            this.clearData();
+            this.collectData();
+            if(status !== 2 && !this.queryData['replyContent']){
+                App.error("请填写审核信息！");
+                return;
+            }
+
+            //提交信息
+            let ajax = new $ax(this.baseUrl + "/reply", function (data) {
+                App.success("审批成功!");
+                window.parent.Opinion.table.refresh();
+                OpinionDetail.close();
+            }, function (data) {
+                App.error("审批失败!");
+            });
+
+            this.queryData['status'] = status;
+
+            ajax.set(this.queryData);
+            ajax.start();
+        };
+
+        /**
+         * 关闭此对话框
+         */
+        OpinionDetail.close = function () {
+            parent.layer.close(window.parent.Opinion.layerIndex);
+        };
+    </script>
+</js>

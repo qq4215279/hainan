@@ -1,0 +1,76 @@
+<body>
+<css>
+    <style>
+        div.row {
+            margin-top: 10px;
+        }
+
+        .btn .fa {
+            margin-right: 5px;
+        }
+
+        .form-horizontal .form-group {
+            margin-top: 20px;
+        }
+    </style>
+</css>
+<div class="container">
+    <script th:src="@{/static/plugin/laydate/laydate.js}"></script>
+    <div class="form-horizontal">
+        <div class="row">
+            <div class="col-sm-6">
+                <search:input label="用户名称" name="name" value=""
+                              placeholder="帐号/姓名/手机号" type="text"></search:input>
+            </div>
+            <div class="col-sm-6">
+                <search:select label="下拉框(民族)" name="ethnic"
+                               code="lib_ethnic_group"></search:select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <search:datetime label="日期" name="datetime"
+                                 format="yyyy-MM-dd"></search:datetime>
+            </div>
+            <div class="col-sm-6">
+                <search:datetime label="日期时间" name="datetime"
+                                 istime="true" format="yyyy-MM-dd HH:mm:ss"></search:datetime>
+            </div>
+        </div>
+        <div class="row text-center">
+            <qx:btn id="btn1" class="btn btn-default" fa="fa fa-address-book" label="deflult" role="" permission=""></qx:btn>
+            <qx:btn id="btn2" class="btn btn-primary" fa="fa fa-address-book" label="primary" role=""></qx:btn>
+            <qx:btn id="btn3" class="btn btn-success" fa="fa fa-address-book" label="success" role=""></qx:btn>
+            <qx:btn id="btn4" class="btn btn-info" fa="fa fa-address-book" label="info" role=""></qx:btn>
+            <qx:btn id="btn5" class="btn btn-warning" fa="fa fa-address-book" label="warning" role=""></qx:btn>
+            <qx:btn id="btn6" class="btn btn-danger" fa="fa fa-address-book" label="danger" role=""></qx:btn>
+        </div>
+    </div>
+
+
+    <form class="form-horizontal">
+        <form:figure id="two" label="数字输入框" name="two" max="100" min="10"></form:figure>
+        <form:text id="one" label="文本输入框" name="one"></form:text>
+        <form:datetime id="three" label="日期输入" istime="false" line="true" format="yyyy-MM-dd" name="three"></form:datetime>
+        <form:datetime id="four" label="日期时间输入" istime="true" format="yyyy-MM-dd HH:mm:ss" name="four"></form:datetime>
+        <form:check id="five" label="check选择" name="five"></form:check>
+        <div class="row text-center">
+            <qx:btn id="sure" class="btn btn-default" fa="fa fa-address-book" label="确认"></qx:btn>
+            <qx:btn id="back" class="btn btn-primary" fa="fa fa-address-book" label="返回"></qx:btn>
+        </div>
+    </form>
+
+    <div id="content"></div>
+</div>
+
+</body>
+
+<js>
+    <script th:src="@{/static/ueditor/ueditor.config.js}"></script>
+    <script th:src="@{/static/ueditor/ueditor.all.js}"></script>
+
+    <script>
+        /** 富文本编辑器初期化 */
+        var ue = UE.getEditor('content', {});
+    </script>
+</js>

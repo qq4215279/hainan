@@ -1,0 +1,124 @@
+<css>
+    <div th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="container">
+    <div class="form-horizontal">
+        <div class="row">
+            <input th:value="${cateId}" id="cateId" type="hidden"/>
+            <div class="col-sm-3" style="margin-left: -15px">
+                <search:input label="标题" name="title" value=""
+                              type="text"></search:input>
+            </div>
+            <div class="col-sm-3">
+                <search:datetime label="发布时间" name="begDate"
+                                 format="yyyy-MM-dd HH:mm:ss"></search:datetime>
+            </div>
+            <div class="col-sm-3" style="margin-left: -30px">
+                <search:datetime label="至" name="endDate"
+                                 format="yyyy-MM-dd HH:mm:ss"></search:datetime>
+            </div>
+            <div class="col-sm-1">
+                <qx:btn class="btn btn-primary" fa="fa fa-search" label="搜索" permission=""
+                        onclick="OptArticle.search()"></qx:btn>
+            </div>
+        </div>
+    </div>
+    <table id="OptArticleTable" data-mobile-responsive="true" data-click-to-select="true">
+    </table>
+</div>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+        /**
+         * 咨询初始化
+         */
+        var OptArticle = {
+            id: "OptArticleTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1,
+            choose:function (id,title) {
+                parent.chooseArticle(id,title);
+            }
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        OptArticle.initColumn = function () {
+            return [
+                {title: '编号', field: 'id', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {title: '标题', field: 'title', align: 'center', valign: 'middle'},
+                {
+                    title: '发布时间', field: 'publishedTime', align: 'center', valign: 'middle', sortable: false,
+                    formatter: function (value, row, index) {
+                        var a = row.publishedTime;
+                        if (typeof a == "undefined") {
+                            a = "--";
+                        } else {
+                            a = dateDisplay(row.publishedTime);
+                        }
+                        return a;
+                    }
+                },
+
+                {
+                    title: '信息状态', field: 'status', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        var a = row.status;
+                        if (typeof a == "undefined") {
+                            a = "--";
+                        } else if (a == 0) {
+                            a = "未审核"
+                        } else if (a == 1) {
+                            a = "已审核"
+                        } else if (a == 2) {
+                            a = "审核未通过"
+                        }
+                        return a;
+                    }
+                },
+                {
+                    title: '操作',
+                    field: 'publishedUid',
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: function (value, row, index) {
+                        return "<a href=\"javascript:OptArticle.choose('"+row.id+"','"+row.title+"')\">选择</a>";
+                    }
+                }
+            ]
+        };
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        OptArticle.formParams = function () {
+            var queryData = {};
+            queryData['title'] = $("#title").val();
+            queryData['begDate'] = frDate2time($("#begDate").val());
+            queryData['endDate'] = toDate2time($("#endDate").val());
+            queryData['status'] = '1';
+            queryData['infoType'] = '';
+            return queryData;
+        }
+
+        /**
+         * 查询资讯列表
+         */
+        OptArticle.search = function () {
+            OptArticle.table.refresh({query: OptArticle.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = OptArticle.initColumn();
+            var table = new BSTable(OptArticle.id, "/article/list", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(OptArticle.formParams());
+            OptArticle.table = table.init();
+        });
+    </script>
+</js>
+</body>

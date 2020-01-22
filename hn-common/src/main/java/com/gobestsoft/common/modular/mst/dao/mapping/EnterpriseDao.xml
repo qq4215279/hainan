@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.mst.dao.EnterpriseDao">
+
+	<select id="selectByAccount" resultType="map">
+		SELECT
+		enterprise_id,
+		p_id,
+		p_name,
+		enterprise_name,
+		org_code,
+		unit_type,
+		economic_type,
+		industry_type,
+		address,
+		person,
+		phone,
+		enterprise_number,
+		comment,
+		code,
+		status,
+		create_user,
+		create_time,
+		update_user,
+		update_time
+		FROM
+		mst_enterprise where enterprise_name = #{account}
+	</select>
+
+	<insert id="enterpriseBuild">
+		INSERT INTO mst_enterprise (
+		p_id,
+		p_name,
+		enterprise_name,
+		org_code,
+		unit_type,
+		economic_type,
+		industry_type,
+		address,
+		person,
+		phone,
+		enterprise_number,
+		comment,
+		code,
+		status,
+		create_user,
+		create_time
+		)
+		VALUES
+		(
+		#{pId},
+		#{pName},
+		#{enterpriseName},
+		#{orgCode},
+		#{unitType},
+		#{economicType},
+		#{industryType},
+		#{address},
+		#{person},
+		#{phone},
+		#{enterpriseNumber},
+		#{comment},
+		#{code},
+		#{status},
+		#{createUser},
+		#{createTime}
+		)
+	</insert>
+
+	<insert id="enterpriseBuildLog">
+		INSERT INTO mst_enterprise_log (
+		code,
+		status,
+		comment,
+		check_date,
+		record_flow_info,
+		check_user,
+		check_dept_id,
+		back_dept_id
+		)
+		VALUES
+		(
+		#{code},
+		#{status},
+		#{comment},
+		#{checkDate},
+		#{recordFlowInfo},
+		#{checkUser},
+		#{checkDeptId},
+		#{backDeptId}
+		)
+	</insert>
+
+	<select id="enterpriseByCode" resultType="map">
+		select
+		substring(code
+		from 9 for 11) as code from mst_enterprise_log
+		order by code desc
+	</select>
+
+	<!-- 根据当前用户orgId查询可以审核的所有下级工会 -->
+	<select id="auditByOrgId" resultType="int">
+		SELECT
+		ID
+		FROM
+		sys_dept
+		WHERE
+		pids LIKE CONCAT ('%', #{orgId}, '%')
+	</select>
+
+	<select id="selectAuditEnterprise" resultType="map">
+		SELECT
+		enterprise_id,
+		p_id,
+		p_name,
+		enterprise_name,
+		org_code,
+		unit_type,
+		economic_type,
+		industry_type,
+		address,
+		person,
+		phone,
+		enterprise_number,
+		comment,
+		code,
+		status,
+		create_user,
+		create_time,
+		update_user,
+		update_time
+		FROM
+		mst_enterprise
+		WHERE
+		code IN (
+		SELECT DISTINCT
+		code
+		FROM
+		mst_enterprise_log log
+		WHERE
+		exists (select * from (SELECT
+		ID
+		FROM
+		sys_dept
+		WHERE
+		(find_in_set(#{oid},pids) or id=#{id})
+		and root_flg=0) pidT where log.check_dept_id=pidT.id )
+		) and 1=1 and status !=6
+		<if test="status != -1 ">
+			AND status = #{status}
+		</if>
+		<if test="enterpriseName != null and enterpriseName != ''">
+			AND enterprise_name like CONCAT('%',#{enterpriseName},'%')
+		</if>
+		<if test="createTime != null and createTime != ''">
+			AND substring(create_time from 1 for 8) = #{createTime}
+		</if>
+		order by create_time desc
+	</select>
+
+	<select id="selectByEnterpriseId" resultType="map">
+		SELECT
+		enterprise_id,
+		p_id,
+		p_name,
+		enterprise_name,
+		org_code,
+		unit_type,
+		economic_type,
+		industry_type,
+		address,
+		person,
+		phone,
+		enterprise_number,
+		comment,
+		code,
+		status,
+		create_user,
+		create_time
+		FROM
+		mst_enterprise where enterprise_id = #{enterpriseId}
+	</select>
+
+	<!-- 查询审核流程 -->
+	<select id="log" resultType="map">
+	SELECT
+	a.status AS status,
+	a.comment AS comment,
+	a.check_date AS check_date,
+	a.record_flow_info AS record_flow_info,
+	(
+		CASE
+		WHEN a.status = '0' THEN
+			m2. name
+		ELSE
+			m1.simplename
+		END
+	) AS orgName
+	FROM
+		mst_enterprise_log a
+	LEFT JOIN sys_dept m1 ON a.check_dept_id = m1.id
+	LEFT JOIN sys_user m2 ON a.check_user = m2.account
+	WHERE
+		a.code = (
+		SELECT
+		code
+		FROM
+		mst_enterprise
+		WHERE
+		enterprise_id = #{companyId})
+	ORDER BY
+		a.check_date
+	</select>
+
+	<update id="updateByStatus">
+	UPDATE mst_enterprise
+		SET status=#{status}
+		WHERE
+		code = #{code}
+	</update>
+
+	<select id="deptByPids" resultType="map">
+		select pids,level,org_type from sys_dept where id = #{pid}
+	</select>
+
+	<update id="updateByDeptId">
+	UPDATE mst_enterprise
+		SET dept_id=#{deptId}
+		WHERE
+		code = #{code}
+	</update>
+
+	<update id="updateByUserOrgId">
+	UPDATE sys_user
+		SET deptid=#{deptId}
+		WHERE
+		account = #{account}
+	</update>
+
+	<select id="selectByUserUid" resultType="map">
+	select uid,roleid from sys_user where account = #{account}
+	</select>
+
+
+	<insert id="addDept" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO sys_dept(
+		sort,
+		pid,
+		pids,
+		simplename,
+		fullname,
+		tips,
+		VERSION,
+		dept_type,
+		addr,
+		p_dept_name,
+		pic_name,
+		dept_no,
+		p_dept_no,
+		LEVEL,
+		establish_date,
+		org_type,
+		root_flg
+		)
+		VALUES
+		(
+		#{sort},
+		#{pid},
+		#{pids},
+		#{simplename},
+		#{fullname},
+		#{tips},
+		#{version},
+		#{deptType},
+		#{addr},
+		#{pDeptName},
+		#{picName},
+		#{deptNo},
+		#{pDeptNo},
+		#{level},
+		#{establishDate},
+		#{orgType},
+		#{rootFlg}
+		)
+	</insert>
+
+	<update id="updateEnterprise">
+	UPDATE mst_enterprise
+		SET  status=#{status},
+				update_user=#{updateUser},
+				update_time=#{updateTime}
+				<if test="orgCode != null and orgCode != ''">
+			,org_code=#{orgCode}
+			</if>
+			<if test="unitType != null and unitType != ''">
+				,unit_type=#{unitType}
+			</if>
+			<if test="economicType != null and economicType != ''">
+				,economic_type=#{economicType}
+			</if>
+			<if test="industryType != null and industryType != ''">
+				,industry_type=#{industryType}
+			</if>
+			<if test="address != null and address != ''">
+				,address=#{address}
+			</if>
+			<if test="person != null and person != ''">
+				,person=#{person}
+			</if>
+			<if test="comment != null and comment != ''">
+				,comment=#{comment}
+			</if>
+			<if test="phone != null">
+				,phone=#{phone}
+			</if>
+			<if test="enterpriseNumber != null">
+				,enterprise_number=#{enterpriseNumber}
+			</if>
+		WHERE enterprise_id=#{enterpriseId}
+	</update>
+
+	<select id="userType" resultType="String">
+	select user_type from sys_user where account = #{account}
+	</select>
+
+	<insert id="addComplete">
+	INSERT INTO mst_enterprise_ext (
+		dept_id,
+		staff_home_flag,
+		staff_home_level,
+		advanced_flag,
+		advanced_level,
+		company,
+		person_company,
+		establishment,
+		social_organization,
+		employee_number,
+		person_company_number,
+		establishment_number,
+		social_organization_number,
+		member_number,
+		person_company_member_number,
+		establishment_member_number,
+		social_organization_member_number,
+		committee_type,
+		tenure_start_time,
+		organization_tenure,
+		female_committee_flag,
+		funds_examination_committee_flag,
+		plate_flag,
+		chairman_flag,
+		seal_flag,
+		certification_flag,
+		org_code_flag,
+		org_code,
+		fund_guarantee_flag,
+		expenditure,
+		group_flag,
+		group_number,
+		social_organization_type,
+		solve_flag,
+		contract_flag,
+		sign_time,
+		molss_flag,
+		contract_indate,
+		contract_number,
+		negotiate_flag,
+		negotiate_time,
+		amplification,
+		conference_flag,
+		conference_period,
+		conference_tenure,
+		shape,
+		reigning_time,
+		factory_open_flag,
+		convoke_time,
+		convoke_number,
+		create_user,
+		create_time
+		)
+		VALUES
+		(
+		#{deptId},
+		#{staffHomeFlag},
+		#{staffHomeLevel},
+		#{advancedFlag},
+		#{advancedLevel},
+		#{company},
+		#{personCompany},
+		#{establishment},
+		#{socialOrganization},
+		#{employeeNumber},
+		#{personCompanyNumber},
+		#{establishmentNumber},
+		#{socialOrganizationNumber},
+		#{memberNumber},
+		#{personCompanyMemberNumber},
+		#{establishmentMemberNumber},
+		#{socialOrganizationMemberNumber},
+		#{committeeType},
+		#{tenureStartTime},
+		#{organizationTenure},
+		#{femaleCommitteeFlag},
+		#{fundsExaminationCommitteeFlag},
+		#{plateFlag},
+		#{chairmanFlag},
+		#{sealFlag},
+		#{certificationFlag},
+		#{orgCodeFlag},
+		#{orgCode},
+		#{fundGuaranteeFlag},
+		#{expenditure},
+		#{groupFlag},
+		#{groupNumber},
+		#{socialOrganizationType},
+		#{solveFlag},
+		#{contractFlag},
+		#{signTime},
+		#{molssFlag},
+		#{contractIndate},
+		#{contractNumber},
+		#{negotiateFlag},
+		#{negotiateTime},
+		#{amplification},
+		#{conferenceFlag},
+		#{conferencePeriod},
+		#{conferenceTenure},
+		#{shape},
+		#{reigningTime},
+		#{factoryOpenFlag},
+		#{convokeTime},
+		#{convokeNumber},
+		#{createUser},
+		#{createTime}
+	)
+	</insert>
+
+	<select id="selectEnterpriseExtByDeptId" resultType="map">
+	SELECT
+	staff_home_flag,
+	staff_home_level,
+	advanced_flag,
+	advanced_level,
+	company,
+	person_company,
+	establishment,
+	social_organization,
+	employee_number,
+	person_company_number,
+	establishment_number,
+	social_organization_number,
+	member_number,
+	person_company_member_number,
+	establishment_member_number,
+	social_organization_member_number,
+	committee_type,
+	tenure_start_time,
+	organization_tenure,
+	female_committee_flag,
+	funds_examination_committee_flag,
+	plate_flag,
+	chairman_flag,
+	seal_flag,
+	certification_flag,
+	org_code_flag,
+	org_code,
+	fund_guarantee_flag,
+	expenditure,
+	group_flag,
+	group_number,
+	social_organization_type,
+	solve_flag,
+	contract_flag,
+	sign_time,
+	molss_flag,
+	contract_indate,
+	contract_number,
+	negotiate_flag,
+	negotiate_time,
+	amplification,
+	conference_flag,
+	conference_period,
+	conference_tenure,
+	shape,
+	reigning_time,
+	factory_open_flag,
+	convoke_time,
+	convoke_number
+    FROM
+	mst_enterprise_ext where dept_id = #{deptId}
+	</select>
+
+</mapper>

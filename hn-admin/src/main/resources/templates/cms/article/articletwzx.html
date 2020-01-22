@@ -1,0 +1,178 @@
+<css>
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <input th:value="${cateId}" id="cateId" type="hidden"/>
+                            <div class="col-sm-3" style="margin-left: -15px">
+                                <search:input id="title" label="标题" name="title" value=""
+                                              type="text"></search:input>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:datetime id="begDate" label="发布时间" name="begDate"
+                                                 format="yyyy-MM-dd HH:mm:ss"></search:datetime>
+                            </div>
+                            <div class="col-sm-3" style="margin-left: -30px">
+                                <search:datetime id="endDate" label="至" name="endDate"
+                                                 format="yyyy-MM-dd HH:mm:ss"></search:datetime>
+                            </div>
+                            <div class="col-sm-2">
+                                <search:select label="信息状态" name="status"
+                                               code="lib_article_pub_status"></search:select>
+                            </div>
+                            <div class="col-sm-1">
+                                <qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="OptArticle.search()"></qx:btn>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hidden-xs" id="OptArticleTableToolbar" role="group">
+                        <qx:btn class="btn btn-primary" fa="fa fa-plus" label="新增" permission="" onclick="OptArticle.openAdd()"></qx:btn>
+                        <qx:btn class="btn btn-primary" fa="fa fa-edit" label="编辑" permission="" onclick="OptArticle.detail()"></qx:btn>
+                    </div>
+                    <table id="OptArticleTable" data-mobile-responsive="true" data-click-to-select="true">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+        /**
+         * 咨询初始化
+         */
+        var OptArticle = {
+            id: "OptArticleTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        OptArticle.initColumn = function () {
+            return [
+                {field: 'selectItem', radio: true},
+                {title: '编号', field: 'id', visible: true, align: 'center', valign: 'middle',sortable: false},
+                {title: '标题', field: 'title', align: 'center', valign: 'middle'},
+                {title: '发布时间', field: 'publishedTime', align: 'center', valign: 'middle',sortable: false,
+                    formatter: function (value, row, index) {
+                        var a = row.publishedTime;
+                        if(typeof a == "undefined" || a == null){
+                            a = "--";
+                        }else{
+                            a = dateDisplay(row.publishedTime);
+                        }
+                        return a;
+                    }
+                },
+
+                {title: '信息状态', field: 'publishedStatus', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        var a = row.publishedStatus;
+                        if(typeof a == "undefined"){
+                            a = "--";
+                        }else if(a == 0){
+                            a = "下架"
+                        } else if(a == 1){
+                            a = "上架"
+                        }
+                        return a;
+                    }
+                },
+                {title: '发布人', field: 'publishedUid', align: 'center', valign: 'middle'}
+            ]
+        };
+
+        /**
+         * 资讯新增
+         */
+        OptArticle.openAdd = function () {
+
+            var index = layer.open({
+                type: 2,
+                title: '信息发布',
+                area: ['100%', '100%'], //宽高
+                fix: true, //不固定
+                maxmin: true,
+                content: App.ctxPath+'/article/article_add?cateId=' + $("#cateId").val()
+            });
+            layer.full(index);
+            this.layerIndex = index;
+        };
+
+        /**
+         * 检查是否选中  xxxxxx
+         */
+        OptArticle.check = function () {
+            var selected = $('#'+this.id).bootstrapTable('getSelections');
+
+            if(selected.length == 0){
+                App.info("请先选中表格中的某一记录！");
+                return false;
+            }else{
+                OptArticle.seItem = selected[0];
+                return true;
+            }
+
+        };
+
+        /**
+         * 资讯编辑
+         */
+        OptArticle.detail = function () {
+            if (this.check()) {
+                var index = layer.open({
+                    type: 2,
+                    title: '资讯编辑',
+                    area: ['100%', '100%'], //宽高
+                    fix: true, //不固定
+                    maxmin: true,
+                    content:App.ctxPath+ '/article/article_edit?id=' + this.seItem.id + '&cateId='+$('#cateId').val()
+                });
+                layer.full(index);
+                this.layerIndex = index;
+            }
+        };
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        OptArticle.formParams = function() {
+            var queryData = {};
+            queryData['title'] = $("#title").val();
+            queryData['begDate'] = $("#begDate").val();
+            queryData['endDate'] = $("#endDate").val();
+            queryData['status'] = $("#status").val();
+            queryData['infoType'] = '0';
+
+            return queryData;
+        }
+
+        /**
+         * 查询资讯列表
+         */
+        OptArticle.search = function () {
+
+            OptArticle.table.refresh({query: OptArticle.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = OptArticle.initColumn();
+            var table = new BSTable(OptArticle.id,  "/article/list", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(OptArticle.formParams());
+            OptArticle.table = table.init();
+        });
+    </script>
+</js>
+</body>

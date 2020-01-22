@@ -1,0 +1,313 @@
+<css xmlns:form="http://www.w3.org/1999/html" xmlns:form="http://www.w3.org/1999/html">
+<!--     <link th:href="@{http://xiumi.us/connect/ue/v5/xiumi-ue-v5.css}" rel="stylesheet">-->
+     <link th:href="@{/static/css/fileUpload.css}" rel="stylesheet">
+</css>
+<body>
+<div class="ibox float-e-margins">
+	<div class="ibox-content">
+		<input type="hidden" id="id" th:value="${bannerInfo.id}">
+		<input type="hidden" id="bannerType" th:value="${bannerInfo.type}">
+		<input type="hidden" id="tempId" th:value="${bannerInfo.targetId}">
+		<input type="hidden" id="authValue" th:value="${bannerInfo.auth}">
+		<input type="hidden" id="targetId"/>
+
+			<div class="form-horizontal" id="bannerForm">
+				<div class="row">
+					<div class="col-sm-10">
+					    <form:text label="标题" id="title" name="title" value="${bannerInfo.title}" type="text" must="true"  ></form:text>
+						<div th:if="${category} eq '0'">
+							<form:img label="封面图" id="articleCover" name="articleCover" width="480" height="270" defImg="${bannerInfo.cover}"  viewtype="1"></form:img>
+						</div>
+						<div th:if="${category} eq '101'">
+							<form:img label="封面图" id="articleCover" name="articleCover" width="500" height="100" defImg="${bannerInfo.cover}"  viewtype="1"></form:img>
+						</div>
+						<div th:if="${category} eq '102'">
+							<form:img  label="封面图"  id="articleCover" name="articleCover" width="480" height="270" defImg="${bannerInfo.cover}" viewtype="1"></form:img>
+						</div>
+						<div th:if="${category} eq '103'">
+							<form:img id="cover"  id="articleCover" name="articleCover" width="480"  label="封面图" defImg="${bannerInfo.cover}"   width="1125" height="420" viewtype="1"></form:img>
+						</div>
+					    <form:check label="是否启用" id="status" name="status" value="${bannerInfo.status}" type="text" ></form:check>
+
+						<!-- 用户权限 -->
+						<!--<div th:if="${bannerInfo.auth} eq 0 ">
+							用户权限： 游客<input type="radio" name="auth"  value="0" checked >
+									  用户<input type="radio" name="auth"  value="1">
+									  会员<input type="radio" name="auth"  value="2"><br>
+						</div>
+						<div th:if="${bannerInfo.auth} eq 1 ">
+							用户权限： 游客<input type="radio" name="auth"  value="0">
+									  用户<input type="radio" name="auth"  value="1" checked >
+									  会员<input type="radio" name="auth"  value="2"><br>
+						</div>
+						<div th:if="${bannerInfo.auth} eq 2 ">
+							用户权限： 游客<input type="radio" name="auth"  value="0">
+									  用户<input type="radio" name="auth"  value="1">
+									  会员<input type="radio" name="auth"  value="2" checked ><br>
+						</div>-->
+
+						<!-- 用户权限 -->
+						<div class="form-group">
+							<label for="isEnable" class="col-sm-4 control-label">用户权限</label>
+							<div class="col-sm-8">
+								游客: <input type="checkbox" id="auth0" name="auth" value="0" style="margin-top: 10px;">
+								用户: <input type="checkbox" id="auth1" name="auth" value="1" style="margin-top: 10px;">
+								会员: <input type="checkbox" id="auth2" name="auth" value="2" style="margin-top: 10px;">
+							</div>
+						</div>
+
+					    <form:imgchg name="bannerType" value="${bannerTypeCode}" onclick="cyUlAvtivty(this)" must="true"></form:imgchg>
+					    <div id="OnejumpUrl" style="display: none;">
+					        <form:text label="跳转路径" id="jumpUrl" name="jumpUrl" value="${bannerInfo.jumpUrl}" type="text" ></form:text>
+					    </div>
+					    <div id="chooseArticle" style="display: none;">
+		                    <form:text label="选择资讯" id="article" name="article" type="text" readonly="true"
+		                               onclick="BannerDlg.chooseArticle()" value="${bannerInfo.targetId}"></form:text>
+		                </div>
+						<div id="chooseSeminar" style="display: none;">
+							<form:text label="选择专题" id="seminar" name="seminar" type="text" readonly="true"
+									   onclick="BannerDlg.chooseSeminar()" value="${bannerInfo.targetId}"></form:text>
+						</div>
+						<div id="TwoJumpUrl" style="display: none;">
+							<form:text label="跳转路径" id="smallJumpUrl" name="smallJumpUrl" type="text" value="${bannerInfo.smallJumpUrl}"></form:text>
+						</div>
+					    
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-12" align="center">
+						<div class="hr-line-dashed"></div>
+						<qx:btn  fa="fa fa-check" label="提交" permission="" onclick="BannerDlg.editSubmit()"></qx:btn>
+					    <qx:btn  fa="fa fa-eraser" label="取消" permission="" onclick="BannerDlg.close()"></qx:btn>
+                    </div>
+				</div>
+			</div>
+
+	</div>
+</div>
+</body>
+<js>
+    <div  th:include="fragment/fargment :: clipJs"></div>
+    <div  th:include="fragment/fargment :: fileUploadJs"></div>
+    <script th:src="@{/static/ueditor/ueditor.config.js}"></script>
+    <script th:src="@{/static/ueditor/ueditor.all.js}"></script>
+    <script type="text/javascript">
+    /**
+     * 画面初期处理
+     */
+    $(function () {
+        // 详细信息form验证
+        App.initValidator("bannerForm", BannerDlg.validateFields);
+        // 初始化是否启用
+        var isEnable = $("#status").val();
+        if(isEnable == 0){
+        	$("input[name='status']").attr("checked", true);
+        }
+        var bannerType = $("#bannerType").val();
+        if(bannerType == 0){
+        	$("#OnejumpUrl").show();
+        }if(bannerType == 1){
+        	$("#chooseArticle").show();
+        }
+        if(bannerType == 2){
+            $("#chooseSeminar").show();
+            var target_id=$('[id="tempId"]').val();
+            $('input[name="seminar"][value="'+target_id+'"]').prop('checked','checked');
+        }
+		if(bannerType == 4) {
+			$("#TwoJumpUrl").show();
+		}
+
+		// 回显checkbox的值:
+		var authValue = $("#authValue").val();
+		if (authValue.indexOf("0") >= 0){
+			$("#auth0").attr("checked",true);
+		}
+		if (authValue.indexOf("1") >= 0){
+			$("#auth1").attr("checked",true);
+		}
+		if (authValue.indexOf("2") >= 0){
+			$("#auth2").attr("checked",true);
+		}
+
+    });
+    
+    //获取展示类型
+    $("#bannerType" + $("#bannerType").val()).attr("checked", true);
+    var banner = "bannerType" + $("#bannerType").val();
+    $('label[for="' + banner + '"]  li').addClass("caoy_ul_activity");
+
+    $('input[name="bannerType"]').click(function () {
+        $(this).attr("checked", true);
+        $(this).siblings().removeAttr("checked");
+    })
+
+
+    // 列表展示类型 radio 选择响应
+    $("label[name='bannerType']").click(function (e) {
+        hiddenAll();
+        var radioId = $(this).attr("for")
+        if ("bannerType0" === radioId) {
+            $("#OnejumpUrl").show();
+        } else if ("bannerType1" === radioId) {
+            $("#chooseArticle").show();
+        }else if('bannerType2'===radioId){
+            $("#chooseSeminar").show();
+        }else if("bannerType4" === radioId) {
+			$("#TwoJumpUrl").show();
+		}
+	});
+
+    function hiddenAll() {
+        $("#OnejumpUrl").hide();
+        $("#TwoJumpUrl").hide();
+        $("#chooseArticle").hide();
+        $("#chooseSeminar").hide();
+    }
+
+    /**
+     * 初始化详情内容
+     */
+    var BannerDlg = {
+        bannerData: {},
+        zTreeInstance: null,
+        validateFields: {
+            title: {
+                validators: {
+                    notEmpty: {
+                        message: '标题不能为空。'
+                    },
+                    stringLength: {
+                        min: 2,
+                        max: 70,
+                        message: '标题长度必须在2到70个字符之间。'
+                    }
+                }
+            }
+        }
+    };
+
+    /**
+     * Banner详细信息设定
+     */
+     BannerDlg.collectData = function () {
+		 //获取所有name为demand的对象
+		 var obj = document.getElementsByName('auth');
+		 var auth = '';
+		 for (var i = 0; i < obj.length; i++) {
+			 if (obj[i].checked) {
+				 auth += obj[i].value + ',';//如果选中，将value添加到变量s中
+			 }
+		 }
+
+        this.bannerData['id'] = $('#id').val();
+        this.bannerData['title'] = $('#title').val();
+        this.bannerData['cover'] = $('#articleCover').val();
+        this.bannerData['status'] = typeof $('input[name="status"]:checked').val() != "undefined" ? 0 : 1;
+        this.bannerData['type'] = $('input[name="bannerType"]:checked').val();
+        this.bannerData['auth'] = auth;
+        this.bannerData['jumpUrl'] = $('#jumpUrl').val();
+        this.bannerData['smallJumpUrl'] = $('#smallJumpUrl').val();
+        this.bannerData['targetId'] = $('#targetId').val();
+    }
+
+    /**
+     * 验证数据
+     */
+    BannerDlg.validate = function () {
+        $('#bannerForm').data("bootstrapValidator").resetForm();
+        $('#bannerForm').bootstrapValidator('validate');
+        return $("#bannerForm").data('bootstrapValidator').isValid();
+    };
+
+    /**
+     * 清空数据
+     */
+     BannerDlg.clearData = function () {
+        this.bannerData = {};
+    };
+
+    /**
+     * 【提交】按钮响应
+     */
+     BannerDlg.editSubmit = function () {
+        this.clearData();
+        this.collectData();
+        if (!this.validate()) {
+            errorFocus();
+            return;
+        }
+         var bannerType = $('input[name="bannerType"]:checked').val();
+
+        //提交信息
+        var ajax = new $ax(App.ctxPath + "banner/update", function (data) {
+            App.success("编辑成功!");
+            window.parent.ObjBanner.table.refresh();
+            BannerDlg.close();
+        }, function (data) {
+            App.error("编辑失败!" + data.responseJSON.message + "!");
+        });
+        ajax.set(BannerDlg.bannerData);
+        ajax.start();
+    };
+
+    /**
+     * 【取消】按钮响应 关闭当前窗口
+     */
+     BannerDlg.close = function () {
+        parent.layer.close(window.parent.ObjBanner.layerIndex);
+    };
+    
+    /**
+     * 选择资讯
+     */
+    var chooseLayerIndex;
+    BannerDlg.chooseArticle = function () {
+        chooseLayerIndex = layer.open({
+            type: 2,
+            area: ["100%", "100%"],
+            fixed: true,
+            maxmin: true,
+            content: App.ctxPath + 'article/choose'
+        });
+    }
+    // 选择专题
+
+    BannerDlg.chooseSeminar = function () {
+        chooseLayerIndex = layer.open({
+            type: 2,
+            title: '选择专题',
+            area: ["100%", "100%"],
+            fixed: true,
+            maxmin: true,
+            content: App.ctxPath + 'banner/chooseSeminar'
+        });
+    }
+
+
+    /**
+     * 选择资讯后回调方法
+     * @param articleId
+     * @param articleTitle
+     */
+    function chooseArticle(articleId, articleTitle) {
+        $("#targetId").val(articleId);
+        $("#article").val(articleTitle);
+        layer.close(chooseLayerIndex);
+    }
+
+    /**
+     * 选择专题
+     * @param serminar_id
+     */
+    function chooseSeminar(seminarId,seminarName){
+
+        $("#targetId").val(seminarId);
+        $("#seminar").val(seminarName);
+        layer.close(chooseLayerIndex);
+
+    }
+
+
+	</script>
+</js>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dao.mapper.SrvTjMapper">
+   <select id="getBfType" resultType="java.util.LinkedHashMap">
+       select case
+		when straitened_type='0' then '职工救助'
+		when straitened_type='1' then '医疗救助'
+		when straitened_type='2' then '子女助学'
+		when straitened_type='3' then '子女助学和医疗救助'
+    end as `name`
+		,count(1),(count(1)/(select count(0) from srv_straitened_first)*100+'%') as percent from srv_straitened_first GROUP BY straitened_type
+   </select>
+    <select id="getRegion" resultType="java.util.LinkedHashMap">
+        select `name`,counts,percent from srv_qutj
+    </select>
+    <select id="getBfaAge" resultType="java.util.LinkedHashMap">
+        select `name`,counts,percent from srv_agetj
+    </select>
+    <select id="getBfPass" resultType="java.util.LinkedHashMap">
+        select `name`,counts,percent from srv_applytj
+    </select>
+    <select id="getlist" resultType="java.util.Map">
+        select * from staff_skill
+        <where>
+            <if test="name != null and name != ''">
+                AND name like '%${name}%'
+            </if>
+            <if test="mobile != null and mobile != ''">
+                AND mobile like '%${mobile}%'
+            </if>
+        </where>
+    </select>
+    <select id="getStaffSkill" resultType="java.util.Map">
+        select name from staff_skill where id_num=#{idNum} or mobile=#{mobile}
+    </select>
+</mapper>

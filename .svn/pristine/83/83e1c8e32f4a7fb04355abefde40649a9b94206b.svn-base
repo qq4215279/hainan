@@ -1,0 +1,151 @@
+<body>
+<div class="container" style="">
+    <form class="form-horizontal" id="infoForm" method="post" th:action="@{/srv/straitened/addSkillNeed}">
+        <form:text id="name" label="姓名" name="name" must="true" value="${pojo.name}"></form:text>
+        <form:figure id="mobile" label="电话" name="mobile" must="true" value="${pojo.mobile}"></form:figure>
+        <form:text id="idNum" label="身份证号" name="idNum" must="true"  value="${pojo.idNum}"></form:text>
+        <form:area id="skillNeed" label="技能需求" name="skillNeed" must="true" value="${pojo.skillNeed}"></form:area>
+    </form>
+    <div class="row text-center">
+        <qx:btn class="btn btn-primary" fa="fa fa-check" label="添加" onclick="InfoDlg.submit()"></qx:btn>
+        <qx:btn class="btn btn-primary" fa="fa fa-close" label="返回" onclick="InfoDlg.close()"></qx:btn>
+    </div>
+</div>
+
+<js>
+    <script th:src="@{/static/js/jquery.form.js}"></script>
+    <script type="text/javascript">
+
+
+        /**
+         * 初始化详情对话框
+         */
+        var InfoDlg = {
+            infoData: {},
+            zTreeInstance: null,
+            validateFields: {
+                name: {
+                    validators: {
+                        notEmpty: {
+                            message: '姓名不能为空'
+                        }
+                    }
+                },
+                mobile: {
+                    validators: {
+                        notEmpty: {
+                            message: '电话号不能为空'
+                        },
+                        regexp:{
+                            regexp:/^1\d{10}$/,
+                            message:'请判断手机号是否正确'
+                        }
+                    }
+                },
+                idNum: {
+                    validators: {
+                        notEmpty: {
+                            message: '身份证号不能为空'
+                        },
+                        regexp:{
+                            regexp:/^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9Xx])$/,
+                            message:'请判断身份证号是否正确'
+                        }
+                    }
+                },
+                skillNeed: {
+                    validators: {
+                        notEmpty: {
+                            message: '内容不能为空'
+                        },
+                        stringLength: {
+                            max: 1000
+                        }
+                    }
+                }
+            }
+        };
+        /**
+         * 关闭此对话框
+         */
+        InfoDlg.close = function () {
+            parent.layer.close(window.parent.OptAppVersion.layerIndex);
+        }
+
+        /**
+         * 验证数据是否为空
+         */
+        InfoDlg.validate = function () {
+            $('#infoForm').data("bootstrapValidator").resetForm();
+            $('#infoForm').bootstrapValidator('validate');
+            return $("#infoForm").data('bootstrapValidator').isValid();
+        }
+
+
+        /**
+         *重置验证规则
+         */
+        function resetValidator() {
+            $('#infoForm').data('bootstrapValidator').destroy();
+            $('#infoForm').data('bootstrapValidator', null);
+
+            if ($("#vType").val() == 0) {
+                InfoDlg.validateFields.downloadAddress = {
+                    validators: {
+                        notEmpty: {
+                            message: '下载地址不能为空'
+                        },
+                        stringLength: {
+                            max: 400
+                        }
+                    }
+                }
+            } else {
+                delete InfoDlg.validateFields.downloadAddress;
+            }
+            App.initValidator("infoForm", InfoDlg.validateFields);
+        }
+
+
+        /**
+         * 提交
+         */
+        InfoDlg.submit = function () {
+
+            if (!this.validate()) {
+                return;
+            }
+            App.showLoading();
+            $("#infoForm").submit();
+        }
+
+        //绑定FORM提交后事件
+        $("#infoForm").ajaxForm(function (data) {
+            App.closeLoading();
+            if (data.code == 200) {
+                App.success("提交成功", function () {
+                    window.parent.OptAppVersion.table.refresh();
+                    InfoDlg.close();
+                })
+            }
+        });
+
+        /**
+         * 画面初期处理
+         */
+        $(function () {
+            App.initValidator("infoForm", InfoDlg.validateFields);
+
+            $("#vType").change(function () {
+                var vType = $(this).val();
+                if (vType == "0") {
+                    $("#apkArea").show();
+                } else {
+                    $("#apkArea").hide();
+                }
+            });
+        });
+
+    </script>
+</js>
+</body>

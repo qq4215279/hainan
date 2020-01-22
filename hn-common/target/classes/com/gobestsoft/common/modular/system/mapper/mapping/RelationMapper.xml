@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.system.mapper.RelationMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.system.model.Relation">
+		<id column="id" property="id" />
+		<result column="menuid" property="menuid" />
+		<result column="roleid" property="roleid" />
+		<result column="uid" property="uid" />
+	</resultMap>
+	
+	<!-- 批量插入角色、人员关联表 -->
+	<insert id="insertList" parameterType="java.util.List" >
+            insert into sys_relation  (roleid, uid)  values
+            <foreach collection ="relations" item="relation" index= "index" separator =",">
+                (#{relation.roleid}, #{relation.uid})
+            </foreach >
+	</insert>
+
+</mapper>

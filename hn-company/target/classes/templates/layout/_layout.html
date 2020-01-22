@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <sitemesh:write property='title'/>
+        <link th:href="@{/static/assets/css/animate.min.css}" rel="stylesheet"/>
+        <link rel="shortcut icon" th:href="@{/static/favicon.ico}">
+        <link th:href="@{/static/plugin/bootstrap-3.3.7/css/bootstrap.min.css}" rel="stylesheet"/>
+        <link th:href="@{/static/plugin/font-awesome-4.7.0/css/font-awesome.min.css}" rel="stylesheet"/>
+        <link th:href="@{/static/css/animate.css}" rel="stylesheet">
+        <link th:href="@{/static/css/style.css}" rel="stylesheet">
+        <link th:href="@{/static/plugin/validate/bootstrapValidator.min.css}" rel="stylesheet">
+        <sitemesh:write property='css'/>
+    </head>
+    <body>
+        <div class="container">
+            <sitemesh:write property='body'/>
+        </div>
+        <script th:inline="javascript">
+            var ctxPath = /*[[@{/}]]*/ '';
+        </script>
+        <script th:src="@{/static/js/jquery-1.12.4.min.js}"></script>
+        <script th:src="@{/static/plugin/bootstrap-3.3.7/js/bootstrap.min.js}"></script>
+        <script th:src="@{/static/plugin/layer/layer.js}"></script>
+        <script th:src="@{/static/plugin/laydate/laydate.js}"></script>
+        <script>
+            lay('.datetime-control').each(function () {
+                var format = this.getAttribute("data-format");
+                var isTime = this.getAttribute("data-istime");
+                var value = this.getAttribute("value");
+                var type = "date";
+                if (isTime.toLowerCase() == 'true') {
+                    type = "datetime";
+                }
+                laydate.render({
+                    elem: this,
+                    type: type
+                    , trigger: 'click',
+                    format: format,
+                    value: value
+                });
+            });
+        </script>
+        <script th:src="@{/static/plugin/validate/bootstrapValidator.min.js}"></script>
+        <script th:src="@{/static/js/App.js}"></script>
+        <script th:src="@{/static/js/util.js}"></script>
+        <script th:src="@{/static/js/ajax-object.js}"></script>
+        <script>
+            App.setCtxPath(ctxPath)
+        </script>
+        <sitemesh:write property='js'/>
+    </body>
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?d7969b10bf52170baeaadda5de41c7e7";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+    </head>
+</html>

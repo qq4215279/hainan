@@ -1,0 +1,158 @@
+<body>
+<div class="container">
+    <form class="form-horizontal" id="organizationForm">
+        <input type="hidden" id="pageType" th:value="${pageType}"/>
+        <input id="id" type="hidden" th:value="${deptOrganization.id}"/>
+        <div class="row">
+            <div class="col-sm-6">
+                <form:text id="unionName" label="工会名称" name="unionName" value="${deptOrganization.unionName}"
+                           disabled="true"></form:text>
+                <form:text id="pName" label="上级工会" name="pName" value="${deptOrganization.pName}"
+                           disabled="true"></form:text>
+                <form:text id="othersOrgCode" label="工会法人和其他组织统一社会信用代码" name="othersOrgCode"
+                           value="${deptOrganization.othersOrgCode}" disabled="true"></form:text>
+                <form:datetime id="createunionTime" label="建会时间" name="createunionTime" istime="false"
+                               format="yyyy-MM-dd"
+                               value="${deptOrganization.createunionTime}" disabled="true"></form:datetime>
+                <form:select id="unionType" label="工会类型" name="unionType" value="${deptOrganization.unionType}"
+                             code="lib_base_org_type" disabled="true"></form:select>
+                <form:figure id="membership" label="会员人数" name="membership" value="${deptOrganization.membership}"
+                             min="0" disabled="true"></form:figure>
+                <form:text id="unionEmail" label="工会邮箱" name="unionEmail" value="${deptOrganization.unionEmail}"
+                           disabled="true"></form:text>
+                <form:text id="unionLeader" label="工会负责人" name="unionLeader"
+                           value="${deptOrganization.unionLeader}" disabled="true"></form:text>
+                <form:text id="unionLeaderPhone" label="联系电话" name="unionLeaderPhone"
+                           value="${deptOrganization.unionLeaderPhone}" disabled="true"></form:text>
+
+                <!--<form:text id="unionSimpleName" label="工会简称" name="unionSimpleName"-->
+                <!--value="${deptOrganization.unionSimpleName}" disabled="true"></form:text>-->
+                <!--<form:text id="unitZipCode" label="工会邮编" name="unitZipCode" value="${deptOrganization.unitZipCode}"-->
+                <!--disabled="true"></form:text>-->
+                <!--<form:figure id="cadresNumber" label="专职干部人数" name="cadresNumber"-->
+                <!--value="${deptOrganization.cadresNumber}" min="0" disabled="true"></form:figure>-->
+                <!--<form:text id="chairmanName" label="主席名称" name="chairmanName" value="${deptOrganization.chairmanName}"-->
+                <!--disabled="true"></form:text>-->
+            </div>
+            <div class="col-sm-6">
+                <form:text id="unitName" label="单位名称" name="unitName" value="${deptOrganization.unitName}"
+                           disabled="true"></form:text>
+                <form:text id="unitOrgCode" label="单位法人和其他组织统一社会信用代码" name="unitOrgCode"
+                           value="${deptOrganization.unitOrgCode}" disabled="true"></form:text>
+                <form:text id="unitAddress" label="单位地址" name="unitAddress" value="${deptOrganization.unitAddress}"
+                           disabled="true"></form:text>
+                <form:select id="unitDistrict" label="单位所在行政区" name="unitDistrict" code="unit_district_code"
+                             value="${deptOrganization.unitDistrict}" disabled="true"></form:select>
+                <form:select id="unitNature" label="单位性质类别" name="unitNature" code="lib_unit_type"
+                             value="${deptOrganization.unitNature}" disabled="true"></form:select>
+                <form:select id="unitEconomicType" label="经济类型" name="unitEconomicType" code="lib_economic_type"
+                             value="${deptOrganization.unitEconomicType}" disabled="true"></form:select>
+                <form:select id="unitIndustry" label="单位所属行业" name="unitIndustry" code="lib_industry_type"
+                             value="${deptOrganization.unitIndustry}" disabled="true"></form:select>
+                <form:figure id="unitNumber" label="职工人数" name="unitNumber" value="${deptOrganization.unitNumber}"
+                             min="0" disabled="true"></form:figure>
+                <!--<form:text id="chairmanSession" label="现任第几届主席" name="chairmanSession"-->
+                <!--value="${deptOrganization.chairmanSession}" disabled="true"></form:text>-->
+                <!--<form:figure id="chairmanMobile" label="主席手机号" name="chairmanMobile"-->
+                <!--value="${deptOrganization.chairmanMobile}" min="0" disabled="true"></form:figure>-->
+
+            </div>
+        </div>
+        <div th:if="${pageType == null }" class="row text-center">
+            <qx:btn fa="fa fa-eraser" label="取消" onclick="DeptInfo.close()"></qx:btn>
+        </div>
+
+        <div th:if="${pageType == 1 }">
+            <div class="row">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-6">
+                    <form:area id="reason" label="审核意见" name="reason" must="true"></form:area>
+                </div>
+            </div>
+            <div class="row text-center">
+                <qx:btn id="save" class="btn btn-success" onclick="DeptInfo.submit(2)"
+                        fa="fa fa-eraser" label="审核通过"></qx:btn>
+                <qx:btn id="submit" class="btn btn-danger" onclick="DeptInfo.submit(3)"
+                        fa="fa fa-eraser" label="审核不通过"></qx:btn>
+                <qx:btn id="close" class="btn btn-warning" onclick="DeptInfo.close()"
+                        fa="fa fa-eraser" label="取消"></qx:btn>
+            </div>
+        </div>
+
+        <div th:if="${pageType == 2 }">
+            <div class="row">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-6">
+                    <form:area id="reason" label="审核意见" name="reason" must="true"></form:area>
+                </div>
+            </div>
+            <div class="row text-center">
+                <qx:btn id="save" class="btn btn-success" onclick="DeptInfo.submit(2)"
+                        fa="fa fa-eraser" label="审核通过"></qx:btn>
+                <qx:btn id="submit" class="btn btn-danger" onclick="DeptInfo.submit(3)"
+                        fa="fa fa-eraser" label="审核不通过"></qx:btn>
+                <qx:btn id="close" class="btn btn-warning" onclick="DeptInfo.close()"
+                        fa="fa fa-eraser" label="取消"></qx:btn>
+            </div>
+        </div>
+
+    </form>
+</div>
+</body>
+<js>
+    <script>
+        var DeptInfo = {
+            close: function () {
+                App.closeSelfIframe();
+            }
+        };
+
+
+        /**
+         * 添加企业信息并提交建会事情
+         */
+        DeptInfo.submit = function (status) {
+
+            var reason = $("#reason").val();
+            if (reason == null || reason == '') {
+                App.error("审核意见不能为空");
+                return;
+            }
+
+            var pageType = $("#pageType").val();
+
+            var url;
+            if (pageType == 1) {
+                url = App.ctxPath + "organization/check/saveAuthen";
+            } else if (pageType == 2) {
+                url = App.ctxPath + "organization/check/savePerFectAuthen";
+            }
+
+            var data = {
+                id: $("#id").val(),
+                status: status,
+                reason: reason
+            };
+
+            var showMessage = getShowMessage(status);
+
+            App.loadingAjax({
+                url: url,
+                data: data,
+                success: function (result) {
+                    App.success(showMessage + "成功 !");
+                    DeptInfo.close();
+                }
+            });
+
+        }
+
+        function getShowMessage(status) {
+            var showMessage = "审核通过";
+            if (status == '3') {
+                showMessage = "审核不通过";
+            }
+            return showMessage;
+        }
+    </script>
+</js>

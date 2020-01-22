@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.mst.dao.MstMemberCadreDao">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultBean" type="com.gobestsoft.common.modular.mst.model.MstMemberCadre">
+		<id column="cadre_id" property="cadreId" />
+		<result column="organization_id" property="organizationId" />
+		<result column="union_id" property="unionId" />
+		<result column="member_id" property="memberId" />
+		<result column="union_position" property="unionPosition" />
+		<result column="full_time_union" property="fullTimeUnion" />
+		<result column="samelevel_union_committeeman" property="samelevelUnionCommitteeman" />
+		<result column="trial_committeeman" property="trialCommitteeman" />
+		<result column="woman_worker_committeeman" property="womanWorkerCommitteeman" />
+		<result column="division_position" property="divisionPosition" />
+		<result column="bureau_position" property="bureauPosition" />
+		<result column="corp_position" property="corpPosition" />
+		<result column="sort" property="sort" />
+		<result column="create_user" property="createUser" />
+		<result column="create_time" property="createTime" />
+		<result column="update_user" property="updateUser" />
+		<result column="update_time" property="updateTime" />
+	</resultMap>
+	
+	<!-- 通用版全部字段 ,可用于插入-->
+	<sql id="columns">
+		mst_member_cadre.organization_id,
+		mst_member_cadre.union_id,
+		mst_member_cadre.member_id,
+		mst_member_cadre.union_position,
+		mst_member_cadre.full_time_union,
+		mst_member_cadre.samelevel_union_committeeman,
+		mst_member_cadre.trial_committeeman,
+		mst_member_cadre.woman_worker_committeeman,
+		mst_member_cadre.division_position,
+		mst_member_cadre.bureau_position,
+		mst_member_cadre.corp_position,
+		mst_member_cadre.sort,
+		mst_member_cadre.create_user,
+		mst_member_cadre.create_time,
+		mst_member_cadre.update_user,
+		mst_member_cadre.update_time
+	</sql>
+	
+	<!-- 插入全部字段 -->
+	<sql id="columnValues">
+		#{organizationId},
+		#{unionId},
+		#{memberId},
+		#{unionPosition},
+		#{fullTimeUnion},
+		#{samelevelUnionCommitteeman},
+		#{trialCommitteeman},
+		#{womanWorkerCommitteeman},
+		#{divisionPosition},
+		#{bureauPosition},
+		#{corpPosition},
+		#{sort},
+		#{createUser},
+		#{createTime},
+		#{updateUser},
+		#{updateTime}
+	</sql>
+	
+	<!-- 更新全部字段 -->
+	<sql id="columnSets">
+		mst_member_cadre.union_position=#{unionPosition},
+		mst_member_cadre.full_time_union=#{fullTimeUnion},
+		mst_member_cadre.samelevel_union_committeeman=#{samelevelUnionCommitteeman},
+		mst_member_cadre.trial_committeeman=#{trialCommitteeman},
+		mst_member_cadre.woman_worker_committeeman=#{womanWorkerCommitteeman},
+		mst_member_cadre.division_position=#{divisionPosition},
+		mst_member_cadre.bureau_position=#{bureauPosition},
+		mst_member_cadre.corp_position=#{corpPosition},
+		mst_member_cadre.sort=#{sort},
+		mst_member_cadre.update_user=#{updateUser},
+		mst_member_cadre.update_time=#{updateTime}
+	</sql>
+	
+	<!-- 多条件查询  -->
+    <select id="selectListPage" resultType="map">
+		SELECT
+			mst_member_cadre.cadre_id, 
+			mst_member.name,
+			mst_member.union_name,
+			mst_member.work_unit,
+			<include refid="columns"></include>
+		FROM mst_member_cadre 
+		left join mst_member on mst_member.member_id = mst_member_cadre.member_id
+		<where>
+			<if test="name != null and name != '' ">
+				and mst_member.name like '%${name}%'
+			</if>
+			<if test="deptId != null and deptId != '' ">
+				and mst_member.union_id = #{deptId}
+			</if>
+			<if test="memberId != null and memberId != '' ">
+				and mst_member_cadre.member_id = #{memberId}
+			</if>
+		</where>
+        order by mst_member_cadre.union_position,mst_member_cadre.create_time desc
+    </select>
+    
+    <!-- 根据当前登录用户orgId,查询出所属工会及子工会及部门的会员干部  -->
+    <select id="selectListPageByOrgId" resultType="map">
+		SELECT
+		mst_member_cadre.cadre_id,
+		mst_member.name,
+		(select sys_dept.fullname from sys_dept where sys_dept.id=mst_member_cadre.union_id) as union_name,
+		mst_member.work_unit,
+		<include refid="columns"></include>
+		FROM mst_member_cadre
+		left join mst_member on mst_member.member_id = mst_member_cadre.member_id
+		where mst_member_cadre.union_id in (select id from sys_dept where id =
+		#{orgId} or FIND_IN_SET(#{orgId},pids) order by
+		level,sort,id)
+		<if test="name != null and name != '' ">
+			and mst_member.name like '%${name}%'
+		</if>
+        order by mst_member_cadre.union_id,mst_member_cadre.union_position
+    </select>
+    
+    <select id="selectByMemberAndUnion" resultType="map">
+		SELECT
+			mst_member_cadre.cadre_id, 
+			mst_member.name,
+			<include refid="columns"></include>
+		FROM mst_member_cadre 
+		left join mst_member on mst_member.member_id = mst_member_cadre.member_id
+		<where>
+			<if test="memberId != null and memberId != '' ">
+				and mst_member_cadre.member_id = #{memberId}
+			</if>
+			<if test="organizationId != null and organizationId != '' ">
+				and mst_member_cadre.organization_id = #{organizationId}
+			</if>
+			<if test="unionId != null and unionId != '' ">
+				and mst_member_cadre.union_id = #{unionId}
+			</if>
+		</where>
+        order by mst_member_cadre.union_position,mst_member_cadre.create_time desc
+    </select>
+    
+    <select id="selectListMap" resultType="map">
+		SELECT
+			mst_member_cadre.cadre_id, 
+			mst_member.name,
+		    case when mst_member_cadre.union_position is null then 1 when mst_member_cadre.union_position='' then 1 else 0 end newsort,
+			<include refid="columns"></include>
+		FROM mst_member_cadre 
+		left join mst_member on mst_member.member_id = mst_member_cadre.member_id
+		where mst_member_cadre.union_id = #{deptId}
+        order by newsort,mst_member_cadre.union_position,mst_member_cadre.create_time desc
+    </select>
+	
+	<!-- 删除一条数据 -->
+    <delete id="remove">
+		delete from mst_member_cadre where mst_member_cadre.cadre_id = #{id}
+	</delete>
+	
+	 <!-- 根据会员id，查询出该会员的干部信息-->
+	<select id="selectByMemberId" resultMap="BaseResultBean">
+		SELECT 
+			mst_member_cadre.cadre_id,
+			<include refid="columns"></include>
+		FROM mst_member_cadre
+		where mst_member_cadre.member_id = #{memberId}
+		order by mst_member_cadre.union_position,mst_member_cadre.create_time desc
+	</select>
+	
+	 <!-- 根据会员id，查询出该会员的干部信息和会员名称,任职工会名称信息-->
+	<select id="selectMemBerAndMemberCadreByMemberId" resultType="map">
+		SELECT
+		mst_member_cadre.cadre_id,
+		(select mst_member.name from mst_member where mst_member.member_id = mst_member_cadre.member_id) as name,
+		(select sys_dept.fullname from sys_dept where sys_dept.id=mst_member_cadre.union_id) as union_name,
+		<include refid="columns"></include>
+		FROM mst_member_cadre
+		where mst_member_cadre.member_id = #{memberId}
+		order by mst_member_cadre.union_position,mst_member_cadre.create_time desc
+	</select>
+	
+	<!-- 根据会员id,查询出关联的干部数量 -->
+	<select id="selectCountByMemberId" resultType="int">
+		select count(0) from mst_member_cadre 
+		where mst_member_cadre.member_id = #{memberId}
+	</select>
+	
+	 <!-- 根据会员id,获取关联的多个干部id拼接的字符串,以逗号进行分割 -->
+	<select id="getIdsByMemberId" resultType="string">
+		SELECT group_concat(mst_member_cadre.cadre_id) as ids
+		FROM mst_member_cadre group by member_id having mst_member_cadre.member_id = #{memberId}
+	</select>
+	
+	<!-- 根据工会组织id,查询出该工会下的干部数量  -->
+	<select id="getMemberCadreCountByUnionId" resultType="int">
+		select count(0) from mst_member_cadre join mst_member on mst_member_cadre.member_id = mst_member.member_id
+		where mst_member_cadre.union_id = #{unionId}
+	</select>
+	
+	<!-- 根据sys_dept表id,和工会职务的编码,获取对应工会职务人员名称  -->
+	<select id="getChairmanNameByDeptId" resultType="string">
+		select group_concat(P.name) as name from (
+		select DISTINCT(mst_member.name) from mst_member_cadre 
+		join mst_member on mst_member_cadre.member_id = mst_member.member_id
+		where mst_member_cadre.union_id = #{unionId} and union_position = #{code})P group by P.name
+	</select>
+	
+	<!-- 根据工会组织id,查询会员中干部的数量 -->
+	<select id="selectCountByMemberAndUnionId" resultType="int">
+		select count(mst_member_cadre.cadre_id) from mst_member_cadre 
+		join mst_member on mst_member.member_id = mst_member_cadre.member_id where mst_member.union_id=#{unionId}
+	</select>
+	
+</mapper>

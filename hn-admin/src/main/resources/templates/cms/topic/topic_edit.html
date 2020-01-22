@@ -1,0 +1,118 @@
+<!--<css xmlns:form="http://www.w3.org/1999/xhtml">
+    <link th:href="@{http://xiumi.us/connect/ue/v5/xiumi-ue-v5.css}" rel="stylesheet">
+</css>-->
+<body>
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal" id="topicForm">
+            <input type="hidden" id="id" th:value="${pojo.id}">
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-6">
+                    <form:text id="name" label="专题名称" name="name" must="true" value="${pojo.name}"></form:text>
+                    <form:img id="topicCover" label="专题封面" width="400" height="150" must="true" defImg="${pojo.icon}"></form:img>
+                </div>
+            </div>
+            <div class="row text-center">
+                <qx:btn id="ensure" class="btn btn-primary" fa="fa fa-check" label="提交" onclick="TopicDlg.addSubmit()" ></qx:btn>
+                <qx:btn id="cancel" class="btn btn-primary" fa="fa fa-eraser" label="取消" onclick="TopicDlg.close()" ></qx:btn>
+            </div>
+        </div>
+    </div>
+</div>
+<js>
+    <div  th:include="fragment/fargment :: clipJs"></div>
+    <script>
+        /**
+         * 角色详情对话框（可用于添加和修改对话框）
+         */
+        var TopicDlg = {
+            topicData: {},
+            deptZtree: null,
+            pNameZtree: null,
+            validateFields: {
+                name: {
+                    validators: {
+                        notEmpty: {
+                            message: '专题名称不能为空'
+                        }
+                    }
+                }
+            }
+        };
+        App.initValidator("topicForm", TopicDlg.validateFields);
+
+        /**
+         * 清除数据
+         */
+        TopicDlg.clearData = function () {
+            this.topicData = {};
+        };
+
+        /**
+         * 设置对话框中的数据
+         */
+        TopicDlg.set = function (key) {
+            this.topicData[key] = (typeof value == "undefined") ? $("#" + key).val() : value;
+            return this;
+        };
+
+        /**
+         * 收集数据
+         */
+        TopicDlg.collectData = function () {
+            this
+                    .set('id')
+                    .set('name');
+        };
+
+        /**
+         * 关闭此对话框
+         */
+        TopicDlg.close = function () {
+            parent.layer.close(window.parent.OptTopic.layerIndex);
+        };
+
+        /**
+         * 验证数据是否为空
+         */
+        TopicDlg.validate = function () {
+            $('#topicForm').data("bootstrapValidator").resetForm();
+            $('#topicForm').bootstrapValidator('validate');
+            return $("#topicForm").data('bootstrapValidator').isValid();
+        };
+        /**
+         * 提交添加用户
+         */
+        TopicDlg.addSubmit = function () {
+
+            this.clearData();
+            this.collectData();
+            if (!this.validate()) {
+                errorFocus();
+                return;
+            }
+
+            var covor_1 = $("#topicCover").val();
+            if(covor_1 == null || covor_1 == ""){
+                App.error("请上传图片!");
+                return false;
+            }
+
+            //提交信息
+            var ajax = new $ax(App.ctxPath + "/topic/edit", function (data) {
+                App.success("编辑成功!");
+                window.parent.OptTopic.table.refresh();
+                TopicDlg.close();
+            }, function (data) {
+                App.error("编辑失败!");
+            });
+            ajax.set(TopicDlg.topicData);
+
+            ajax.set("photoBase64Data",covor_1);
+            ajax.start();
+        };
+
+    </script>
+</js>
+</body>

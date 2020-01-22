@@ -1,0 +1,152 @@
+package com.gobestsoft.rabbitmq.config;
+
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Created by gutongwei on 2018/2/6.
+ */
+@Configuration
+public class RabbitConfig {
+
+    //信道配置
+    @Bean
+    public DirectExchange defaultExchange() {
+        return new DirectExchange(MQConstant.DEFAULT_EXCHANGE, true, false);
+    }
+
+    @Bean
+    public Queue repeatTradeQueue() {
+        Queue queue = new Queue(MQConstant.DEFAULT_LETTER_RECEIVE_QUEUE_NAME, true, false, false);
+        return queue;
+    }
+
+    @Bean
+    public Binding repeatTradeBinding() {
+        return BindingBuilder.bind(repeatTradeQueue()).to(defaultExchange()).with(MQConstant.DEFAULT_LETTER_RECEIVE_QUEUE_NAME);
+    }
+
+    /**
+     * 建立延迟任务列队
+     * <p>
+     * 延迟消息发送至MQConstant.DEFAULT_DEAD_LETTER_QUEUE_NAME列队
+     * 接收时会使用EXCHANGE转发值MQConstant.DEFAULT_REPEAT_TRADE_QUEUE_NAME列队
+     *
+     * @return
+     */
+    @Bean
+    public Queue deadLetterQueue() {
+        Map<String, Object> arguments = new HashMap<>();
+        arguments.put("x-dead-letter-exchange", MQConstant.DEFAULT_EXCHANGE);//出现dead letter之后将dead letter重新发送到指定exchange
+        arguments.put("x-dead-letter-routing-key", MQConstant.DEFAULT_LETTER_RECEIVE_QUEUE_NAME);//出现dead letter之后将dead letter重新按照指定的routing-key发送
+        Queue queue = new Queue(MQConstant.DEFAULT_LETTER_SENDER_QUEUE_NAME, true, false, false, arguments);
+        return queue;
+    }
+
+    /**
+     * 延迟任务绑定交互机
+     *
+     * @return
+     */
+    @Bean
+    public Binding deadLetterBinding() {
+        return BindingBuilder.bind(deadLetterQueue()).to(defaultExchange()).with(MQConstant.DEFAULT_LETTER_SENDER_QUEUE_NAME);
+    }
+
+
+    /**
+     * 建立默认消息列队
+     *
+     * @return
+     */
+    @Bean
+    public Queue defaultQueue() {
+        Queue queue = new Queue(MQConstant.ADMIN_GIVE_API_QUEUE, true);
+        return queue;
+    }
+
+    /**
+     * 默认消息列队绑定交互机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingDefault() {
+        return BindingBuilder.bind(defaultQueue()).to(defaultExchange()).with(MQConstant.ADMIN_GIVE_API_QUEUE);
+    }
+
+
+    /**
+     * 建立默认消息列队
+     *
+     * @return
+     */
+    @Bean
+    public Queue giveAdminQueue() {
+        Queue queue = new Queue(MQConstant.API_GIBE_ADMIN, true);
+        return queue;
+    }
+
+    /**
+     * 默认消息列队绑定交互机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingGiveAdmin() {
+        return BindingBuilder.bind(giveAdminQueue()).to(defaultExchange()).with(MQConstant.API_GIBE_ADMIN);
+    }
+
+
+
+    /**
+     * 建立默认消息列队
+     *
+     * @return
+     */
+    @Bean
+    public Queue giveAdminExcludeQueue() {
+        Queue queue = new Queue(MQConstant.API_GIBE_ADMIN_EXCLUDE, true);
+        return queue;
+    }
+
+    /**
+     * 默认消息列队绑定交互机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingGiveExcludeAdmin() {
+        return BindingBuilder.bind(giveAdminExcludeQueue()).to(defaultExchange()).with(MQConstant.API_GIBE_ADMIN_EXCLUDE);
+    }
+
+
+    /**
+     * 建立默认消息列队
+     * 后台会员导入
+     * @return
+     */
+    @Bean
+    public Queue memberImportExcludeQueue() {
+        Queue queue = new Queue(MQConstant.MEMBER_IMPORT_QUEUE, true);
+        return queue;
+    }
+
+    /**
+     * 默认消息列队绑定交互机
+     * 后台会员导入
+     * @return
+     */
+    @Bean
+    public Binding bindingmemberImportExclude() {
+        return BindingBuilder.bind(memberImportExcludeQueue()).to(defaultExchange()).with(MQConstant.MEMBER_IMPORT_QUEUE);
+    }
+
+}

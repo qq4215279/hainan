@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Created-By: IntelliJ IDEA
+Built-By: liu86
+Build-Jdk: 1.8.0_73
+Implementation-Title: hn-api
+Implementation-Version: 1.0-SNAPSHOT
+Implementation-Vendor-Id: com.gobestsoft.rest
+Main-Class: ${start-class}
+

@@ -1,0 +1,18 @@
+<body>
+<div class="container">
+
+    <form class="form-horizontal">
+        <form:figure id="two" label="数字输入框" name="two" max="100" min="10" value=""></form:figure>
+        <form:text id="one" label="文本输入框" name="one"></form:text>
+        <form:datetime id="three" label="日期输入" istime="false" must="true" format="yyyy-MM-dd" name="three"></form:datetime>
+        <form:datetime id="four" label="日期时间输入" istime="true" format="yyyy-MM-dd HH:mm:ss" name="four"></form:datetime>
+        <form:select id="account" label="性别" name="account"  code="lib_sex" must="true"></form:select>
+        <form:check id="five" label="check选择" name="five"></form:check>
+        <div class="row text-center">
+            <qx:btn id="sure" class="btn btn-default" fa="fa fa-address-book" label="确认"></qx:btn>
+            <qx:btn id="back" class="btn btn-primary" fa="fa fa-address-book" label="返回"></qx:btn>
+        </div>
+    </form>
+</div>
+
+</body>

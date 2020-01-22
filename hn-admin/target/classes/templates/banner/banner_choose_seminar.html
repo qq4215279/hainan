@@ -1,0 +1,86 @@
+<css>
+    <div th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="container">
+    <div class="form-horizontal">
+        <div class="row">
+            <div class="col-sm-3" style="margin-left: -15px">
+                <search:input label="标题" id="query_name" name="query_name" value=""
+                              type="text"></search:input>
+            </div>
+            <div class="col-sm-1">
+                <qx:btn class="btn btn-primary" fa="fa fa-search" label="搜索" permission=""
+                        onclick="OptArticle.search()"></qx:btn>
+            </div>
+        </div>
+    </div>
+    <table id="OptArticleTable" data-mobile-responsive="true" data-click-to-select="true">
+    </table>
+</div>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+        /**
+         * 咨询初始化
+         */
+        var OptArticle = {
+            id: "OptArticleTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1,
+            choose:function (id,title) {
+                parent.chooseSeminar(id,title);
+            }
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        OptArticle.initColumn = function () {
+            return [
+                {title: '编号', field: 'id', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {title: '标题', field: 'name', align: 'center', valign: 'middle'},
+                {
+                    title: '发布时间', field: 'create_time', align: 'center', valign: 'middle', sortable: false
+                },
+
+                {
+                    title: '操作',
+                    field: 'publishedUid',
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: function (value, row, index) {
+                        return "<a href=\"javascript:OptArticle.choose('"+row.id+"','"+row.name+"')\">选择</a>";
+                    }
+                }
+            ]
+        };
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        OptArticle.formParams = function () {
+            var queryData = {};
+            queryData['query_name'] = $("#query_name").val();
+            return queryData;
+        }
+
+        /**
+         * 查询资讯列表
+         */
+        OptArticle.search = function () {
+            OptArticle.table.refresh({query: OptArticle.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = OptArticle.initColumn();
+            var table = new BSTable(OptArticle.id, "/banner/seminarList", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(OptArticle.formParams());
+            OptArticle.table = table.init();
+        });
+    </script>
+</js>
+</body>

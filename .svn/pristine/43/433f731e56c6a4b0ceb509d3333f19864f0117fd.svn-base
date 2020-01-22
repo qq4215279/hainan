@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dept.dao.InfoManageDao">
+	<resultMap type="HashMap" id="selResultMap">
+       <result property="dept_id" column="dept_id" /> 
+       <result property="dept_type" column="dept_type" /> 
+       <result property="org_code" column="org_code" /> 
+       <result property="economy_type" column="economy_type" /> 
+       <result property="unit_type" column="unit_type" /> 
+       <result property="industry_type" column="industry_type" /> 
+       <result property="unit_name" column="unit_name" /> 
+       <result property="base_org_type" column="base_org_type" /> 
+       <result property="change_date" column="change_date" /> 
+       <result property="telephone" column="telephone" /> 
+       <result property="employee_cnt" column="employee_cnt" /> 
+       <result property="is_closed" column="is_closed" /> 
+       <result property="simplename" column="simplename" /> 
+       <result property="establish_date" column="establish_date" /> 
+       <result property="dept_no" column="dept_no" /> 
+		<result property="p_dept_name" column="p_dept_name" /> 
+		<result property="pic_name" column="pic_name" /> 
+		<result property="level" column="level" /> 
+		<result property="pid" column="pid" /> 
+   </resultMap>
+
+	<!-- 对应selectByCondition方法，条件查询（工会名称，组织机构代码） -->
+	<select id="selectByCondition" resultMap="selResultMap">
+		SELECT 
+			org.*,
+			sys.simplename,
+			sys.establish_date,
+			sys.dept_no,
+			sys.p_dept_name,
+			sys.pic_name,
+			sys.level,
+			sys.pid
+		FROM org_dept_ext org
+		INNER JOIN sys_dept sys 
+		ON org.dept_id = sys.id
+		WHERE 1 = 1
+		<if test="deptName != null and deptName != ''">
+			AND sys.simplename like CONCAT('%',#{deptName},'%')
+		</if>
+		<if test="orgCode != null and orgCode != ''">
+			AND org.org_code like CONCAT('%',#{orgCode},'%')
+		</if>
+		order by org.dept_id ASC
+	</select>
+	
+	<!-- 对应addDept方法，新增一条工会信息  -->
+	<insert id="addDept" parameterType="com.gobestsoft.common.modular.dept.model.InfoManage" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO sys_dept (
+		pid,
+		simplename,
+		level,
+		addr,
+		dept_type,
+		dept_no,
+		p_dept_no,
+		p_dept_name,
+		pic_name,
+		establish_date
+		)
+		VALUES(
+		#{pid},
+		#{deptName},
+		4,
+		#{addr},
+		0,
+		#{deptNo},
+		#{pDeptNo},
+		#{pDeptName},
+		#{picName},
+		#{establishDate}
+		)
+	</insert>
+	
+	<!-- 对应addInfoManage方法，新增一条工会信息  -->
+	<insert id="addInfoManage" parameterType="com.gobestsoft.common.modular.dept.model.InfoManage" >
+		INSERT INTO org_dept_ext (
+		dept_id,
+		dept_type,
+		org_code,
+		economy_type,
+		unit_type,
+		industry_type,
+		unit_name,
+		base_org_type,
+		change_date,
+		telephone,
+		employee_cnt,
+		is_closed
+		)
+		VALUES(
+		#{deptId},
+		0,
+		#{orgCode},
+		#{economyType},
+		#{unitType},
+		#{industryType},
+		#{unitName},
+		#{baseOrgType},
+		#{changeDate},
+		#{telephone},
+		#{employeeCnt},
+		0
+		)
+	</insert>
+
+	<delete id="deleteDept" >
+		DELETE FROM sys_dept
+		WHERE id=#{deptId}
+	</delete>
+	
+	<delete id="deleteInfoManage" >
+		DELETE FROM org_dept_ext
+		WHERE dept_id=#{deptId}
+	</delete>
+	
+	<update id="closeInfoManage" >
+		UPDATE org_dept_ext
+		SET  is_closed=1
+		WHERE dept_id=#{deptId}
+	</update>
+	
+	<select id="getDetail" resultType="com.gobestsoft.common.modular.dept.model.InfoManage">
+		SELECT 
+			org.*,
+			sys.simplename as deptName,
+			sys.establish_date as establishDate,
+			sys.dept_no as deptNo,
+			sys.p_dept_no as p_dept_no,
+			sys.p_dept_name as pDeptName,
+			sys.pic_name as picName,
+			sys.addr
+		FROM org_dept_ext org
+		LEFT JOIN sys_dept sys 
+		ON org.dept_id = sys.id
+		WHERE 1 = 1
+			AND org.dept_id =#{deptId}
+		order by org.dept_id ASC
+	</select>
+	
+	<select id="getDeptInfo" resultType="com.gobestsoft.common.modular.system.model.Dept">
+		SELECT 
+			dept_no,
+			simplename
+		FROM sys_dept
+		WHERE id =#{id}
+	</select>
+	
+	<!-- 对应editDept方法，修改工会信息  -->
+	<update id="editDept" parameterType="com.gobestsoft.common.modular.dept.model.InfoManage" >
+		UPDATE sys_dept
+		SET  simplename=#{deptName},
+				addr=#{addr},
+				dept_no=#{deptNo},
+				pic_name=#{picName},
+				establish_date=#{establishDate}
+		WHERE id=#{deptId}		
+	</update>
+	
+	<!-- 对应editInfoManage方法，修改工会信息  -->
+	<update id="editInfoManage" parameterType="com.gobestsoft.common.modular.dept.model.InfoManage" >
+		UPDATE org_dept_ext
+		SET  org_code=#{orgCode},
+				economy_type=#{economyType},
+				unit_type=#{unitType},
+				industry_type=#{industryType},
+				unit_name=#{unitName},
+				base_org_type=#{baseOrgType},
+				change_date=#{changeDate},
+				telephone=#{telephone},
+				employee_cnt=	#{employeeCnt}
+		WHERE dept_id=#{deptId}		
+	</update>
+	
+	<select id="tree" resultType="com.gobestsoft.core.node.ZTreeNode">
+		select id,pid as pId,simplename as name,
+		(case when level = 3 then 'pIcon02' else 'pIcon01' end ) as iconSkin,
+		(
+		CASE
+		WHEN (pId = 0 OR pId IS NULL) THEN
+			'true'
+		ELSE
+			'false'
+		END
+		) as isOpen,dept_type as deptType,level as deptLevel from sys_dept
+		where dept_type=0 and level &lt;=3
+	</select>
+	
+	<!-- 对应transferDept方法，转移工会  -->
+	<update id="transferDept" >
+		UPDATE sys_dept
+		SET  pid=#{pid},
+				p_dept_no=#{pDeptNo},
+				p_dept_name=#{pDeptName}
+		WHERE id=#{deptId}		
+	</update>
+	
+	<select id="isExist" resultType="com.gobestsoft.common.modular.system.model.Dept">
+		SELECT *
+		FROM sys_dept
+		WHERE dept_no =#{deptNo}
+		limit 1
+	</select>
+</mapper>

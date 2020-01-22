@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="hn-admin" />
+        <module name="hn-api" />
+        <module name="hn-common" />
+        <module name="hn-company" />
+        <module name="hn-core" />
+        <module name="hn-mail" />
+        <module name="hn-manage" />
+        <module name="jpush" />
+        <module name="rabbitmq" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="hn-admin" target="1.8" />
+      <module name="hn-api" target="1.8" />
+      <module name="hn-common" target="1.8" />
+      <module name="hn-company" target="1.8" />
+      <module name="hn-core" target="1.8" />
+      <module name="hn-mail" target="1.8" />
+      <module name="hn-manage" target="1.8" />
+      <module name="hn-parent" target="1.8" />
+      <module name="jpush" target="1.8" />
+      <module name="rabbitmq" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

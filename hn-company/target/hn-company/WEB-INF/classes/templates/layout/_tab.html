@@ -1,0 +1,58 @@
+<nav  th:fragment="tab" class="navbar-default navbar-static-side" role="navigation" scroll="no" xmlns:th="http://www.thymeleaf.org">
+    <div class="nav-close">
+        <i class="fa fa-times-circle"></i>
+    </div>
+    <div class="sidebar-collapse">
+        <ul class="nav" id="side-menu">
+
+            <!--<li class="nav-header" title="收缩/展开">-->
+            <!--<a class="navbar-minimalize section" href="#"></a>-->
+            <!--</li>-->
+            <li  th:each="title,stat : ${titles}">
+                <a  th:if="${#strings.isEmpty(title.url)}" class="J_menuItem"  name="tabMenuItem">
+                    <i th:class="'fa ' + ${title.icon}"></i>
+                    <span  class="nav-label" th:text="${title.name}"></span>
+                    <span class="badge badge-warning" th:text="${title.badge}"></span>
+                    <span class="fa arrow"></span>
+                </a>
+                <a  th:if="${#strings.isEmpty(title.url) == false}" class="J_menuItem" th:href="@{/} + ${title.url}" name="tabMenuItem">
+                    <i th:class="'fa '+${title.icon} "></i>
+                    <span  class="nav-label" th:text="${title.name}"></span>
+                    <span class="badge badge-warning" th:text="${title.badge}"></span>
+                </a>
+                <ul th:if="${title.children !=null}" class="nav nav-second-level">
+                    <li  th:each="subTitle : ${title.children}">
+                        <a th:if="${#strings.isEmpty(subTitle.url)}" class="J_menuItem"   name="tabMenuItem">
+                            <i th:class="'fa '+ ${subTitle.icon} "></i>
+                            <span  class="nav-label" th:text="${subTitle.name}"></span>
+                            <span class="badge badge-warning" th:text="${subTitle.badge}"></span>
+                        </a>
+                        <a th:if="${#strings.isEmpty(subTitle.url) == false}" class="J_menuItem" th:href="@{/} + ${subTitle.url}"  name="tabMenuItem">
+                            <i th:class="'fa '+ ${subTitle.icon}"></i>
+                            <span  class="nav-label" th:text="${subTitle.name}"></span>
+                            <span class="badge badge-warning" th:text="${subTitle.badge}"></span>
+                        </a>
+                        <ul th:if="${subTitle.children !=null}" class="nav nav-second-level">
+                            <li  th:each="thirdTitle : ${subTitle.children}">
+                                <a  class="J_menuItem" th:href="@{/} + ${thirdTitle.url}"  name="tabMenuItem">
+                                    <i th:class="${subTitle.icon}+ 'iconfont' "></i>
+                                    <span  class="nav-label" th:text="${thirdTitle.name}"></span>
+                                    <span class="badge badge-warning" th:text="${thirdTitle.badge}"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+
+        </ul>
+    </div>
+</nav>
+
+<script type="text/javascript">
+    function toUrl(url) {
+        //document.location = url;
+        parent.iframe0.location.href=url;
+    }
+
+</script>

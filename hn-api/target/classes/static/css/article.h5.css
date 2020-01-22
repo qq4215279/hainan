@@ -1,0 +1,39 @@
+.nowrap {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+body {
+  padding: 10px;
+}
+body #article img {
+  width: 100% !important;
+  height: auto !important;
+}
+body #article .head {
+  font-size: 22px;
+  font-family: "Times New Roman", Georgia, Serif;
+  margin-bottom: 20px;
+}
+body #article .create-area {
+  color: #B9B9B9;
+  font-size: 14px;
+  margin: 0 0 8px 0;
+}
+
+.content{
+  margin: 10px 0;
+}
+.attachment {
+  margin-top: 15px;
+  width: 100%;
+}
+
+.attachment image {
+  width: 100% !important;
+  margin-top: 12px;
+}
+
+.mp4 {
+  width: 100%;
+}

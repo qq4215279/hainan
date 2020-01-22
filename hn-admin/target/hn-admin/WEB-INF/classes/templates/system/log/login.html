@@ -1,0 +1,134 @@
+<css xmlns:th="http://www.thymeleaf.org">
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body xmlns:th="http://www.thymeleaf.org">
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <search:input id="name" label="用户名" name="name" value=""
+                                              type="text"></search:input>
+                            </div>
+                            <div class="col-sm-3">
+                                <search:select label="状态" name="status"
+                                               code="lib_log_login_status" id="status"></search:select>
+                            </div>
+                            <div class="col-sm-3">
+                                <qx:btn  class="btn btn-primary" fa="fa fa-search" label="查询" permission="" onclick="LoginLog.search()"></qx:btn>
+                            </div>
+                        </div>
+                    </div>
+                    <table id="LoginLogTable" data-mobile-responsive="true" data-click-to-select="true">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+        /**
+         * 初始化表格对象
+         */
+        var LoginLog = {
+            id: "LoginLogTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         *
+         */
+        LoginLog.initColumn = function () {
+            return [
+                {title: '用户名', field: 'creator_name', visible: true, align: 'center', valign: 'middle'},
+                {title: '操作类型', field: 'operation', visible: true, align: 'center', valign: 'middle',formatter: initOperationField},
+                {title: '状态', field: 'status', align: 'center', valign: 'middle' ,formatter: initStatusField},
+                {title: '操作IP', field: 'ip', align: 'center', valign: 'middle'},
+                {title: 'User-Agent', field: 'user_agent', align: 'center', valign: 'middle'},
+                {title: '创建时间', field: 'create_date', align: 'center', valign: 'middle',formatter: initCreateTimeField}
+            ];
+        }
+
+        /**
+         *初始化状态
+         */
+        function initStatusField(value, row, index) {
+            if(row.status === 0){
+                return '失败';
+            }else if(row.status === 2){
+                return '账号已锁定';
+            }else if(row.status === 1){
+                return '成功';
+            }else{
+                return '-';
+            }
+        }
+
+        /**
+         * 初始化操作
+         */
+        function initOperationField(value, row, index){
+            if(row.operation === 1){
+                return '退出';
+            } else if (row.operation === 0){
+                return '登录';
+            } else {
+                return '-';
+            }
+        }
+
+
+        /**
+         * 初始化列表的创建时间类型的字段
+         */
+        function initCreateTimeField(value, row, index){
+            if(row.create_date){
+                return returnTimeStr(row.create_date);
+            }
+        }
+
+        /**
+         * 返回组装好的日期字符串
+         */
+        function returnTimeStr(time) {
+            return time.substring(0,4)+"-"+time.substring(4,6)+"-"+time.substring(6,8)+" "+time.substring(8,10)+":"+time.substring(10,12)+":"+time.substring(12,14);
+        }
+
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        LoginLog.formParams = function () {
+            var queryData = {};
+            queryData['name'] = $("#name").val();
+            queryData['status'] = $("#status").val();
+            return queryData;
+        }
+
+        /**
+         * 查询列表
+         */
+        LoginLog.search = function () {
+            LoginLog.table.refresh({query: LoginLog.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = LoginLog.initColumn();
+            var table = new BSTable(LoginLog.id, "log/list/login", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(LoginLog.formParams());
+            LoginLog.table = table.init();
+        });
+    </script>
+</js>
+</body>

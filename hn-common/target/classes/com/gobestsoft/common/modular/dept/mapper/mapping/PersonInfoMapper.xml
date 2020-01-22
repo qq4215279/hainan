@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dept.mapper.PersonInfoMapper">
+
+  <resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.dept.model.PersonInfo">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="sex" jdbcType="VARCHAR" property="sex" />
+    <result column="birthday" jdbcType="VARCHAR" property="birthday" />
+    <result column="nation" jdbcType="VARCHAR" property="nation" />
+    <result column="work_situation" jdbcType="VARCHAR" property="workSituation" />
+    <result column="certificate_type" jdbcType="VARCHAR" property="certificateType" />
+    <result column="certificate_num" jdbcType="VARCHAR" property="certificateNum" />
+    <result column="education" jdbcType="VARCHAR" property="education" />
+    <result column="technology_level" jdbcType="VARCHAR" property="technologyLevel" />
+    <result column="mobile" jdbcType="VARCHAR" property="mobile" />
+    <result column="household" jdbcType="VARCHAR" property="household" />
+    <result column="domicile" jdbcType="VARCHAR" property="domicile" />
+    <result column="member_change" jdbcType="VARCHAR" property="memberChange" />
+    <result column="member_change_date" jdbcType="VARCHAR" property="memberChangeDate" />
+    <result column="member_change_reason" jdbcType="VARCHAR" property="memberChangeReason" />
+    <result column="political_status" jdbcType="VARCHAR" property="politicalStatus" />
+    <result column="work_unit" jdbcType="VARCHAR" property="workUnit" />
+    <result column="native_place" jdbcType="VARCHAR" property="nativePlace" />
+    <result column="homeplace" jdbcType="VARCHAR" property="homeplace" />
+    <result column="is_farmer" jdbcType="VARCHAR" property="isFarmer" />
+  </resultMap>
+  
+  <!-- 简单字段 -->
+  <sql id="commonColumns">
+  	 person_info.id
+  	,person_info.name
+  	,person_info.sex
+  	,person_info.certificate_type
+  	,person_info.certificate_num
+  	,person_info.education
+  	,person_info.native_place
+  	,person_info.political_status
+  	,person_info.work_unit
+  	,person_info.is_farmer
+  </sql>
+  
+  <!-- 企业端会员管理多条件分页查询 -->
+  <select id="selectCompanyPageByCondition" resultType="map">
+  	select <include refid="commonColumns"></include>,dept_member.id as member_id,dept_member.member_card,dept_member.create_time from dept_member 
+	left join person_info on person_info.id = dept_member.person_id
+	where dept_id = #{deptId}
+	<if test="name != null and name != ''">
+		and person_info.name like '%${name}%'
+	</if>
+	<if test="memberCard != null and memberCard != ''">
+		and dept_member.station_card like '%${memberCard}%'
+	</if>
+  </select>
+  
+  <!-- 根据会员身份证号查询出会员信息 -->
+  <select id="selectByCertificateNum" resultMap="BaseResultMap">
+		SELECT 
+			 <include refid="commonColumns"></include>
+		FROM person_info
+		<where>
+			<if test="certificateNum != null and certificateNum != ''">
+				and person_info.certificate_num = #{certificateNum}
+			</if>
+		</where>
+    </select>
+
+    <select id="selectByNameAndNum" resultType="java.lang.Integer">
+        select count(1) from person_info pi
+        INNER JOIN dept_member dm
+        on pi.id= dm.person_id
+        where pi.certificate_num=#{certificateNum}
+        and pi.name=#{name}
+    </select>
+
+    <select id="selectByMemId" resultType="String">
+        SELECT
+	      is_farmer
+        FROM
+	      person_info
+        WHERE
+	      id IN (
+		      SELECT
+			    person_id
+		      FROM
+			    dept_member
+		      WHERE
+		  id = ${memberId}
+	  )
+    </select>
+  
+</mapper>

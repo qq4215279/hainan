@@ -1,0 +1,78 @@
+<css>
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal" id="articlePubForm">
+            <div class="row">
+                <input type="hidden" id="publishid" th:value="${pubId}">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" style="font-size:14px">定向发布</label>
+                    <div class="col-sm-9" style="margin-top:30px">
+                        <qx:btn  class="btn btn-primary" label="app发布" id="catesApp" fa="fa fa-cags"
+                                 onclick="ArticlePubDlg.getCates(0)" /> &nbsp;
+                        <qx:btn  class="btn btn-primary" label="专题发布" id="catesTopic" fa="fa fa-cags"
+                                 onclick="ArticlePubDlg.getCates(1)" />
+                    </div>
+
+                    <div class="hr-line-dashed" style="margin-top:100px"></div>
+                    <div class="col-sm-12" align="center">
+                        <br/><br/>
+                        <qx:btn  class="btn btn-danger" label="取消" id="cancel" fa="fa fa-eraser"
+                                 onclick="ArticlePubDlg.close()" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<js>
+    <script>
+        /**
+         * 角色详情对话框（可用于添加和修改对话框）
+         */
+        var ArticlePubDlg = {
+            articlePubData: {},
+            deptZtree: null,
+            pNameZtree: null,
+            validateFields: {
+            }
+        };
+
+        /**
+         * 清除数据
+         */
+        ArticlePubDlg.clearData = function () {
+            this.articlePubData = {};
+        };
+
+        /**
+         * 设置对话框中的数据
+         */
+        ArticlePubDlg.set = function (key) {
+            this.articlePubData[key] = (typeof value == "undefined") ? $("#" + key).val() : value;
+            return this;
+        };
+
+        /**
+         * 关闭此对话框
+         */
+        ArticlePubDlg.close = function () {
+            parent.layer.close(window.parent.OptArticleValid.layerIndex);
+        };
+
+        ArticlePubDlg.getCates = function(type){
+            var index = layer.open({
+                type: 2,
+                title: '定向发布',
+                area: ['100%', '100%'], //宽高
+                fix: true, //不固定
+                maxmin: true,
+                content: App.ctxPath+'/articlevalid/article_getCates?articleId=' + $('#publishid').val() + "&type=" + type
+            });
+            this.layerIndex = index;
+        }
+    </script>
+</js>
+</body>

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.cms.dao.CommentDao">
+
+	<insert id="writeComment">
+		INSERT INTO
+		cms_comment(article_id,auid,content,status,create_time,update_time,del_flg,thumbup_num,comment_type)
+		VALUES(${articleId},#{uId},#{content},1,#{createTime},#{createTime},0,0,0);
+	</insert>
+
+	<update id="amendArticleCommentTotal">
+		update cms_article set comm_num=(select COUNT(0) FROM cms_comment where cms_comment.article_id=${articleId}
+		AND status=1)
+		where  id=${articleId};
+	</update>
+
+	<insert id="writeCommentReply" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO
+		cms_reply(p_id,auid,content,status,create_time,update_time,del_flg,thumbup_num)
+		VALUES(${commentId},#{uId},#{content},1,#{createTime},#{createTime},0,0);
+	</insert>
+
+	<resultMap type="com.gobestsoft.common.modular.cms.model.ReplyContent"
+		id="commentReplyMap">
+		<id column="id" property="id" />
+		<result column="auid" property="userId" />
+		<result column="nickname" property="nickname" />
+		<result column="avatar" property="avatar" />
+		<result column="content" property="reply_content" />
+		<result column="is_give_thumbsUp" property="is_give_thumbs_up" />
+		<result column="thumbup_num" property="thumbs_up_total" />
+		<result column="create_time" property="create_time" />
+	</resultMap>
+
+
+	<select id="commentReply" resultMap="commentReplyMap">
+		SELECT T1.id,
+		app_user.auid,T1.content,app_user.nick_name AS
+		nickname,app_user.avatar,T1.thumbup_num,T1.create_time,
+		<choose>
+			<when test=" uId!=null and uId!='' ">
+				(SELECT COUNT(0) FROM cms_reply_thumbup WHERE
+				auId=#{uId} and
+				reply_id=T1.id) AS is_give_thumbsUp
+			</when>
+			<otherwise>
+				(select 0) as is_give_thumbsUp
+			</otherwise>
+		</choose>
+		FROM   cms_reply as T1   left join app_user on T1.auid=app_user.auid
+		AND T1.del_flg=0   WHERE   p_id=${id} AND   T1.status=1
+		AND EXISTS (SELECT 0 FROM (SELECT * FROM cms_reply where p_id =${id} ORDER BY
+		thumbup_num) AS T2 WHERE T2.id=T1.id AND T2.status=1)
+		order by create_time desc
+		 LIMIT
+		${pageSize}
+		OFFSET
+		${startIndex};
+	</select>
+
+	<select id="hotCommentReply" resultMap="commentReplyMap">
+		SELECT id,
+		app_user.auid,content,app_user.nick_name AS
+		nickname,app_user.avatar,thumbup_num,cms_reply.create_time,
+		<choose>
+			<when test=" uId!=null and uId!='' ">
+				(SELECT COUNT(0) FROM cms_reply_thumbup WHERE
+				auId=#{uId} and
+				reply_id=cms_reply.id) AS is_give_thumbsUp
+			</when>
+			<otherwise>
+				(select 0) as is_give_thumbsUp
+			</otherwise>
+		</choose>
+		FROM
+		cms_reply
+		left join app_user on cms_reply.auid=app_user.auid AND
+		cms_reply.status=1
+		AND cms_reply.del_flg=0
+		WHERE
+		p_id=${id} AND thumbup_num>0
+		order by thumbup_num desc
+		LIMIT 3
+	</select>
+
+	<resultMap type="com.gobestsoft.common.modular.cms.model.Comment"
+		id="commentMap">
+		<id column="id" property="id" />
+		<result column="auid" property="userId" />
+		<result column="nickname" property="nickname" />
+		<result column="avatar" property="avatar" />
+		<result column="content" property="content" />
+		<result column="thumbup_num" property="thumbs_up_total" />
+		<result column="create_time" property="create_time" />
+		<result column="reply_total" property="reply_total" />
+		<result column="is_give_thumbsUp" property="is_give_thumbs_up" />
+		<collection property="reply_contents" javaType="ArrayList"
+			select="getCommentReply" column="{id=id,uId=uId}"
+			ofType="com.gobestsoft.common.modular.cms.model.ReplyContent"></collection>
+	</resultMap>
+
+	<select id="comment" resultMap="commentMap">
+		SELECT
+		id,app_user.auid,content,thumbup_num,cms_comment.create_time,app_user.nick_name
+		AS nickname,app_user.avatar,(SELECT '${uId}') AS uId,
+		(SELECT COUNT(0) FROM cms_reply WHERE
+		p_id=cms_comment.id) as reply_total,
+		<choose>
+			<when test=" uId!=null and uId!='' ">
+				(SELECT COUNT(0) FROM cms_comment_thumbup WHERE
+				comment_id=cms_comment.id AND cms_comment_thumbup.auid=#{uId} ) AS is_give_thumbsUp
+			</when>
+			<otherwise>
+				(SELECT 0) AS is_give_thumbsUp
+			</otherwise>
+		</choose>
+		FROM cms_comment
+		INNER JOIN app_user ON cms_comment.auid=app_user.auid
+		where cms_comment.comment_type=0
+		AND cms_comment.article_id=${articleId}
+		AND cms_comment.status=1
+		AND cms_comment.del_flg=0
+		ORDER BY cms_comment.create_time DESC
+		LIMIT ${pageSize} OFFSET ${startIndex};
+	</select>
+
+	<select id="getCommentReply" resultMap="commentReplyMap">
+		SELECT
+		id,app_user.auid,content,app_user.nick_name as
+		nickname,app_user.avatar,cms_reply.create_time,
+		<choose>
+			<when test=" uId!=null and uId!='' ">
+				(SELECT COUNT(0) FROM cms_reply_thumbup WHERE auId=#{uId} and reply_id=cms_reply.id) AS
+				is_give_thumbsUp,
+			</when>
+			<otherwise>
+				(select 0) as is_give_thumbsUp,
+			</otherwise>
+		</choose>
+		thumbup_num FROM cms_reply
+		INNER JOIN app_user  ON cms_reply.auid=app_user.auid
+		WHERE cms_reply.p_id=${id}
+		AND cms_reply.status=1 AND cms_reply.del_flg=0 limit 3;
+	</select>
+	<select id="selectOneById" resultType="java.util.Map">
+
+		SELECT
+		id,app_user.auid,content,thumbup_num as thumbs_up_total,
+		cms_comment.create_time,
+		app_user.nick_name as nickname,
+		app_user.avatar,
+		<choose>
+			<when test="uId!=null and uId!='' ">
+				(SELECT COUNT(0) FROM cms_comment_thumbup WHERE
+				comment_id=cms_comment.id AND cms_comment_thumbup.auid=#{uId} ) AS is_give_thumbsUp
+			</when>
+			<otherwise>
+				(SELECT 0) AS is_give_thumbsUp
+			</otherwise>
+		</choose>
+		FROM cms_comment
+		INNER JOIN app_user ON cms_comment.auid=app_user.auid
+		where cms_comment.id=#{id}
+
+	</select>
+	<select id="selectApplyById" resultType="java.util.Map">
+		SELECT T1.id,T1.p_id comment_id,
+		app_user.auid,T1.content,app_user.nick_name AS
+		nickname,app_user.avatar,T1.create_time
+		FROM   cms_reply as T1   left join app_user on T1.auid=app_user.auid
+		where T1.id=#{id}
+
+	</select>
+
+</mapper>

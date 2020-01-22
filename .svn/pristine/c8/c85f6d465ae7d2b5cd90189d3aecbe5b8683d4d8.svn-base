@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.homepage.dao.BannerDao">
+
+ 	<resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.homepage.model.Banner">
+   		<id column="id"  property="id" />
+   		<result column="category_id" property="categoryId"/>
+    	<result column="resource_id" property="resourceId"/>
+    	<result column="resource_type" property="resourceType"/>
+    	<result column="title" property="title"/>
+    	<result column="description" property="description"/>
+    	<result column="img_path" property="imgPath"/>
+    	<result column="img_url" property="imgUrl"/>
+    	<result column="create_time" property="createTime"/>
+    	<result column="create_user" property="createUser"/>
+    	<result column="is_enable" property="isEnable"/>
+    	<result column="del_flg" property="delFlg"/>
+    	<result column="sort" property="sort"/>
+    	<result column="city_code" property="cityCode"/>
+    </resultMap>
+    
+    <select id="selectBannerByCondition" resultMap="BaseResultMap" >
+    	SELECT
+			*
+		FROM
+			app_banner
+		WHERE 
+			del_flg = 0
+			AND category_id = #{categoryId}
+		<if test="title != null and title != ''">
+			AND title like CONCAT('%',#{title},'%')
+		</if>
+		<if test="isEnable != -1">
+			AND is_Enable = #{isEnable}
+		</if>
+		ORDER BY ID
+    </select>
+    
+	<update id="updateOneColumnWithArgsId" >
+		UPDATE app_banner 
+			SET 
+			<if test="isEnable != -1">
+				is_enable = #{isEnable}
+			</if>
+			<if test="delFlg != -1">
+				del_flg = #{delFlg}
+			</if>
+		where
+			1=1
+		AND id IN
+		<foreach collection="array" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+	</update>
+	
+	<update id="updateBannerById" >
+		UPDATE app_banner 
+			SET 
+				resource_id = #{resourceId} ,
+				resource_type = #{resourceType} ,
+				title = #{title} ,
+				description = #{description} ,
+			<if test="imgPath != ''">
+				img_path = #{imgPath} ,
+			</if>
+			<if test="imgUrl != ''">
+				img_url = #{imgUrl} ,
+			</if>
+				sort = #{sort},
+				city_code = #{cityCode}
+		where
+			id = #{id}
+	</update>
+    
+	<!-- 对应addBanner方法，新增一条banner -->
+	<insert id="addBanner">
+		INSERT INTO app_banner (
+
+			category_id,
+			resource_id,
+			resource_type,
+			title,
+			description,
+			img_path,
+			img_url,
+			create_time,
+			create_user,
+			is_enable,
+			del_flg,
+			sort,
+			city_code
+		)
+		VALUES(
+
+			#{categoryId},
+			#{resourceId},
+			#{resourceType},
+			#{title},
+			#{description},
+			#{imgPath},
+			#{imgUrl},
+			#{createTime},
+			#{createUser},
+			#{isEnable},
+			#{delFlg},
+			#{sort},
+			#{cityCode}
+		)
+	</insert>
+	
+	<select id="selectBannerById" resultMap="BaseResultMap" >
+    	SELECT
+			*
+		FROM
+			app_banner
+		WHERE 
+			id = #{id}
+    </select>
+    
+    
+    
+    <!-- 对应selectByCondition方法，条件查询，无分页（状态，标题，开始日期，结束日期） -->
+    <resultMap type="HashMap" id="selResultMap">
+        <result property="id" column="id"/>
+        <result property="media_Type" column="media_Type"/>
+        <result property="title" column="title"/>
+        <result property="sub_title" column="sub_title"/>
+        <result property="content" column="content"/>
+        <result property="roundup" column="roundup"/>
+        <result property="source_from" column="source_from"/>
+        <result property="author" column="author"/>
+        <result property="info_type" column="info_type"/>
+        <result property="template_type" column="template_type"/>
+        <result property="jump_url" column="jump_url"/>
+        <result property="published_time" column="published_time"/>
+        <result property="published_user" column="published_user"/>
+        <result property="sync_time" column="sync_time"/>
+        <result property="end_time" column="end_time"/>
+        <result property="is_on_top" column="is_on_top"/>
+        <result property="tags" column="tags"/>
+        <result property="sort" column="sort"/>
+        <result property="status" column="status"/>
+        <result property="check_desc" column="check_desc"/>
+        <result property="check_date" column="check_date"/>
+        <result property="check_user_id" column="check_user_id"/>
+        <result property="share_num" column="share_num"/>
+        <result property="comm_num" column="comm_num"/>
+        <result property="thumbup_num" column="thumbup_num"/>
+        <result property="collect_num" column="collect_num"/>
+        <result property="hit_num" column="hit_num"/>
+        <result property="is_share" column="is_share"/>
+        <result property="is_topic" column="is_topic"/>
+        <result property="is_like" column="is_like"/>
+        <result property="is_collect" column="is_collect"/>
+        <result property="create_user" column="create_user"/>
+        <result property="create_time" column="create_time"/>
+        <result property="update_user" column="update_user"/>
+        <result property="update_time" column="update_time"/>
+        <result property="del_flg" column="del_flg"/>
+        <result property="cover_path" column="cover_path"/>
+        <!-- <result property="cover_url" column="cover_url" /> -->
+        <result property="is_hot" column="is_hot"/>
+        <result property="media_id" column="media_id"/>
+        <result property="name" column="name"/>
+    </resultMap>
+
+    <!-- 条件查询 集合 -->
+    <!-- 条件查询 集合 -->
+    <select id="selectByCondition" resultMap="selResultMap">
+        SELECT
+        t1.*
+        FROM
+            r_article_category t3
+        INNER JOIN cms_article t1 ON t1.id = t3.article_id
+        WHERE
+        t1.del_Flg = 0
+        AND t1.media_type = 0
+        <if test="cateId != -1 and cateId != null">
+            AND t3.category_id = #{cateId}
+        </if>
+        <if test="status != -2 and status != null">
+            AND t1.status = #{status}
+        </if>
+        <if test="title != null and title != ''">
+            AND title like CONCAT('%',#{title},'%')
+        </if>
+        <if test="begDate != null and begDate != ''">
+            AND published_Time &gt; #{begDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND published_Time &lt; #{endDate}
+        </if>
+        ORDER BY id DESC
+    </select>
+
+
+	<resultMap type="HashMap" id="ArticleForBannerResultMap">
+		<result column="article_id" property="articleId" />
+		<result column="article_title" property="articleTitle" />
+		<result column="published_time" property="publishedTime" />
+		<result column="type_name" property="typeName" />
+	</resultMap>
+
+
+	<!--获取新媒体轮播图可选资讯-->
+	<select id="getArticleForNewMediaBanner" resultMap="ArticleForBannerResultMap">
+		SELECT
+		article.id as article_id
+		,article.title as article_title
+		,article.published_time as published_time
+		,cmsColumn.column_name as type_name
+		FROM
+		r_article_column AS relation
+		INNER JOIN cms_article AS article
+		ON relation.article_id = article.id
+		INNER JOIN cms_column AS cmsColumn
+		ON relation.column_id = cmsColumn.id
+		<where>
+			article.del_flg = '0'
+			AND article.status = '1'
+			<if test="columnId != null and columnId !=''">
+				AND cmsColumn.id = #{columnId}
+			</if>
+			<if test="begDate != null and begDate != ''">
+				AND article.published_Time &gt;= #{begDate}
+			</if>
+			<if test="endDate != null and endDate != ''">
+				AND article.published_Time &lt;= #{endDate}
+			</if>
+			<if test="keyword != null and keyword != ''">
+				AND article.title like CONCAT('%',#{keyword},'%')
+			</if>
+		</where>
+		ORDER BY article.published_time DESC
+	</select>
+
+	<!--获取工会资讯轮播图可选资讯-->
+	<select id="getArticleForUnionBanner" resultMap="ArticleForBannerResultMap">
+		SELECT
+			article.id as article_id
+			,article.title as article_title
+			,article.published_time as published_time
+			,category.title as type_name
+		FROM
+		r_article_category AS relation
+		INNER JOIN cms_article AS article
+		ON relation.article_id = article.id
+		INNER JOIN cms_category AS category
+		ON relation.category_id = category.id
+		<where>
+			article.del_flg = '0'
+			AND article.status = '1'
+			<if test="categoryId != null and categoryId !=''">
+				AND (category.id = #{categoryId} or category.pid = #{categoryId})
+			</if>
+			<if test="begDate != null and begDate != ''">
+				AND article.published_Time &gt;= #{begDate}
+			</if>
+			<if test="endDate != null and endDate != ''">
+				AND article.published_Time &lt;= #{endDate}
+			</if>
+			<if test="keyword != null and keyword != ''">
+				AND article.title like CONCAT('%',#{keyword},'%')
+			</if>
+		</where>
+		ORDER BY article.published_time DESC
+	</select>
+
+	<!--获取Banner资讯-->
+	<select id="getArticleForBanner" resultMap="ArticleForBannerResultMap">
+		SELECT
+		article.id as article_id
+		,article.title as article_title
+		,article.published_time as published_time
+		FROM
+			cms_article AS article
+		<where>
+			article.del_flg = '0'
+			AND article.status = '1'
+			<if test="begDate != null and begDate != ''">
+				AND article.published_Time &gt;= #{begDate}
+			</if>
+			<if test="endDate != null and endDate != ''">
+				AND article.published_Time &lt;= #{endDate}
+			</if>
+			<if test="keyword != null and keyword != ''">
+				AND article.title like CONCAT('%',#{keyword},'%')
+			</if>
+		</where>
+		ORDER BY article.published_time DESC
+	</select>
+	
+</mapper>

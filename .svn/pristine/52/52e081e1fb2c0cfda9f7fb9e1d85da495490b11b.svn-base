@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dao.mapper.SrvLawSupportLogMapper">
+
+
+    <resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.dao.model.SrvLawSupportLogPojo">
+        <id column="id" property="id"/>
+        <result column="support_id" property="supportId"/>
+        <result column="status" property="status"/>
+        <result column="comment" property="comment"/>
+        <result column="check_date" property="checkDate"/>
+        <result column="create_uid" property="createUid"/>
+        <result column="create_time" property="createTime"/>
+        <result column="check_uid" property="checkUid"/>
+        <result column="check_dept_id" property="checkDeptId"/>
+    </resultMap>
+    
+    <sql id="commonColumns">
+           srv_law_support_log.id,
+           srv_law_support_log.support_id,
+           srv_law_support_log.status,
+           srv_law_support_log.comment,
+           srv_law_support_log.check_date,
+           srv_law_support_log.create_uid,
+           srv_law_support_log.create_time,
+           srv_law_support_log.check_uid,
+           srv_law_support_log.check_dept_id
+    </sql>
+    
+    <resultMap type="com.gobestsoft.common.modular.model.LogModel"
+		id="logModelMap">
+		<result column="status" property="status" />
+		<result column="comment" property="comment" />
+		<result column="content" property="content" />
+		<result column="fullname" property="fullname" />
+		<result column="check_date" property="checkTime" />
+		<result column="create_time" property="createTime" />
+		<result column="name" property="name" />
+		<result column="account" property="account" />
+	</resultMap>
+    
+    <!-- 根据法律援助申请id,查询审核日志  -->
+    <select id="selectListMapById" resultMap="logModelMap">
+          SELECT 
+          srv_law_support.`name`,
+          sys_dept.fullname,
+          sys_user.account,
+          <include refid="commonColumns"></include>
+          FROM srv_law_support_log
+          LEFT JOIN sys_dept ON srv_law_support_log.check_dept_id = sys_dept.id
+          LEFT JOIN sys_user ON srv_law_support_log.check_uid = sys_user.uid
+          LEFT JOIN srv_law_support ON srv_law_support_log.support_id = srv_law_support.id
+          where srv_law_support_log.support_id = #{id}
+          order by srv_law_support_log.create_time ASC
+    </select>
+
+
+
+</mapper>

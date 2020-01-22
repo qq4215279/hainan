@@ -1,0 +1,147 @@
+<body>
+<css>
+    <link th:href="@{/static/plugin/bootstrap-table/bootstrap-table.min.css}" rel="stylesheet">
+</css>
+<div class="container">
+    <div class="form-horizontal">
+        <div class="row">
+            <div class="col-sm-3">
+                <search:input label="单位名称" name="unitName" value=""
+                              placeholder="" type="text"></search:input>
+            </div>
+            <qx:btn class="btn btn-primary" fa="fa fa-search" label=搜索 permission=""
+                    onclick="DeptOrganization.search()"></qx:btn>
+        </div>
+        <div id="OrganizationTableTableToolbar">
+        </div>
+        <table id="OrganizationTable" data-mobile-responsive="true" data-click-to-select="true">
+        </table>
+    </div>
+</div>
+<js>
+    <script th:src="@{/static/plugin/bootstrap-table/bootstrap-table.min.js}"></script>
+    <script th:src="@{/static/plugin/bootstrap-table/locale/bootstrap-table-zh-CN.min.js}"></script>
+    <script th:src="@{/static/js/bootstrap-table-object.js}"></script>
+    <script>
+
+        /**
+         * 初始化
+         */
+        var DeptOrganization = {
+            id: "OrganizationTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        DeptOrganization.initColumn = function () {
+            return [
+                {field: 'selectItem', radio: true},
+                {title: '单位名称', field: 'unitName', align: 'center', valign: 'middle'},
+                {title: '统一社会信用代码', field: 'unitOrgCode', align: 'center', valign: 'middle'},
+                {title: '职工人数', field: 'unitNumber', align: 'center', valign: 'middle'},
+                {title: '单位地址', field: 'unitAddress', align: 'center', valign: 'middle'},
+                {
+                    title: '完善状态',
+                    field: 'perfectInformation',
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: initStatusFun
+                },
+                {
+                    title: '操作', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        var perfectInformation = row.perfectInformation;
+                        var detail = '<a href="javascript:DeptOrganization.openDetail(' + row.id + ')">查看详情</a>',
+                            log = '<a href="javascript:DeptOrganization.log(' + row.id + ')">查看流程</a>',
+                            check = '<a href="javascript:DeptOrganization.openAdd(' + row.id + ')">审核</a>';
+                        if (perfectInformation && (perfectInformation == 2 || perfectInformation == 3)) {
+                            return detail + "&nbsp;&nbsp;&nbsp;" + log;
+                        } else {
+                            return check + "&nbsp;&nbsp;&nbsp;" + log;
+                        }
+                    }
+                }
+            ];
+        };
+
+        //初始化审核状态
+        function initStatusFun(value, row, index) {
+            var perfectInformation = row.perfectInformation;
+            if (!perfectInformation || (perfectInformation && perfectInformation == '1')) {
+                return '完善待审';
+            }
+            if (perfectInformation == '2') {
+                return '完善已通过'
+            }
+            if (perfectInformation == '3') {
+                return '完善未通过'
+            }
+        }
+
+        /**
+         * 打开查看信息的窗口
+         */
+        DeptOrganization.openDetail = function (id) {
+            openLayerPage("查看详情", App.ctxPath + 'dept/organization/watch?id=' + id);
+        };
+
+        /**
+         * 打开完善信息审核
+         */
+        DeptOrganization.openAdd = function (id) {
+            openLayerPage("完善信息审核", App.ctxPath + 'dept/organization/watch?pageType=2&id=' + id)
+        };
+
+        //打开查看流程的窗口
+        DeptOrganization.log = function (id) {
+            openLayerPage("查看流程", App.ctxPath + 'organization/check/log/' + id)
+        }
+
+        function openLayerPage(title, url) {
+            var index = layer.open({
+                type: 2,
+                title: title,
+                area: ['100%', '100%'], //宽高
+                fix: true, //不固定
+                maxmin: true,
+                content: url,
+                end: function () {
+                    DeptOrganization.search();
+                }
+            });
+            layer.full(index);
+            this.layerIndex = index;
+        }
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        DeptOrganization.formParams = function () {
+            var queryData = {};
+//    queryData['status'] = $("#status").val();
+            queryData['unitName'] = $("#unitName").val();
+            return queryData;
+        }
+
+        /**
+         * 查询安全事故列表
+         */
+        DeptOrganization.search = function () {
+            DeptOrganization.table.refresh({query: DeptOrganization.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = DeptOrganization.initColumn();
+            var table = new BSTable(DeptOrganization.id, "organization/check/auditPerFectList", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(DeptOrganization.formParams());
+            DeptOrganization.table = table.init();
+        });
+    </script>
+</js>
+</body>

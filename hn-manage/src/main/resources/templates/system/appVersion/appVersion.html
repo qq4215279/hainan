@@ -1,0 +1,173 @@
+<body>
+<css>
+    <div th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<div class="container">
+    <div class="form-horizontal">
+        <div class="row">
+            <div class="col-sm-6">
+                <search:input label="版本名称" name="keyword" value=""
+                              placeholder="版本名称" type="text"></search:input>
+            </div>
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <search:datetime id="begDate" label="发布时间" name="begDate" istime="true"
+                                         format="yyyy-MM-dd HH:mm:ss"></search:datetime>
+                    </div>
+                    <div class="col-sm-6" style="margin-left: -30px">
+                        <search:datetime id="endDate" label="至" name="endDate" istime="true"
+                                         format="yyyy-MM-dd HH:mm:ss"></search:datetime>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row text-center" style="margin-top: 20px;" >
+            <qx:btn class="btn btn-primary" fa="fa fa-search" label="搜索" onclick="OptAppVersion.search()"></qx:btn>
+        </div>
+    </div>
+    <div id="OptAppVersionTableToolbar">
+        <qx:btn class="btn btn-primary" fa="fa fa-plus" label="发布新版本" onclick="OptAppVersion.openAdd()"></qx:btn>
+        <qx:btn class="btn btn-primary" fa="fa fa-search" label="查看详情" onclick="OptAppVersion.openDetail()"></qx:btn>
+        <qx:btn class="btn btn-primary" fa="fa fa-trash" label="删除" onclick="OptAppVersion.del()"></qx:btn>
+    </div>
+    <table id="OptAppVersionTable" data-mobile-responsive="true" data-click-to-select="true">
+    </table>
+</div>
+</body>
+
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+
+        var OptAppVersion = {
+            id: "OptAppVersionTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        OptAppVersion.initColumn = function () {
+            return [
+                {field: 'selectItem', radio: true},
+                {title: '版本号', field: 'versionCode', visible: true, align: 'center', valign: 'middle', sortable: false},
+                {title: '版本名称', field: 'versionName', align: 'center', valign: 'middle'},
+                {
+                    title: '更新内容', field: 'description', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        var str = row.description;
+                        if (typeof str == "undefined") {
+                            return "--";
+                        } else {
+                            return cutstr(str, 40);
+                        }
+                    }
+                },
+                {
+                    title: '发布时间', field: 'updateTime', align: 'center', valign: 'middle'
+                }
+            ]
+        };
+
+        OptAppVersion.formParams = function () {
+            var queryData = {};
+
+            queryData['keyword'] = $("#keyword").val();
+            queryData['begDate'] = frDate2time($("#begDate").val());
+            queryData['endDate'] = toDate2time($("#endDate").val());
+            return queryData;
+        }
+
+        /**
+         * 初始化加载
+         */
+        $(function () {
+            var defaultColunms = OptAppVersion.initColumn();
+            var table = new BSTable(OptAppVersion.id, "appVersion/list", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(OptAppVersion.formParams());
+            OptAppVersion.table = table.init();
+        });
+
+        /**
+         * 查询
+         */
+        OptAppVersion.search = function () {
+            OptAppVersion.table.refresh({
+                query: OptAppVersion.formParams()
+            });
+        };
+
+        /**
+         * 查看详情
+         */
+        OptAppVersion.openDetail = function () {
+            if (this.check()) {
+                var index = layer.open({
+                    type: 2,
+                    title: '版本详情',
+                    area: ['50%', '100%'], //宽高
+                    fix: true, //不固定
+                    maxmin: false,
+                    content: App.ctxPath + 'appVersion/detail/' + this.seItem.id
+                });
+                this.layerIndex = index;
+            }
+        };
+
+        /**
+         * 点击删除
+         */
+        OptAppVersion.del = function () {
+            if (this.check()) {
+                var id =  OptAppVersion.seItem.id;
+                var fun = function (){
+                    var ajax = new $ax(App.ctxPath+"appVersion/del?id=" + id, function (data) {
+                        App.success("成功删除！", '');
+                    }, function (data) {
+                        App.error("删除失败!");
+                    });
+                    ajax.start();
+                    OptAppVersion.table.refresh({query: OptAppVersion.formParams()});
+                }
+                App.confirm("确定要删除吗？", fun);
+            }
+        };
+
+        /**
+         * 发布新版本
+         */
+        OptAppVersion.openAdd = function () {
+            var index = layer.open({
+                type: 2,
+                title: '发布新版本',
+                area: ['50%', '100%'], //宽高
+                fix: true, //不固定
+                maxmin: false,
+                content: App.ctxPath + 'appVersion/openAdd'
+            });
+            this.layerIndex = index;
+        };
+
+
+        /**
+         * 检查是否选中
+         */
+        OptAppVersion.check = function () {
+            var selected = $('#' + this.id).bootstrapTable('getSelections');
+            if (selected.length == 0) {
+                App.info("请先选中表格中的某一记录！");
+                return false;
+            } else {
+                OptAppVersion.seItem = selected[0];
+                return true;
+            }
+        };
+
+    </script>
+
+</js>

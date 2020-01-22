@@ -1,0 +1,91 @@
+<body xmlns:th="http://www.w3.org/1999/xhtml">
+<div class="container">
+    <div id="modifyPassword" class="form-horizontal" style="margin-top: 10%; text-align: center;  padding: 10% 20%;">
+        <h2>修改密码</h2>
+        <div class="inputs" style="padding-right: 10%">
+            <div class="form-group">
+                <label for="account" class="col-sm-2 control-label">帐户名</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" disabled id="account" th:value="${account}" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="oldPwd" class="col-sm-2 control-label">旧密码</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" disabled id="oldPwd" th:value="${oldPwd}" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="newPwd" class="col-sm-2 control-label">新密码</label>
+                <div class="col-sm-10">
+                    <input type="password" class="form-control" id="newPwd"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="rePwd" class="col-sm-2 control-label">确认密码</label>
+                <div class="col-sm-10">
+                    <input type="password" class="form-control" id="rePwd"/>
+                </div>
+            </div>
+        </div>
+        <div class="form-group text-center">
+            <button class="btn btn-success" id="sure">确认</button>
+        </div>
+        <div class="tips" style="color: indianred; font-size: 20px;text-align: left;padding-left: 5%;">
+            <div class="tip">1.新密码要求至少在 8位 以上</div>
+            <div class="tip">2.由大小写字母和阿拉伯数字组合</div>
+            <div class="tip">3.不得有两位连续相同</div>
+        </div>
+    </div>
+</div>
+</body>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+        // 至少8位，且包含数字，大小写字母
+        let reg1 =  /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9\d$@$!%*?&]{8,}$/;
+        // 相邻两位不重复
+        let reg2 =  /^.*(.)\1{1}.*$/;
+
+        function checkPwd() {
+            let newPwd = $("#newPwd").val();
+            // 弱口令校验
+            if(!reg1.test(newPwd) || reg2.test(newPwd)){
+                App.error("根据口令管理要求，请修改密码。新密码要求至少在 8位 以上，由大小写字母和阿拉伯数字组合，不得有两位连续相同。");
+                return false;
+            }
+            // 两次密码一致校验
+            let rePwd = $("#rePwd").val();
+            if (rePwd !== newPwd) {
+                App.error("两次密码不一致");
+                return false;
+            }
+            return true;
+        }
+
+        $(function () {
+            $("#sure").click(function () {
+                if (checkPwd()) {
+                    let param = {
+                        account: $("#account").val(),
+                        oldPwd: $("#oldPwd").val(),
+                        newPwd: $("#newPwd").val(),
+                        rePwd: $("#rePwd").val(),
+                        userType: 1
+                    };
+                    $.post(ctxPath + "/changePwdPage", param, function (data) {
+                        if (data.code === 200) {
+                            App.alert("修改成功,2秒后自动跳转...");
+                            setTimeout(function () {
+                                parent.window.location.href = ctxPath;
+                            }, 2000)
+                        } else {
+                            App.alert(data.message)
+                        }
+                    })
+                }
+            })
+        })
+
+    </script>
+</js>

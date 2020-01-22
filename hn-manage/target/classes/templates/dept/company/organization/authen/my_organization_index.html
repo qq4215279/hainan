@@ -1,0 +1,142 @@
+<css>
+    <div th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="form-horizontal">
+    <div class="hidden-xs" id="DeptOrganizationTableToolbar" role="group">
+    </div>
+    <table id="DeptOrganizationTable" data-mobile-responsive="true" data-click-to-select="true">
+    </table>
+</div>
+</body>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+        /**
+         * 初始化
+         */
+        var DeptOrganization = {
+            id: "DeptOrganizationTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+        /**
+         * 初始化表格的列
+         */
+        DeptOrganization.initColumn = function () {
+            return [
+                {field: 'selectItem', radio: true},
+                {title: '单位名称', field: 'unitName', align: 'center', valign: 'middle'},
+                {title: '统一社会信用代码', field: 'unitOrgCode', align: 'center', valign: 'middle'},
+                {title: '职工人数', field: 'unitNumber', align: 'center', valign: 'middle'},
+                {title: '单位地址', field: 'unitAddress', align: 'center', valign: 'middle'},
+                {
+                    title: '建会状态',
+                    field: 'status',
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: function (value, row, index) {
+                        return '已建会';
+                    }
+                },
+                {
+                    title: '完善状态',
+                    field: 'perfectInformation',
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: initPerfectInformation
+                },
+                {
+                    title: '操作', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        var detail = '<a href="javascript:DeptOrganization.openDetail(' + row.id + ')">查看详情</a>',
+                            edit = '<a href="javascript:DeptOrganization.edit(' + row.id + ')">完善信息</a>';
+                        if (row.perfectInformation && row.perfectInformation == '1') {
+                            return detail;
+                        }
+                        return edit + "&nbsp;&nbsp;" + detail;
+                    }
+                },
+                {
+                    title: '流程', align: 'center', valign: 'middle', formatter: function (value, row, index) {
+                        return '<a href="javascript:DeptOrganization.log(' + row.id + ')">查看流程</a>';
+                    }
+                }
+            ];
+        };
+
+        //初始化完善信息字段
+        function initPerfectInformation(value, row, index) {
+            if (!row.perfectInformation) {
+                return '未完善';
+            }
+            if (row.perfectInformation == '1') {
+                return '完善待审';
+            }
+            if (row.perfectInformation == '2') {
+                return '已完善';
+            }
+            return '完善未通过';
+        }
+
+        /**
+         * 打开查看信息的窗口
+         */
+        DeptOrganization.openDetail = function (id) {
+            openLayerPage('查看详情',App.ctxPath + 'dept/organization/watch?id=' + id);
+        };
+
+        /**
+         * 打开查看流程的窗口
+         */
+        DeptOrganization.log = function (id) {
+            openLayerPage('查看流程',App.ctxPath + 'company/organization/log/' + id);
+        };
+
+        /**
+         * 完善信息
+         */
+        DeptOrganization.edit = function (id) {
+            openLayerPage('完善信息',App.ctxPath + 'dept/organization/edit?pageType=2&id=' + id);
+        };
+
+        function openLayerPage(title, pageUrl) {
+            var index = layer.open({
+                type: 2,
+                title: title,
+                area: ['100%', '100%'], //宽高
+                fix: true, //不固定
+                maxmin: true,
+                content: pageUrl
+            });
+            layer.full(index);
+            this.layerIndex = index;
+        }
+
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        DeptOrganization.formParams = function () {
+            var queryData = {};
+            return queryData;
+        }
+
+        /**
+         * 查询企业信息列表
+         */
+        DeptOrganization.search = function () {
+            DeptOrganization.table.refresh({query: DeptOrganization.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = DeptOrganization.initColumn();
+            var table = new BSTable(DeptOrganization.id, "company/organization/list", defaultColunms);
+            table.setPaginationType("server");
+            DeptOrganization.table = table.init();
+        });
+    </script>
+</js>
+

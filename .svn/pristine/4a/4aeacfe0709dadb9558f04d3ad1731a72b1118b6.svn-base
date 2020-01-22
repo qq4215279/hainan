@@ -1,0 +1,136 @@
+<body>
+<div class="container">
+    <p class="box_login_account_null" id="tip" th:text="${tip}"></p>
+    <form id="modifyPassword" class="form-horizontal">
+        <form:password label="旧密码" name="oldPwd" id="oldPwd"></form:password>
+        <span class="box_login_account_null" id="old"></span>
+        <form:password label="新密码" name="newPwd" id="newPwd"></form:password>
+        <p class="box_login_account_null" id="msg"></p>
+        <form:password label="确认新密" name="rePwd" id="rePwd"></form:password>
+        <span class="box_login_account_null" id="reNew"></span>
+        <!--        <qx:btn id="sure" class="btn btn-primary" fa="fa fa-eraser" label="确认"></qx:btn>-->
+        <button id="sure" class="btn btn-primary" fa="fa fa-eraser">确认</button>
+    </form>
+</div>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+
+
+        function checkOldPwd() {
+            var oldPwd = $("#oldPwd").val();
+            if (oldPwd == '') {
+                $("#old").html("旧密码不能为空");
+                return false;
+            } else {
+                $("#old").html("");
+                return true;
+            }
+        }
+
+        function checkNewPwd() {
+            var newPwd = $("#newPwd").val();
+            var chars = newPwd.split('');
+            if (chars.length < 8){
+                $("#msg").html("密码要求至少在8位以上,由大小写字母和阿拉伯数字组合,不得有两位连续相同");
+                return false;
+            }
+            for (var i = 0; i < newPwd.length - 1; i++) {
+                if (chars[i] == chars[i + 1]) {
+                    $("#msg").html("密码要求至少在8位以上,由大小写字母和阿拉伯数字组合,不得有两位连续相同");
+                    return false;   //任何相邻两位不能相同
+                }
+            }
+            $("#msg").html("");
+            return true
+        }
+
+        function checkRePwd() {
+            var newPwd = $("#newPwd").val();
+            var rePwd = $("#rePwd").val();
+            if (rePwd !== newPwd) {
+                $("#reNew").html("两次密码不一样");
+                return false;
+            } else {
+                $("#reNew").html("");
+                return true;
+            }
+        }
+
+        $(function () {
+
+            var validateFields = {
+                oldPwd: {
+                    validators: {
+                        notEmpty: {
+                            message: '旧密码不能为空'
+                        }
+                    }
+                },
+                newPwd: {
+                    validators: {
+                        notEmpty: {
+                            message: '新密码不能为空'
+                        }
+                    }
+                },
+                rePwd: {
+                    validators: {
+                        notEmpty: {
+                            message: '请再次输入新密'
+                        },
+                        callback: {
+                            message: "两次密码不一样",
+                            callback: function (rePwd) {
+                                var newPwdVal = $("#newPwd").val();
+                                if (rePwd != newPwdVal) {
+                                    return false;
+                                }
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            $('#modifyPassword').bootstrapValidator({
+                fields: validateFields
+            });
+
+
+            $("#oldPwd").blur(checkOldPwd);
+            $("#newPwd").blur(checkNewPwd);
+            $("#rePwd").blur(checkRePwd);
+
+            $("#sure").click(function () {
+
+                var param = {
+                    oldPwd: $("#oldPwd").val(),
+                    newPwd: $("#newPwd").val(),
+                    rePwd: $("#rePwd").val()
+                }
+                if(checkOldPwd() && checkNewPwd() && checkRePwd()){
+                    App.loadingAjax({
+                        url: App.ctxPath + "changePwd",
+                        type: "post",
+                        data: param,
+                        success: function (data) {
+                            if (data.code == 200) {
+                                location.href = "https://www.baidu.com/";
+                                // App.success("修改成功，请重新登录!", function () {
+                                //     parent.window.location.href = "https://www.baidu.com/";
+                                // })
+                            }
+                        }
+                    });
+                }else {
+                    App.alert("请按照提示修改密码");
+                }
+
+            });
+
+        })
+
+    </script>
+</js>
+</body>

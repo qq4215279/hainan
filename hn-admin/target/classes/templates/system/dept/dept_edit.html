@@ -1,0 +1,71 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+	<div class="ibox-content">
+		<div class="form-horizontal" id="deptInfoForm">
+
+			<input type="hidden" id="id" value="${dept.id}"> <input
+				type="hidden" id="deptTypeValue" value="${dept.deptType}" />
+			<div class="row">
+				<div class="col-sm-6 b-r">
+					<#input id="simplename" name="部门名称" mustFlg="true" underline="true"
+						value="${dept.simplename}" />
+
+					<#input id="fullname" name="部门全称" mustFlg="true" underline="true"
+						value="${dept.fullname}" />
+
+					<#input id="tips" name="备注" value="${dept.tips}" />
+				</div>
+				<div class="col-sm-6">
+					<#input id="sort" name="排序" underline="true" value="${dept.sort}" />
+
+					<#input id="pName" name="上级部门" mustFlg="true" readonly="readonly"
+						hidden="pid" hiddenValue="${dept.pid}" value="${pName}"
+						clickFun="DeptInfoDlg.showDeptSelectTree(); return false;"
+						style="background-color: #ffffff !important;" underline="true" />
+					<#select id="deptType" name="部门类型" mustFlg="true">
+					<option name="deptType" value="0" check="true">工会</option>
+					<option name="deptType" value="1">部门</option>
+					</#select>
+				</div>
+			</div>
+
+			<!-- 父级部门的选择框 -->
+			<div id="parentDeptMenu" class="menuContent"
+				style="display: none; position: absolute; z-index: 200;">
+				<ul id="parentDeptMenuTree" class="ztree tree-box"
+					style="width: 245px !important;"></ul>
+			</div>
+
+			<div class="row btn-group-m-t">
+				<div class="col-sm-10">
+					<#button btnCss="info" name="提交" id="ensure" icon="fa-check"
+						clickFun="DeptInfoDlg.editSubmit()" />
+					<#button btnCss="danger" name="取消" id="cancel" icon="fa-eraser"
+						clickFun="DeptInfoDlg.close()" />
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+<style type="text/css">
+.ztree li span.button.pIcon01_ico_open, .ztree li span.button.pIcon01_ico_close,
+	.ztree li span.button.pIcon01_ico_docu {
+	margin-right: 2px;
+	background: url(${ctxPath}/static/css/zTreeStyle/img/diy/1_open.png)
+		no-repeat scroll 0 0 transparent;
+	vertical-align: top;
+	*vertical-align: middle
+}
+
+.ztree li span.button.pIcon02_ico_open, .ztree li span.button.pIcon02_ico_close,
+	.ztree li span.button.pIcon02_ico_docu {
+	margin-right: 2px;
+	background: url(${ctxPath}/static/css/zTreeStyle/img/diy/2.png)
+		no-repeat scroll 0 0 transparent;
+	vertical-align: top;
+	*vertical-align: middle
+}
+</style>
+<script src="${ctxPath}/static/modular/system/dept/dept_info.js"></script>
+@}

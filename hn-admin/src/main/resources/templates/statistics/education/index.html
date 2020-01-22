@@ -1,0 +1,44 @@
+<body xmlns:th="http://www.thymeleaf.org">
+<div class="form-horizontal" id="educationForm">
+    <div th:each="key1 : ${map.keySet()}">
+        <h1 th:text="${key1}" class="text-left"></h1>
+        <div class="panel panel-info text-center" th:each="key2 : ${map.get(key1).keySet()}">
+            <div class="panel-heading">
+                <h3 th:text="${key2}"></h3>
+            </div>
+            <!-- Table -->
+            <table class="table text-center">
+                <thead>
+                <tr>
+                    <th class="text-center" th:each="key3 : ${map.get(key1).get(key2).keySet()}" th:text="${key3}"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr >
+                    <td class="text-center"
+                        th:each="key3 : ${map.get(key1).get(key2).keySet()}"
+                        th:text="${map.get(key1).get(key2).get(key3)}"
+                    ></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <hr />
+    </div>
+
+</div>
+</body>
+
+
+<!--<js>
+    <script type="text/javascript">
+        $(function () {
+            $('.download_tag').click(function(){
+                let paths = window.document.location.pathname.split('/');
+                let pathName = "/";
+                if(paths.length>0){ pathName = pathName + paths[1] }
+                location.href = pathName + "/dept/member/downloadRealData";
+            });
+        })
+    </script>
+</js>-->

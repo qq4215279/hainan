@@ -1,0 +1,386 @@
+<css>
+<!--    <link th:href="@{http://xiumi.us/connect/ue/v5/xiumi-ue-v5.css}" rel="stylesheet">-->
+    <link th:href="@{/static/css/fileUpload.css}" rel="stylesheet">
+</css>
+<body>
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal" id="articleForm">
+            <input type="hidden" id="id" th:value="${article.id}">
+            <input type="hidden" id="shareval" th:value="${article.isShare}">
+            <input type="hidden" id="topicval" th:value="${article.isTopic}">
+            <input type="hidden" id="likeval" th:value="${article.isLike}">
+            <input type="hidden" id="collectval" th:value="${article.isCollect}">
+            <input type="hidden" id="templateType" th:value="${article.templateType}">
+            <input type="hidden" id="ypUrl" th:value="${article.jumpUrl}">
+            <div class="row">
+                <div class="col-sm-7 b-r">
+                    <form:text id="title" label="资讯标题" name="title" must="true" line="true" value="${article.title}"></form:text>
+                    <form:text id="tags" label="关键词" name="tags" line="true" value="${article.tags}"></form:text>
+                    <form:select id="dacCode" label="行政划分" name="dacCode"  value="${article.districtCode}" code="lib_administrative_area" line="true"></form:select>
+                    <form:text id="author" label="编辑" name="author" line="true" value="${article.author}"></form:text>
+                    <form:text id="sourceFrom" label="来源" name="sourceFrom" line="true" value="${article.sourceFrom}"></form:text>
+                    <form:datetime id="publishedTime" label="发布时间" istime="true" format="yyyy-MM-dd HH:mm:ss" name="publishedTime" line="true" value="${article.publishedTime}"></form:datetime>
+                    <form:imgchg name="templateType" value="${templateCode}" onclick="cyUlAvtivty(this)" line="true"></form:imgchg>
+                    <div id="oneCovor" style="display: none;">
+                        <form:img id="articleCovor" label="封面图" width="200" height="100" line="true" defImg="${article.coverPath}"></form:img>
+                    </div>
+                    <div id="threeCovor" style="display: none;">
+                        <form:img id="articleCovor1" label="封面图1" width="200" height="100" line="true" defImg="${article.coverPath}"></form:img>
+                        <form:img id="articleCovor2" label="封面图2" width="200" height="100" line="true" defImg="${coverPath2}"></form:img>
+                        <form:img id="articleCovor3" label="封面图3" width="200" height="100" line="true" defImg="${coverPath3}"></form:img>
+                    </div>
+                    <div id="longCovor" style="display: none;">
+                        <form:img id="articleCovorLong" label="封面图" width="400" height="150" line="true" defImg="${article.coverPath}"></form:img>
+                    </div>
+                    <form:file name="jumpUrl" width="300px"></form:file>
+                    <div class="form-group" id="ypArea" style="display: none;">
+                        <label class="col-sm-4 control-label">
+                            音频文件
+                        </label>
+                        <div class="col-sm-8" id="ypfiles">
+                        </div>
+                    </div>
+                    <form:interact id="checkBoxGroup" label="可分享,可点赞,可收藏" value="1" line="true"></form:interact>
+<!--                    <form:interact id="checkBoxGroup" label="可分享,可评论,可点赞,可收藏" value="1" line="true"></form:interact>-->
+                    <form:text id="sort" label="排序数字" name="sort" value="${article.sort}"></form:text>
+                </div>
+                <div class="col-sm-5" align="center">
+                    <input type='hidden' id="ueForPreView"/>
+                    <input type="hidden" id="infoChalType"/>
+                    <div id="content"></div>
+                </div>
+            </div>
+            <div class="row text-center">
+                <qx:btn id="ensure" class="btn btn-primary" fa="fa fa-check" label="提交" onclick="ArticleDlg.addSubmit()" ></qx:btn>
+                <qx:btn id="cancel" class="btn btn-primary" fa="fa fa-eraser" label="取消" onclick="ArticleDlg.close()" ></qx:btn>
+                <qx:btn id="success" class="btn btn-primary" fa="fa fa-eye" label="预览" onclick="ArticleDlg.preview()" ></qx:btn>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="defUeValue" style="display: none"   th:utext="${article.content}"></div>
+<js>
+    <div  th:include="fragment/fargment :: clipJs"></div>
+    <div  th:include="fragment/fargment :: fileUploadJs"></div>
+    <script th:src="@{/static/ueditor/ueditor.config.js}"></script>
+    <script th:src="@{/static/ueditor/ueditor.all.js}"></script>
+    <script>
+        /** 富文本编辑器初期化 */
+        var ue = UE.getEditor('content', {initialContent : $("#defUeValue").html()});
+
+
+        //验证数字初始化
+        $("#sort").autoNumeric('init', {vMin: '0', vMax: '9999', mDec: '0'});
+
+        // checkboxGroup的按钮判断和确定
+        if(1==$('#ckbIsShare').val()) {$('#isShare').removeClass('btn-default').addClass('btn-primary');}
+        // if(1==$('#ckbIsTopic').val()) {$('#isTopic').removeClass('btn-default').addClass('btn-primary');}
+        if(1==$('#ckbIsLike').val()) {$('#isLike').removeClass('btn-default').addClass('btn-primary');}
+        if(1==$('#ckbIsCollect').val()) {$('#isCollect').removeClass('btn-default').addClass('btn-primary');}
+
+        // 可操作信息设置 checkboxGroup 样式响应
+        $("#checkBoxGroup label").click(function () {
+            $(this).toggleClass("btn-primary");
+            $(this).toggleClass("btn-default");
+        });
+        //获取操作类型
+        if($("#shareval").val() == 1){
+            $("#checkBoxGroup").find("#isShare").removeClass("btn btn-default").addClass("btn btn-primary");
+        }else{
+            $("#checkBoxGroup").find("#isShare").removeClass("btn btn-primary").addClass("btn btn-default");
+        }
+        // if($("#topicval").val() == 1){
+        //     $("#checkBoxGroup").find("#isTopic").removeClass("btn btn-default").addClass("btn btn-primary");
+        // }else{
+        //     $("#checkBoxGroup").find("#isTopic").removeClass("btn btn-primary").addClass("btn btn-default");
+        // }
+        if($("#likeval").val() == 1){
+            $("#checkBoxGroup").find("#isLike").removeClass("btn btn-default").addClass("btn btn-primary");
+        }else{
+            $("#checkBoxGroup").find("#isLike").removeClass("btn btn-primary").addClass("btn btn-default");
+        }
+        if($("#collectval").val() == 1){
+            $("#checkBoxGroup").find("#isCollect").removeClass("btn btn-default").addClass("btn btn-primary");
+        }else{
+            $("#checkBoxGroup").find("#isCollect").removeClass("btn btn-primary").addClass("btn btn-default");
+        }
+
+        //获取展示类型
+        $("#templateType" + $("#templateType").val()).attr("checked", true);
+        var tem = "templateType" + $("#templateType").val();
+        $('label[for="' + tem + '"]  li').addClass("caoy_ul_activity");
+
+        $('input[name="templateType"]').click(function () {
+            $(this).attr("checked", true);
+            $(this).siblings().removeAttr("checked");
+        })
+
+        //获取音频链接
+        $("#ypArea").css("display", "none");
+        var jumpurl = $("#ypUrl").val();
+        if(jumpurl != null && jumpurl != ''){
+            $("#ypArea").css("display", "block");
+            var urlArray = jumpurl.split(",");
+            for(var i=0; i<urlArray.length; i++){
+                addyp(urlArray[i]);
+            }
+        }
+
+        // 列表展示样式初始化
+        var radioId = $('input[name="templateType"]:checked').val();
+        if("0" === radioId || "1" === radioId){
+            $("#oneCovor").show();
+            $("#threeCovor").hide();
+            $("#longCovor").hide();
+        }
+        else if("2" === radioId){
+            $("#oneCovor").hide();
+            $("#threeCovor").hide();
+            $("#longCovor").show();
+        }
+        else if("3" === radioId){
+            $("#oneCovor").hide();
+            $("#threeCovor").show();
+            $("#longCovor").hide();
+        }
+        else if("4" === radioId){
+            $("#oneCovor").hide();
+            $("#threeCovor").hide();
+            $("#longCovor").hide();
+        }
+
+        // 列表展示类型 radio 选择响应
+        $("label[name='templateType']").click(function (e) {
+            var radioId = $(this).attr("for")
+            $("#radioType").val(radioId);
+            if("templateType0" === radioId || "templateType1" === radioId){
+                $("#oneCovor").show();
+                $("#threeCovor").hide();
+                $("#longCovor").hide();
+            }
+            else if("templateType2" === radioId){
+                $("#oneCovor").hide();
+                $("#threeCovor").hide();
+                $("#longCovor").show();
+            }
+            else if("templateType3" === radioId){
+                $("#oneCovor").hide();
+                $("#threeCovor").show();
+                $("#longCovor").hide();
+            }
+            else if("templateType4" === radioId){
+                $("#oneCovor").hide();
+                $("#threeCovor").hide();
+                $("#longCovor").hide();
+            }
+        });
+
+        /**
+         * 角色详情对话框（可用于添加和修改对话框）
+         */
+        var ArticleDlg = {
+            articleData: {},
+            deptZtree: null,
+            pNameZtree: null,
+            validateFields: {
+                title: {
+                    validators: {
+                        notEmpty: {
+                            message: '标题名称不能为空'
+                        }
+                    }
+                }
+            }
+        };
+        App.initValidator("articleForm", ArticleDlg.validateFields);
+
+        /**
+         * 清除数据
+         */
+        ArticleDlg.clearData = function () {
+            this.articleData = {};
+        };
+
+        /**
+         * 设置对话框中的数据
+         */
+        ArticleDlg.set = function (key) {
+            this.articleData[key] = (typeof value == "undefined") ? $("#" + key).val() : value;
+            return this;
+        };
+
+        /**
+         * 收集数据
+         */
+        ArticleDlg.collectData = function () {
+            this
+                    .set('id')
+                    .set('title')
+                    .set('sourceFrom')
+                    .set('author')
+                    .set('tags')
+                    .set('sort');
+            var jumpUrl="";
+            $("#ypArea span").each(function () {
+                jumpUrl+= $(this).data("filename") + ",";
+            });
+            jumpUrl=jumpUrl.substring(0,jumpUrl.length-1)
+            this.articleData["jumpUrl"]=jumpUrl;
+            this.articleData['infoType'] = 1;
+            this.articleData['templateType'] = $('input[name="templateType"]:checked').val();
+            this.articleData['isShare'] = $('#isShare').hasClass('btn-primary') ? 1 : 0;
+            // this.articleData['isTopic'] = $("#isTopic").hasClass('btn-primary') ? 1 : 0;
+            this.articleData['isLike'] = $("#isLike").hasClass('btn-primary') ? 1 : 0;
+            this.articleData['isCollect'] = $("#isCollect").hasClass('btn-primary') ? 1 : 0;
+            this.articleData['isOnTop'] = typeof $('input[name="isOnTop"]:checked').val() != "undefined" ? 1 :0;
+            this.articleData['districtCode'] = $('#dacCode').val();
+            this.articleData['content'] = ue.getContent();
+            var publishedTime = $("#publishedTime").val();
+            if(publishedTime){
+                this.articleData["publishedTime"] = publishedTime.replaceAll("-","").replaceAll(":","").replaceAll(" ","");
+            }
+        };
+
+        /**
+         * 关闭此对话框
+         */
+        ArticleDlg.close = function () {
+            parent.layer.close(window.parent.OptArticle.layerIndex);
+        };
+
+        /**
+         * 验证数据是否为空
+         */
+        ArticleDlg.validate = function () {
+            //$('#articleForm').data("bootstrapValidator").resetForm();
+            $('#articleForm').bootstrapValidator('validate');
+            return $("#articleForm").data('bootstrapValidator').isValid();
+        };
+        /**
+         * 提交添加用户
+         */
+        ArticleDlg.addSubmit = function () {
+            if(uploadStatus!=0){
+                return App.error("当前正在上传文件，请等待文件上传完成");
+            }
+            this.clearData();
+            this.collectData();
+            if (!this.validate()) {
+                errorFocus();
+                return;
+            }
+
+            //提交信息
+            var ajax = new $ax(App.ctxPath + "/article/edit", function (data) {
+                App.success("添加成功!");
+                window.parent.OptArticle.table.refresh();
+                ArticleDlg.close();
+            }, function (data) {
+                App.error("添加失败!");
+            });
+            ajax.set(ArticleDlg.articleData);
+
+            var templateType = this.articleData['templateType'];
+            var covor_1 = "";
+            var covor_2 = "";
+            var covor_3 = "";
+            if(templateType == "0" || templateType == "1"){
+                covor_1 = $("#articleCovor").val();
+            }
+            else if(templateType == "2"){
+                covor_1 = $("#articleCovorLong").val();
+            }
+            else if(templateType == "3"){
+                covor_1 = $("#articleCovor1").val();
+                covor_2 = $("#articleCovor2").val();
+                covor_3 = $("#articleCovor3").val();
+            }
+
+            ajax.set("photoBase64Data",covor_1);
+            ajax.set("photoBase64Data2",covor_2);
+            ajax.set("photoBase64Data3",covor_3);
+            ajax.set("playTimeMin",'');
+            ajax.set("playTimeSed",'');
+            ajax.start();
+        };
+
+        /**
+         * 预览
+         */
+        ArticleDlg.preview = function (){
+
+            this.clearData();
+            this.collectData();
+            if (!this.validate()) {
+                errorFocus();
+                return;
+            }
+            //存ue
+            $('#ueForPreView').val(this.articleData['content']);
+            $("#infoChalType").val("1");
+            $("#jumpUrl").val(this.articleData['jumpUrl'])
+            var index = layer.open({
+                type: 2,
+                title: '预览',
+                area: ['100%', '100%'], //宽高
+                maxmin: false,
+                fix: false, //不固定
+                content: App.ctxPath+'/article/article_preview'
+            });
+            layer.full(index);
+            this.layerIndex = index;
+        }
+
+        /**
+         * 视频/音频上传
+         */
+        var uploadStatus=0;
+        $("#fileupload").fileupload({
+            url: App.ctxPath + '/article/upload?type=yp',
+            start: function (e) {
+                uploadStatus=1;
+                $("#jumpUrl").val('');
+                $('#progressText').html('0%');
+                $('#progressText').css('color', 'black')
+                $('#progress .progress-bar').css('width', '0%');
+            },
+            progressall: function (e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $('#progressText').html(progress + '%')
+                $('#progress .progress-bar').css('width', progress + '%');
+            },
+            done: function (e, data) {
+                var fileName = data.result;
+                var index = fileName.lastIndexOf(".");
+                var suffix =  fileName.substr(index);
+                if(".mp3" != suffix){
+                    $('#progressText').html('error');
+                    $('#progressText').css('color', 'red')
+                    return App.error("请上传MP3类型格式的文件");
+                }
+                uploadStatus=0;
+                $('#progressText').html('complete');
+                $('#progressText').css('color', 'green')
+                $('#ypArea').css("display","block");
+                addyp(data.result);
+            },
+            fail: function (e, data) {
+                $('#progressText').html('error');
+                $('#progressText').css('color', 'red')
+            }
+        });
+
+        function addyp(fileName) {
+            var index = fileName.lastIndexOf("\/");
+            var showName = fileName.substring(index + 1, fileName.length);
+            var area=$('<div>' + '<span data-filename = "' + fileName + '">'+showName+'</span><i class="fa fa-close" ></i></div>');
+            $("#ypfiles").append(area);
+        }
+        $("#ypfiles").on("click",".fa-close",function () {
+            $(this).parent().remove();
+        })
+
+    </script>
+</js>
+</body>

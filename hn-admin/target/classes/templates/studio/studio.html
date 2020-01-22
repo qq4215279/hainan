@@ -1,0 +1,278 @@
+<body>
+<css>
+    <style>
+        .banner {
+            width: 350px;
+            height: 150px;
+            position: relative;
+            margin-top: 10px;
+        }
+
+        .banner .top-zz {
+            background: #d7d7d7;
+            opacity: 0.6;
+            width: 350px;
+            height: 20px;
+            position: absolute;
+            top: 10px;
+            z-index: 2;
+        }
+
+        .banner img {
+            position: relative;
+            width: 350px;
+            height: 150px;
+            margin-top: 10px;
+        }
+
+        .banner .fa-close {
+            position: absolute;
+            right: 5px;
+            top: 1px;
+            color: #000;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+    </style>
+</css>
+<div class="container">
+    <form class="form-horizontal col-sm-12">
+        <form:text id="name" label="工作室名称" name="name" must="true"></form:text>
+        <div class="form-group">
+            <label class="col-sm-3 control-label"><span style="color: #ff2023;">*&nbsp;</span>封面图</label>
+            <div class="col-sm-6">
+                <img src="" id="coverImg" style="width: 250px; height: 150px;display: none;">
+            </div>
+            <div class="col-sm-3">
+                <label for="coverFile" class="btn btn-info" style="display:inline-block;width:100px;"><i
+                        class="fa fa-upload">&nbsp;选择图片</i></label>
+                <input type="file" id="coverFile" style="display:none">
+                <input type="hidden" id="cover">
+            </div>
+        </div>
+        <div class="modal fade" id="coverLayer">
+            <div id="coverClipArea" style="height: 100%;">
+                <button id="coverClipBtn" type="button" class="btn btn-info col-sm-2"
+                        style="z-index:999; margin: 1px 5px;">
+                    <i class="fa fa-check"></i>&nbsp;截取
+                </button>
+                <button id="coverCloseView" type="button" class="btn btn-danger col-sm-2"
+                        style="z-index:999; margin: 1px 5px;">
+                    <i class="fa fa-reply"></i>&nbsp;取消
+                </button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label"><span style="color: #ff2023;">*&nbsp;</span>Banner
+            </label>
+            <div class="col-sm-6" id="bannersImage">
+
+            </div>
+            <div class="col-sm-3">
+                <label for="bannerFile" class="btn btn-info" style="display:inline-block;width:100px;"><i
+                        class="fa fa-upload">&nbsp;选择图片</i></label>
+                <input type="file" id="bannerFile" style="display:none">
+            </div>
+        </div>
+        <div class="modal fade" id="bannerLayer">
+            <div id="bannerClipArea" style="height: 100%;">
+                <button id="bannerClipBtn" type="button" class="btn btn-info col-sm-2"
+                        style="z-index:999; margin: 1px 5px;">
+                    <i class="fa fa-check"></i>&nbsp;截取
+                </button>
+                <button id="bannerCloseView" type="button" class="btn btn-danger col-sm-2"
+                        style="z-index:999; margin: 1px 5px;">
+                    <i class="fa fa-reply"></i>&nbsp;取消
+                </button>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">
+                <span style="color: #ff2023;">*</span>
+                简介
+            </label>
+            <div class="col-sm-8">
+                <div id="summary"></div>
+            </div>
+        </div>
+
+    </form>
+    <div class="row text-center">
+        <qx:btn id="btn2" class="btn btn-warning" fa="fa fa-reply" label="返回" onclick="back()"></qx:btn>
+        <qx:btn id="btn2" class="btn btn-primary" fa="fa fa-send" label="确定" onclick="submit()"></qx:btn>
+    </div>
+</div>
+<js>
+    <div  th:include="fragment/fargment :: clipJs"></div>
+    <script th:src="@{/static/ueditor/ueditor.config.js}"></script>
+    <script th:src="@{/static/ueditor/ueditor.all.js}"></script>
+    <script type="text/javascript">
+
+        clip(1);
+        clip(2);
+
+        var id = App.getQueryString("id");
+
+
+        window.UEDITOR_CONFIG.toolbars =
+            [
+                ['fullscreen', 'source', 'undo', 'redo'],
+                ['fontfamily', 'fontsize', 'bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript', 'subscript', 'removeformat', 'formatmatch', 'autotypeset', 'blockquote', 'pasteplain', '|', 'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc']
+            ];
+
+        /** 富文本编辑器初期化 */
+        var summary = UE.getEditor('summary', {initialFrameHeight: 500});
+        summary.addListener('ready', function (editor) {
+            getData();
+        });
+
+        function getData() {
+            if (id) {
+                App.loadingAjax({
+                    url: App.ctxPath + "studio/studioDetail",
+                    data: {id: id},
+                    type: "POST",
+                    success: function (res) {
+                        $("#name").val(res.data.name);
+                        summary.execCommand('insertHtml', res.data.summary);
+                        $("#coverImg").attr("src", res.data.cover).show();
+                        $("#cover").val(res.data.cover);
+                        $.each(res.data.banner, function (idx, image) {
+                            showBanner(image);
+                        });
+                    }, error: function (res) {
+                        App.info("服务器异常，请稍后重试");
+                    }
+                });
+            }
+        }
+
+
+        function showBanner(image) {
+            var html = $('<div class="banner"><div class="top-zz"><i class="fa fa-close"></i></div><img src=""><input type="hidden" class="banner"></div>');
+            html.find("img").attr("src", image);
+            html.find("input").val(image);
+            $("#bannersImage").append(html);
+        }
+
+        function clip(type) {
+            var clip = {
+                area: "#coverClipArea",
+                ok: "#coverClipBtn",
+                layer: "#coverLayer",
+                closeView: "#coverCloseView",
+                fileBtn: "#coverFile",
+                size: [500, 300],
+                done: function (dataURL) {
+                    $("#coverImg").attr("src", dataURL).show();
+                    $("#cover").val(dataURL);
+                    $("#coverFile").val("");
+                }
+            };
+            if (type == 2) {
+                clip = {
+                    area: "#bannerClipArea",
+                    ok: "#bannerClipBtn",
+                    layer: "#bannerLayer",
+                    closeView: "#bannerCloseView",
+                    fileBtn: "#bannerFile",
+                    size: [700, 300],
+                    done: function (dataURL) {
+                        showBanner(dataURL);
+                        $("#bannerFile").val("");
+                    }
+                }
+            }
+            new PhotoClip(clip.area, {
+                size: clip.size,
+                file: clip.fileBtn,
+                ok: clip.ok,
+                loadStart: function () {
+                    $(clip.layer).modal("show")
+                },
+                loadComplete: function () {
+
+                },
+                done: function (dataURL) {
+                    clip.done(dataURL);
+                    $(clip.layer).modal("hide")
+                },
+                fail: function (msg) {
+                }
+            });
+            $(clip.closeView).click(function () {
+                $(clip.layer).modal("hide");
+            });
+        }
+
+        /**
+         * 提交保存
+         */
+        function submit() {
+
+            var param = {
+                id: id
+            };
+            if (!$("#name").val()) {
+                App.error("工作室名称不能未空");
+                return;
+            }
+            param.name = $("#name").val();
+            if (!$("#cover").val()) {
+                App.error("封面图不能为空");
+                return;
+            }
+            param.cover = $("#cover").val();
+            if ($("input.banner").length == 0) {
+                App.error("Banner最少为一张");
+                return;
+            }
+            var banner = "";
+            $("input.banner").each(function () {
+                banner += $(this).val() + "_";
+            })
+            param.banner = banner.substring(0, banner.length - 1);
+
+            param.summary = summary.getContent();
+            if (param.summary == null || param.summary == '') {
+                App.error("简介不能为空");
+                return;
+            }
+
+            App.loadingAjax({
+                url: App.ctxPath + "studio/renew",
+                data: param,
+                type: "POST",
+                success: function (res) {
+                    if (res.code = 200) {
+                        layer.msg("操作成功", {icon: 1}, function () {
+                            back();
+                        });
+                    } else {
+                        App.error("操作失败! " + res.message + "!");
+                    }
+                }, error: function (res) {
+                    App.info("服务器异常，请稍后重试");
+                }
+            });
+
+        }
+
+        /**
+         * 返回
+         */
+        function back() {
+            var index = parent.layer.getFrameIndex(window.name);
+            parent.layer.close(index); //再执行关闭
+            parent.Studio.search();
+        }
+
+        $("#bannersImage").on("click", ".banner .fa-close", function () {
+            $(this).parents(".banner").remove();
+        })
+
+    </script>
+</js>
+</body>

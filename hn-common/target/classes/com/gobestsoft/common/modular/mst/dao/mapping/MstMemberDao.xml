@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.mst.dao.MstMemberDao">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultBean" type="com.gobestsoft.common.modular.mst.model.MstMember">
+		<id column="member_id" property="memberId" />
+		<result column="work_unit" property="workUnit" />
+		<result column="name" property="name" />
+		<result column="sex" property="sex" />
+		<result column="nation" property="nation" />
+		<result column="education" property="education" />
+		<result column="political_status" property="politicalStatus" />
+		<result column="idcard_number" property="idcardNumber" />
+		<result column="work_time" property="workTime" />
+		<result column="dept_id" property="deptId" />
+		<result column="dept_name" property="deptName" />
+		<result column="duty" property="duty" />
+		<result column="technical_duty" property="technicalDuty" />
+		<result column="technical_title" property="technicalTitle" />
+		<result column="union_id" property="unionId" />
+		<result column="union_name" property="unionName" />
+		<result column="linkphone" property="linkphone" />
+		<result column="marital_status" property="maritalStatus" />
+		<result column="worker_member" property="workerMember" />
+		<result column="home_address" property="homeAddress" />
+		<result column="job_type" property="jobType" />
+		<result column="overseas_location" property="overseasLocation" />
+		<result column="three_level_employee" property="threeLevelEmployee" />
+		<result column="group_employee" property="groupEmployee" />
+		<result column="crop_employee" property="cropEmployee" />
+		<result column="family_member_appellation" property="familyMemberAppellation" />
+		<result column="family_member_name" property="familyMemberName" />
+		<result column="family_member_telephone" property="familyMemberTelephone" />
+		<result column="if_cadre" property="ifCadre" />
+		<result column="sort" property="sort" />
+		<result column="create_user" property="createUser" />
+		<result column="create_time" property="createTime" />
+		<result column="update_user" property="updateUser" />
+		<result column="update_time" property="updateTime" />
+	</resultMap>
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="DeptResultMap" type="com.gobestsoft.common.modular.dept.model.DeptMember">
+		<id column="id" property="id" />
+		<result column="dept_id" property="deptId" />
+		<result column="person_id" property="personId" />
+		<result column="station_card" property="stationCard" />
+		<result column="member_card" property="memberCard" />
+		<result column="create_user" property="createUser" />
+		<result column="create_time" property="createTime" />
+		<result column="update_user" property="updateUser" />
+		<result column="update_time" property="updateTime" />
+		<result column="type" property="type" />
+	</resultMap>
+	
+	<!-- 通用版全部字段,可用于插入 -->
+	<sql id="columns">
+		mst_member.union_id,
+		mst_member.union_name,
+		mst_member.name,
+		mst_member.sex,
+		mst_member.nation,
+		mst_member.education,
+		mst_member.political_status,
+		mst_member.idcard_number,
+		mst_member.linkphone,
+		mst_member.work_unit,
+		mst_member.work_time,
+		mst_member.duty,
+		mst_member.technical_title,
+		mst_member.family_member_appellation,
+		mst_member.family_member_name,
+		mst_member.family_member_telephone,
+		mst_member.marital_status,
+		mst_member.home_address,
+		mst_member.job_type,
+		mst_member.overseas_location,
+		mst_member.worker_member,
+		mst_member.three_level_employee,
+		mst_member.group_employee,
+		mst_member.crop_employee,
+		mst_member.sort,
+		mst_member.create_user,
+		mst_member.create_time,
+		mst_member.update_user,
+		mst_member.update_time,
+		mst_member.if_cadre,
+		mst_member.technical_duty,
+		mst_member.dept_id,
+		mst_member.dept_name
+	</sql>
+
+	<sql id="deptColumn">
+		dm.dept_id,
+		dm.person_id,
+		dm.station_card,
+		dm.member_card,
+		dm.create_user,
+		dm.create_time,
+		dm.update_user,
+		dm.update_time,
+		dm.type
+	</sql>
+	
+	<!-- 插入全部字段 -->
+	<sql id="columnValues">
+		#{unionId},
+		#{unionName},
+		#{name},
+		#{sex},
+		#{nation},
+		#{education},
+		#{politicalStatus},
+		#{idcardNumber},
+		#{linkphone},
+		#{workUnit},
+		#{workTime},
+		#{duty},
+		#{technicalTitle},
+		#{familyMemberAppellation},
+		#{familyMemberName},
+		#{familyMemberTelephone},
+		#{maritalStatus},
+		#{homeAddress},
+		#{jobType},
+		#{overseasLocation},
+		#{workerMember},
+		#{threeLevelEmployee},
+		#{groupEmployee},
+		#{cropEmployee},
+		#{sort},
+		#{createUser},
+		#{createTime},
+		#{updateUser},
+		#{updateTime},
+		#{ifCadre},
+		#{technicalDuty},
+		#{deptId},
+		#{deptName}
+	</sql>
+	
+	<!-- 更新全部字段 -->
+	<sql id="columnSets">
+		mst_member.name=#{name},
+		mst_member.sex=#{sex},
+		mst_member.nation=#{nation},
+		mst_member.education=#{education},
+		mst_member.political_status=#{politicalStatus},
+		mst_member.idcard_number=#{idcardNumber},
+		mst_member.linkphone=#{linkphone},
+		mst_member.work_time=#{workTime},
+		mst_member.duty=#{duty},
+		mst_member.technical_title=#{technicalTitle},
+		mst_member.family_member_appellation=#{familyMemberAppellation},
+		mst_member.family_member_name=#{familyMemberName},
+		mst_member.family_member_telephone=#{familyMemberTelephone},
+		mst_member.marital_status=#{maritalStatus},
+		mst_member.home_address=#{homeAddress},
+		mst_member.job_type=#{jobType},
+		mst_member.overseas_location=#{overseasLocation},
+		mst_member.worker_member=#{workerMember},
+		mst_member.three_level_employee=#{threeLevelEmployee},
+		mst_member.group_employee=#{groupEmployee},
+		mst_member.crop_employee=#{cropEmployee},
+		mst_member.update_user=#{updateUser},
+		mst_member.update_time=#{updateTime},
+		mst_member.if_cadre = #{ifCadre},
+		mst_member.technical_duty = #{technicalDuty},
+		mst_member.dept_name = #{deptName}
+	</sql>
+	
+	<!-- 新增一条数据数据 -->
+	<insert id="insert" parameterType="com.gobestsoft.common.modular.mst.model.MstMember" useGeneratedKeys="true" keyProperty="memberId" keyColumn="member_id">
+		INSERT INTO mst_member (<include refid="columns"></include>)
+		VALUES (<include refid="columnValues"></include>)
+	</insert>
+	
+	<!-- 更新一条数据 -->
+   	<update id="updateAllColumnById" >
+   		UPDATE mst_member
+		<set>
+			<include refid="columnSets"></include>
+		</set>
+	 	where mst_member.member_id = #{memberId}
+   	</update>
+   	
+   	 <!-- 查询一条数据-->
+	<select id="selectById" resultMap="BaseResultBean">
+		SELECT 
+			 mst_member.member_id,
+			<include refid="columns"></include>
+		FROM mst_member
+		where mst_member.member_id = #{id}
+	</select>
+	
+	<!-- 多条件分页查询  -->
+    <select id="selectListPage" resultMap="BaseResultBean">
+		SELECT 
+			 mst_member.member_id,
+			<include refid="columns"></include>
+		FROM mst_member
+		<where>
+			<if test="unionName != null and unionName != ''">
+				and mst_member.union_name  like '%${unionName}%'
+			</if>
+			<if test="name != null and name != ''">
+				and mst_member.name like '%${name}%'
+			</if>
+			<if test="unionId != null and unionId != ''">
+				and mst_member.union_id = #{unionId}
+			</if>
+		</where>
+        order by mst_member.create_time desc
+    </select>
+    
+    <!-- 查询当前登录用户所属组织下及子组织、子部门下的会员  -->
+    <select id="selectListPageByOrgId" resultMap="BaseResultBean">
+		SELECT
+		mst_member.member_id,
+		<include refid="columns"></include>
+		FROM mst_member
+		where union_id in
+		(select id from sys_dept where id = #{orgId} or FIND_IN_SET(#{orgId},pids) order by
+		level,sort,id)
+		<if test="unionName != null and unionName != ''">
+			and mst_member.union_name  like '%${unionName}%'
+		</if>
+		<if test="name != null and name != ''">
+			and mst_member.name like '%${name}%'
+		</if>
+        order by mst_member.union_id,mst_member.create_time 
+    </select>
+    
+    <!-- 根据会员身份证号、姓名查询出会员信息 -->
+    <select id="selectByIdcardNumber" resultMap="DeptResultMap">
+		SELECT
+			dm.id,
+			<include refid="deptColumn"></include>
+		FROM dept_member dm
+		INNER JOIN person_info pi
+		on dm.person_id = pi.id
+		<where>
+			<if test="idcardNumber != null and idcardNumber != ''">
+				and pi.certificate_num = #{idcardNumber}
+			</if>
+			<if test="name != null and name != ''">
+				and pi.name = #{name}
+			</if>
+		</where>
+        order by dm.create_time desc
+    </select>
+
+	<!-- 根据会员身份证号、姓名查询出会员信息 -->
+	<select id="selectByNumber" resultMap="DeptResultMap">
+		SELECT
+		dm.id,
+		<include refid="deptColumn"></include>
+		FROM dept_member dm
+		INNER JOIN person_info pi
+		on dm.person_id = pi.id
+		<where>
+			<if test="idcardNumber != null and idcardNumber != ''">
+				and pi.certificate_num = #{idcardNumber}
+			</if>
+		</where>
+		order by dm.create_time desc
+	</select>
+    
+	<!-- 删除一条数据 -->
+    <delete id="remove">
+		delete from mst_member where mst_member.member_id = #{id}
+	</delete>
+	
+	<!-- 根据工会组织id,查询会员的男的人数  -->
+    <select id="selectMemberMaleCountByUnionid" resultType="int">
+	 select count(0) from mst_member where union_id = #{unionId} and sex = #{sex}
+    </select>
+    
+    <!-- 根据工会id,获取父级工会下的会员和该工会下的会员信息  -->
+    <select id="getPidMemberListByUnionId" resultType="map">
+     select p.member_id,p.name,p.union_name,p.sex,p.duty from (
+		 select member_id,name,union_name,sex,duty from mst_member 
+		 	where mst_member.union_id = #{pid}
+		 union all
+		 select member_id,name,union_name,sex,duty from mst_member 
+		 	where mst_member.union_id = #{unionId}
+	 )P 
+		 <where>
+			<if test="name != null and name != ''">
+				and p.name like '%${name}%'
+			</if>
+			<if test="unionName != null and unionName != ''">
+				and p.union_name like '%${unionName}%'
+			</if>
+			<if test="duty != null and duty != ''">
+				and p.duty like '%${duty}%'
+			</if>
+		</where>
+    </select>
+    
+    <!-- 根据所属工会id,获取会员id拼接的字符串,多个id以逗号分隔  -->
+    <select id="getMemberIdsByUnionId" resultType="string">
+	 select group_concat(member_id) from mst_member group by mst_member.union_id
+	 having mst_member.union_id = #{deptId}
+    </select>
+    
+    <!-- 根据工会组织id,查询会员数量  -->
+    <select id="selectCountByUnionId" resultType="int">
+	 select count(0) from mst_member
+	 where mst_member.union_id = #{unionId}
+    </select>
+	
+</mapper>

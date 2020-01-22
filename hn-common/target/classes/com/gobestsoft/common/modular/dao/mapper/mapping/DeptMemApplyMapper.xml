@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dao.mapper.DeptMemApplyMapper">
+        <select id="selectList" resultType="java.util.Map">
+                    SELECT
+                        count(unit_name) dept_count,
+                        unit_name,
+                        min(id)
+                    FROM
+                        dept_member_apply
+                    WHERE
+                        dept_id IS NULL
+                        and apply_status =-1
+                        and not(unit_name is null or unit_name='')
+                        <if test="query_name!=null and query_name!=''">
+                            and unit_name like concat('%',#{unit_name},'%')
+                        </if>
+                    GROUP BY
+                        unit_name
+                    ORDER BY
+                        unit_name
+
+        </select>
+
+
+    <select id="selectSameUnitById" resultType="String">
+
+        select t2.id from dept_member_apply t1,dept_member_apply t2
+          where t2.unit_name =t1.unit_name and t1.id=#{id}
+          and
+          t2.dept_id IS NULL
+                        and t2.apply_status =-1
+                        and not(t2.unit_name is null or t2.unit_name='')
+
+    </select>
+
+    <update id="updateMemberDept" >
+
+        update dept_member_apply
+
+        set dept_id =#{deptId}
+
+        where id in
+        <foreach collection="list" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+
+
+
+    </update>
+</mapper>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper  namespace="com.gobestsoft.common.modular.dept.mapper.DeptMemberDetailMapper">
+  <select id="getDeptMember" resultType="java.util.Map" parameterType="java.lang.String">
+select
+A.id,B.id as deptId,B.simplename,B.`level`,B.p_dept_name,C.*,D.member_count as total
+from dept_member A LEFT JOIN sys_dept B on A.dept_id=B.id LEFT JOIN person_info C on A.person_id=C.id  LEFT JOIN t_member_count D on A.dept_id=D.dept_id where B.id=#{deptId} or B.pids like concat('%',#{deptId},'%')
+</select>
+</mapper>

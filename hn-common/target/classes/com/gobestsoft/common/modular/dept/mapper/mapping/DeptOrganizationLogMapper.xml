@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dept.mapper.DeptOrganizationLogMapper">
+   
+    <!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.dept.model.DeptOrganizationLog">
+       <result property="id" column="id" /> 
+       <result property="refId" column="ref_id" /> 
+       <result property="status" column="status" /> 
+       <result property="comment" column="comment" /> 
+       <result property="operationTime" column="operation_time" /> 
+       <result property="recordFlowInfo" column="record_flow_info" /> 
+       <result property="operationUser" column="operation_user" /> 
+       <result property="operationDeptId" column="operation_dept_id" /> 
+       <result property="backDeptId" column="back_dept_id" /> 
+   </resultMap>
+   
+   <sql id="commonColumns">
+	   	dept_organization_log.id,
+	   	dept_organization_log.ref_id,
+	   	dept_organization_log.status,
+	   	dept_organization_log.comment,
+	   	dept_organization_log.operation_time,
+	   	dept_organization_log.record_flow_info,
+	   	dept_organization_log.operation_user,
+	   	dept_organization_log.operation_dept_id,
+	   	dept_organization_log.back_dept_id
+   </sql>
+   
+   <!-- 根据申请id，查询审核日志 -->
+   <select id="selectListMapByRefId" resultType="map">
+   		select <include refid="commonColumns"></include>,dept_organization.union_name from dept_organization_log 
+   		left join sys_user on dept_organization_log.operation_user = sys_user.uid
+		left join dept_organization on dept_organization.dept_id=sys_user.deptid
+		where dept_organization_log.ref_id=#{id} 
+		order by dept_organization_log.operation_time
+   </select>
+</mapper>

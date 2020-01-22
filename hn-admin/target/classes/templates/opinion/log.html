@@ -1,0 +1,81 @@
+<css xmlns:th="http://www.thymeleaf.org" >
+    <link th:href="@{/static/css/flowChart.css}" rel="stylesheet">
+    <style type="text/css">
+        .fontstyle{
+            font-size: 16px;
+            font-weight: 600;
+            color: #67b168;
+        }
+    </style>
+</css>
+<body xmlns:th="http://www.w3.org/1999/xhtml">
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="flowChart">
+                        <!--左侧轴-->
+                        <div class="flowChart-left">
+                            <!--虚线-->
+                            <div class="dashed"></div>
+                        </div>
+                        <!--右侧内容-->
+                        <div class="flowChart-right">
+                            <!--节点-->
+                            <div class="oneNode" th:each="log : ${list}">
+                                <!--左侧小球-->
+                                <div class="check check-prime" th:if="${log.status == 1}">
+                                    待处理
+                                </div>
+                                <div class="check check-warning" th:if="${log.status == 0}">
+                                    未通过
+                                </div>
+                                <div class="check check-prime" th:if="${log.status == 2}">
+                                    通过
+                                </div>
+                                <div class="check check-success" th:if="${log.status == 3}">
+                                    上报
+                                </div>
+                                <div class="tag-boder">
+                                    <div class="tag"></div>
+                                </div>
+                                <!--右侧内容-->
+                                <div class="NodeDetail">
+                                    <!--上-->
+                                    <div class="NodeDetail-title">
+                                        <div class="details">
+                                            <span class="orgName" th:text="'所属工会: ' + ${log.orgName}"></span>
+                                            <h4 th:text="'操作人: ' + ${log.fromPerson}"></h4>
+                                        </div>
+                                    </div>
+                                    <!--中-->
+                                    <div class="NodeDetail-content">
+                                        <div class="details">
+                                            <h4 th:if="${log.status==0 && log.toDept!=''}" th:text="'退回: '+${log.toDept}"></h4>
+                                            <h4 th:if="${log.status==1 && log.toDept!=''}" th:text="'提交至: '+${log.toDept}"></h4>
+                                            <h4 th:if="${log.status==2 && log.toDept!=''}" th:text="${log.toDept}+': 审核通过'" class="fontstyle"></h4>
+                                            <h4 th:if="${log.status==3 && log.toDept!=''}" th:text="${log.toDept}+': 上报审核'" class="fontstyle"></h4>
+                                        </div>
+                                    </div>
+                                    <!--下-->
+                                    <div class="NodeDetail-footer">
+                                        <span th:text="${log.createDate}"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<js>
+    <script type="text/javascript">
+        var val=$(".flowChart-right").css("height");
+        $(".dashed").css("height",val);
+    </script>
+</js>

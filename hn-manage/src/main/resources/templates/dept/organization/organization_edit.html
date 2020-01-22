@@ -1,0 +1,390 @@
+<css xmlns:form="http://www.w3.org/1999/html" xmlns:form="http://www.w3.org/1999/html">
+    <div th:replace="fragment/fargment :: treeCss"></div>
+    <link th:href="@{/static/css/_fstyle.css}" rel="stylesheet">
+    <style type="text/css">
+        .ztree li span.button.pIcon01_ico_open, .ztree li span.button.pIcon01_ico_close,
+        .ztree li span.button.pIcon01_ico_docu {
+            margin-right: 2px;
+            background: url('../../static/plugin/ztree/img/diy/1_open.png') no-repeat scroll 0 0 transparent;
+            vertical-align: top;
+            *vertical-align: middle
+        }
+
+        .ztree li span.button.pIcon02_ico_open, .ztree li span.button.pIcon02_ico_close,
+        .ztree li span.button.pIcon02_ico_docu {
+            margin-right: 2px;
+            background: url('../../static/plugin/ztree/img/diy/2.png') no-repeat scroll 0 0 transparent;
+            vertical-align: top;
+            *vertical-align: middle
+        }
+    </style>
+</css>
+<body>
+<div class="container">
+    <div class="form-horizontal" id="organizationForm">
+        <input type="hidden" id="id" th:value="${deptOrganization.id}">
+        <input type="hidden" id="deptId" th:value="${deptOrganization.deptId}">
+        <input type="hidden" id="pId" th:value="${deptOrganization.pId}">
+        <input type="hidden" id="pageType" th:value="${pageType}">
+        <input type="hidden" id="oldUnionName" th:value="${oldUnionName}">
+        <div class="row">
+            <div class="col-sm-6">
+                <form:text id="unionName" label="工会名称" name="unionName" value="${deptOrganization.unionName}"
+                           must="true"></form:text>
+                <form:text id="pName" label="上级工会" name="pName" value="${deptOrganization.pName}"
+                           onclick="OrganizationDlg.showPNameSelectTree();"
+                           readonly="true" must="true"></form:text>
+                <form:text id="othersOrgCode" label="工会法人和其他组织统一社会信用代码" name="othersOrgCode"
+                           value="${deptOrganization.othersOrgCode}" must="true"></form:text>
+                <form:datetime id="createunionTime" label="建会时间" name="createunionTime" istime="false"
+                               format="yyyy-MM-dd" value="${deptOrganization.createunionTime}"
+                               must="true"></form:datetime>
+                <form:select id="unionType" label="工会类型" name="unionType" value="${deptOrganization.unionType}"
+                             code="lib_base_org_type" must="true"></form:select>
+                <form:figure id="membership" label="会员人数" name="membership" value="${deptOrganization.membership}"
+                             min="0"></form:figure>
+                <form:text id="unionEmail" label="工会邮箱" name="unionEmail"
+                           value="${deptOrganization.unionEmail}"></form:text>
+                <form:text id="unionLeader" label="工会负责人" name="unionLeader"
+                           value="${deptOrganization.unionLeader}"></form:text>
+                <form:text id="unionLeaderPhone" label="联系电话" name="unionLeaderPhone"
+                           value="${deptOrganization.unionLeaderPhone}"></form:text>
+
+                <!--<form:text id="unionSimpleName" label="工会简称" name="unionSimpleName"-->
+                <!--value="${deptOrganization.unionSimpleName}" disabled="true"></form:text>-->
+                <!--<form:text id="unitZipCode" label="工会邮编" name="unitZipCode" value="${deptOrganization.unitZipCode}"-->
+                <!--disabled="true"></form:text>-->
+                <!--<form:figure id="cadresNumber" label="专职干部人数" name="cadresNumber"-->
+                <!--value="${deptOrganization.cadresNumber}" min="0" disabled="true"></form:figure>-->
+                <!--<form:text id="chairmanName" label="主席名称" name="chairmanName" value="${deptOrganization.chairmanName}"-->
+                <!--disabled="true"></form:text>-->
+            </div>
+            <div class="col-sm-6">
+                <form:text id="unitName" label="单位名称" name="unitName" value="${deptOrganization.unitName}"
+                           must="true"></form:text>
+                <form:text id="unitOrgCode" label="单位法人和其他组织统一社会信用代码" name="unitOrgCode"
+                           value="${deptOrganization.unitOrgCode}" must="true"></form:text>
+                <form:text id="unitAddress" label="单位地址" name="unitAddress" value="${deptOrganization.unitAddress}"
+                           must="true"></form:text>
+                <form:select id="unitDistrict" label="单位所在行政区" name="unitDistrict" code="unit_district_code"
+                             value="${deptOrganization.unitDistrict}" must="true"></form:select>
+                <form:select id="unitNature" label="单位性质类别" name="unitNature" code="lib_unit_type"
+                             value="${deptOrganization.unitNature}" must="true"></form:select>
+                <form:select id="unitEconomicType" label="经济类型" name="unitEconomicType" code="lib_economic_type"
+                             value="${deptOrganization.unitEconomicType}" must="true"></form:select>
+                <form:select id="unitIndustry" label="单位所属行业" name="unitIndustry" code="lib_industry_type"
+                             value="${deptOrganization.unitIndustry}" must="true"></form:select>
+                <form:figure id="unitNumber" label="职工人数" name="unitNumber" value="${deptOrganization.unitNumber}"
+                             min="0"></form:figure>
+                <!--<form:text id="chairmanSession" label="现任第几届主席" name="chairmanSession"-->
+                <!--value="${deptOrganization.chairmanSession}" disabled="true"></form:text>-->
+                <!--<form:figure id="chairmanMobile" label="主席手机号" name="chairmanMobile"-->
+                <!--value="${deptOrganization.chairmanMobile}" min="0" disabled="true"></form:figure>-->
+
+            </div>
+            <!-- 这是父级菜单下拉框 -->
+            <div id="pNameContent" class="menuContent" style="display: none; position: absolute; z-index: 200;">
+                <div class="row" style="width: 300px !important;">
+                    <div class="col-sm-9">
+                        <input type="text" id="keyword" placeholder="请输入工会全称" style="width:225px; height:35px">
+                    </div>
+                    <div class="col-sm-3">
+                        <qx:btn  class="btn btn-primary" fa="fa fa-search" label="搜索" permission="" onclick="OrganizationDlg.searchDeptName()"></qx:btn>
+                    </div>
+                </div>
+                <ul id="pNameTree" class="ztree tree-box" style="width: 300px !important;"></ul>
+            </div>
+        </div>
+        <div th:if="${pageType == null}" class="row text-center">
+            <qx:btn fa="fa fa-check" label="提交" onclick="OrganizationDlg.editSubmit()"></qx:btn>
+            <qx:btn fa="fa fa-eraser" label="取消" onclick="OrganizationDlg.close()"></qx:btn>
+        </div>
+        <div th:if="${pageType == 1}" class="row text-center">
+            <qx:btn id="sure1" class="btn btn-primary" onclick="OrganizationDlg.editSubmit()"
+                    fa="fa fa-address-book" label="申请建会"></qx:btn>
+            <qx:btn id="sure2" class="btn btn-danger" onclick="OrganizationDlg.close()"
+                    fa="fa fa-eraser" label="返回"></qx:btn>
+        </div>
+
+        <div th:if="${pageType == 2}"  class="row text-center">
+            <qx:btn id="sure1" class="btn btn-primary" onclick="OrganizationDlg.editSubmit()"
+                    fa="fa fa-check" label="提交"></qx:btn>
+            <qx:btn id="sure2" class="btn btn-danger" onclick="OrganizationDlg.close()"
+                    fa="fa fa-eraser" label="返回"></qx:btn>
+        </div>
+    </div>
+</div>
+</body>
+
+<js>
+    <div th:replace="fragment/fargment :: treeJs"></div>
+    <script type="text/javascript">
+
+        /*
+         * 初始对话框
+         */
+        var OrganizationDlg = {
+            recordData: {},
+            deptZtree: null,
+            pNameZtree: null,
+            validateFields: {
+                unionName: {
+                    validators: {
+                        notEmpty: {
+                            message: '工会名称不能为空！'
+                        }
+                    }
+                },
+                pName: {
+                    validators: {
+                        notEmpty: {
+                            message: '上级工会不能为空！'
+                        }
+                    }
+                },
+                othersOrgCode: {
+                    validators: {
+                        notEmpty: {
+                            message: '工会法人和其他组织统一社会信用代码不能为空！'
+                        },
+                        stringLength: {
+                            min: 18,
+                            max: 18,
+                            message: '工会法人和其他组织统一社会信用代码格式错误'
+                        }
+                    }
+                },
+                createunionTime: {
+                    notEmpty: {
+                        message: '建会时间不能为空！'
+                    }
+                },
+                unionType: {
+                    notEmpty: {
+                        message: '工会类型不能为空！'
+                    }
+                },
+                membership: {
+                    validators: {
+                        regexp: {
+                            regexp: '^[1-9]\\d*$',
+                            message: '请输入大于零的整数数字！'
+                        }
+                    }
+                },
+                unionEmail: {
+                    validators: {
+                        regexp: {
+                            regexp: '^[a-z0-9]+([._\\\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$',
+                            message: '请输入正确的邮箱！'
+                        }
+                    }
+                },
+
+                unitName: {
+                    validators: {
+                        notEmpty: {
+                            message: '单位名称不能为空！'
+                        }
+                    }
+                },
+                unitOrgCode: {
+                    validators: {
+                        notEmpty: {
+                            message: '单位法人和其他组织统一社会信用代码不能为空！'
+                        },
+                        stringLength: {
+                            min: 18,
+                            max: 18,
+                            message: '单位法人和其他组织统一社会信用代码格式错误'
+                        }
+                    }
+                },
+                unitAddress: {
+                    validators: {
+                        notEmpty: {
+                            message: '单位地址不能为空！'
+                        }
+                    }
+                },
+                unitDistrict: {
+                    validators: {
+                        notEmpty: {
+                            message: '单位所在行政区不能为空！'
+                        }
+                    }
+                },
+                unitNature: {
+                    validators: {
+                        notEmpty: {
+                            message: '单位性质类别不能为空！'
+                        }
+                    }
+                },
+                unitEconomicType: {
+                    validators: {
+                        notEmpty: {
+                            message: '经济类型不能为空！'
+                        }
+                    }
+                },
+                unitIndustry: {
+                    validators: {
+                        notEmpty: {
+                            message: '单位所属行业不能为空！'
+                        }
+                    }
+                },
+
+            }
+        }
+        /**
+         * 清除数据
+         */
+        OrganizationDlg.clearData = function () {
+            this.recordData = {};
+        }
+
+        /**
+         * 显示父级菜单下拉框
+         * @returns
+         */
+        OrganizationDlg.showPNameSelectTree = function () {
+            App.showInputTree("pName", "pNameContent");
+        };
+
+
+        /**
+         * 关闭此对话框
+         */
+        OrganizationDlg.close = function () {
+            //当你在iframe页面关闭自身时
+            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+            parent.layer.close(index); //再执行关闭
+
+        }
+        /**
+         * 设置对话框中的数据
+         * param key 数据的名称
+         */
+        OrganizationDlg.set = function (key) {
+            this.recordData[key] = $("#" + key).val();
+            return this;
+        }
+        /**
+         * 收集数据
+         */
+        OrganizationDlg.collectData = function () {
+            this.set('id')
+                .set('deptId')
+                .set('unitName')
+                .set('unitOrgCode')
+                .set('othersOrgCode')
+                .set('unitAddress')
+                .set('unitDistrict')
+                .set('unitNature')
+                .set('unitEconomicType')
+                .set('unitIndustry')
+                .set('unitNumber')
+                .set('unionSimpleName')
+                .set('unionName')
+                .set('unionType')
+                .set('unionEmail')
+                .set('createunionTime')
+                .set('membership')
+                .set('unionLeader')
+                .set('pId')
+                .set('pName')
+                .set('unionLeaderPhone');
+            if ($("#createunionTime").val()) {//建会时间
+                this.recordData["createunionTime"] = $("#createunionTime").val().replaceAll('-', '');
+            }
+            if ($("#oldUnionName").val()) {//旧工会名称
+                this.recordData["oldUnionName"] = $("#oldUnionName").val();
+            }
+        }
+        /**
+         * 验证数据是否为空
+         */
+        OrganizationDlg.validate = function () {
+            $('#organizationForm').data("bootstrapValidator").resetForm();
+            $('#organizationForm').bootstrapValidator('validate');
+            return $("#organizationForm").data('bootstrapValidator').isValid();
+        }
+        /**
+         * 点击提交，更新数据
+         */
+        OrganizationDlg.editSubmit = function () {
+            this.clearData();
+            this.collectData();
+            //校验表单是否填写完整
+            if (!this.validate()) {
+                errorFocus();
+                return;
+            }
+
+            var pageType = $("#pageType").val();
+            var requestUrl;
+            var successMessage;
+
+            if (pageType == 1) {
+                requestUrl = App.ctxPath + "company/organization/saveBuild";
+                successMessage = "申请建会提交成功!";
+            }else if (pageType == 2) {
+                requestUrl = App.ctxPath + "company/organization/reEditSaveBuild";
+                successMessage = "提交成功!";
+            } else {
+                requestUrl = App.ctxPath + "dept/organization/update";
+                successMessage = "修改成功!";
+            }
+
+            App.loadingAjax({
+                url: requestUrl,
+                data: OrganizationDlg.recordData,
+                success: function (result) {
+                    if (result.code = 200) {
+                        App.success(successMessage);
+                        OrganizationDlg.close();
+                    }
+                }
+            });
+        }
+
+
+        /**
+         * 点击父级菜单下拉框input框时
+         * @param e
+         * @param treeId
+         * @param treeNode
+         * @returns
+         */
+        OrganizationDlg.onClickPName = function (e, treeId, treeNode) {
+            $("#pName").attr("value", OrganizationDlg.pNameZtree.getSelectedVal());
+            $("#pId").attr("value", treeNode.id);
+        };
+
+        $(function () {
+            App.initValidator("organizationForm", OrganizationDlg.validateFields);
+            //初始化父级菜单下拉框
+            var pNameTree = new $ZTree("pNameTree", "dept/tree?existBasicDept=1");
+            pNameTree.bindOnClick(OrganizationDlg.onClickPName);
+            pNameTree.init();
+            OrganizationDlg.pNameZtree = pNameTree;
+        });
+
+
+
+        //搜索工会
+        OrganizationDlg.searchDeptName = function () {
+
+            var keyword = $("#keyword").val();
+            //初始化父级菜单下拉框
+            var pNameTree = new $ZTree("pNameTree", "dept/treebyName?keyword=" + keyword);
+            pNameTree.bindOnClick(OrganizationDlg.onClickPName);
+            pNameTree.init();
+            OrganizationDlg.pNameZtree = pNameTree;
+        }
+    </script>
+
+</js>
+

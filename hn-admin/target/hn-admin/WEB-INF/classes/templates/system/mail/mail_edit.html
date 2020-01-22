@@ -1,0 +1,221 @@
+@layout("/common/_container.html"){
+<link
+	href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css"
+	rel="stylesheet" />
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/i18n/zh-CN.js"></script>
+<div class="ibox float-e-margins">
+	<div class="ibox-content">
+		<div class="form-horizontal" id="mailForm">
+			<input type="hidden" id="id" value="${mail.id}"> <input
+				type="hidden" id="mailId" value="${mail.mailId}">
+
+			<div class="row">
+				<div class="col-sm-8">
+					<#input id="subject" name="邮件主题" mustFlg="true"
+						value="${mail.subject}" />
+					<#select2 name="收件人" id="recId" style="width: 600px;"
+						options="${userList}"> </#select2>
+					<div class="form-group">
+						<label class="col-sm-3 control-label"> <span
+							class="must-star">*</span>
+						</label> <label class="col-sm-3 control-label">邮件内容</label>
+						<div class="col-sm-9">
+							<textarea class="form-control" rows="15" id="context"
+								style="resize: none;">${mail.context}</textarea>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="panel panel-default">
+						<div class="panel-heading">用户</div>
+						<div class="panel-body dept-tree"
+							style="height: 400px; overflow-y: scroll;">
+							<ul id="userTree" class="ztree"></ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row btn-group-m-t">
+				<div class="col-sm-1 col-sm-offset-2">
+					<#button btnCss="info" name="发送" id="cancel" icon="fa-plus"
+						clickFun="MailDlg.edit()" />
+				</div>
+				<div class="col-sm-1">
+					<#button btnCss="info" name="保存" id="cancel" icon="fa-edit"
+						clickFun="MailDlg.save()" />
+				</div>
+				<div class="col-sm-1">
+					<#button btnCss="danger" name="关闭" id="cancel" icon="fa-close"
+						clickFun="MailDlg.close()" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<style type="text/css">
+.ztree li span.button.pIcon01_ico_open, .ztree li span.button.pIcon01_ico_close,
+	.ztree li span.button.pIcon01_ico_docu {
+	margin-right: 2px;
+	background: url(${ctxPath}/static/css/zTreeStyle/img/diy/1_open.png)
+		no-repeat scroll 0 0 transparent;
+	vertical-align: top;
+	*vertical-align: middle
+}
+
+.ztree li span.button.pIcon02_ico_open, .ztree li span.button.pIcon02_ico_close,
+	.ztree li span.button.pIcon02_ico_docu {
+	margin-right: 2px;
+	background: url(${ctxPath}/static/css/zTreeStyle/img/diy/2.png)
+		no-repeat scroll 0 0 transparent;
+	vertical-align: top;
+	*vertical-align: middle
+}
+
+.ztree li span.button.pIcon03_ico_open, .ztree li span.button.pIcon03_ico_close,
+	.ztree li span.button.pIcon03_ico_docu {
+	margin-right: 2px;
+	background: url(${ctxPath}/static/css/zTreeStyle/img/diy/3.png)
+		no-repeat scroll 0 0 transparent;
+	vertical-align: top;
+	*vertical-align: middle
+}
+</style>
+	<script type="text/javascript">
+/**
+ * 会员信息详情对话框（可用于添加对话框）
+ */
+var MailDlg = {
+		mailData: {},
+		userTreeInstance : null,
+	    validateFields: {
+	    	subject: {
+	             validators: {
+	                 notEmpty: {
+	                     message: '主题不能为空！'
+	                 }
+	             }
+			},
+			context: {
+	             validators: {
+	                 notEmpty: {
+	                     message: '内容不能为空！'
+	                 }
+	             }
+			}
+	    }
+};
+/**
+ * 清除数据
+ */
+ MailDlg.clearData = function () {
+    this.mailData = {};
+};
+/**
+ * 设置对话框中的数据 
+ */
+ MailDlg.set = function (key) {
+    this.mailData[key] = (typeof value == "undefined") ? $("#" + key).val() : value;
+    return this;
+};
+/**
+ * 收集数据
+ */
+ MailDlg.collectData = function () {
+    this.set('subject').
+    set('mailId').
+    set('context');
+};
+/**
+ * 关闭此对话框
+ */
+ MailDlg.close = function () {
+    parent.layer.close(window.parent.Mail.layerIndex);
+};
+
+/**
+ * 验证数据是否为空
+ */
+ MailDlg.validate = function () {
+    $('#mailForm').data('bootstrapValidator').resetForm();
+    $('#mailForm').bootstrapValidator('validate');
+    return $("#mailForm").data('bootstrapValidator').isValid();
+};
+
+MailDlg.onClickDept = function(e, treeId, treeNode) {
+    if (treeNode.isUser==1){
+    var value=$('.js-example-basic-multiple').val();
+    if (value==null){
+    	value = [treeNode.id];
+    }else{
+    value.push(treeNode.id);
+    }
+    $('.js-example-basic-multiple').val(value);
+    $('.js-example-basic-multiple').trigger('change');
+    }
+}
+/**
+ * 发送邮件
+ */
+ MailDlg.edit = function () {
+
+    this.clearData();
+    this.collectData();
+
+     if (!this.validate()) {
+    	 errorFocus();
+         return;
+     }
+
+    //发送邮件
+    var ajax = new $ax(Feng.ctxPath + "/mail/edit", function (data) {
+    		Feng.success("发送成功!");
+            window.parent.Mail.table.refresh();
+            MailDlg.close();
+    }, function (data) {
+        Feng.error("发送失败!" + data.responseJSON.message + "!");
+    });
+    ajax.set(this.mailData);
+    if ($('.js-example-basic-multiple').val()!=null){
+    ajax.set("recId",$('.js-example-basic-multiple').val().toString());
+    ajax.start();
+    }else{
+    	Feng.error("收件人不能为空！");
+    }
+};
+
+/**
+ * 保存邮件到草稿箱
+ */
+ MailDlg.save = function () {
+
+    this.clearData();
+    this.collectData();
+
+    //发送邮件
+    var ajax = new $ax(Feng.ctxPath + "/mail/save", function (data) {
+    		Feng.success("保存成功!");
+            window.parent.Mail.table.refresh();
+            MailDlg.close();
+    }, function (data) {
+        Feng.error("保存失败!" + data.responseJSON.message + "!");
+    });
+    ajax.set(this.mailData);
+    ajax.set("mailId",$("#mailId").val());
+    ajax.start();
+};
+
+$(function() {
+		Feng.initValidator("mailForm", MailDlg.validateFields);
+        var ztree = new $ZTree("userTree", "/mail/tree");
+        ztree.bindOnClick(MailDlg.onClickDept);
+        ztree.init();
+        MailDlg.userTreeInstance = ztree;
+        $('.js-example-basic-multiple').select2({
+        	language: "zh-CN", minimumInputLength: 1,theme: 'classic'});
+});
+    </script>
+
+
+	@}

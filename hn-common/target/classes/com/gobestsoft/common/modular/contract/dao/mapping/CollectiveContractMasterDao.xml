@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.contract.dao.CollectiveContractMasterDao">
+
+    <!-- 条件分页查询 -->
+    <select id="selectByCondition" resultType="java.util.Map">
+        select T1.id,T1.name,T1.code,T1.create_time AS createTime,T1.master_id as masterId,T2.`name` AS
+        createUser,T3.fullname AS createUnion ,T1.file_path AS filePath,T1.union_id AS unionId
+        FROM collective_contract_master AS T1
+        LEFT JOIN sys_user AS T2 ON T1.create_user=T2.uid
+        LEFT JOIN sys_dept AS T3 ON T3.id=T1.union_id
+        <where>
+            T1.del_flg=0
+            <if test="name != null and name != ''">
+                and T1.name like '%${name}%'
+            </if>
+        </where>
+        ORDER BY create_time desc
+    </select>
+
+</mapper>

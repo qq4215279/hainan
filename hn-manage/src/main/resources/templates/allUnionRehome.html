@@ -1,0 +1,289 @@
+<body xmlns:th="http://www.thymeleaf.org">
+<css>
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+    <link th:href="@{/static/assets/css/paper-dashboard.css}" rel="stylesheet"/>
+    <link th:href="@{/static/css/iconfont.css}" rel="stylesheet">
+    <link th:href="@{/static/css/layui.css}" rel="stylesheet">
+    <link th:href="@{/static/css/_fstyle.css}" rel="stylesheet">
+    <style type="text/css">
+        .ztree li span.button.pIcon01_ico_open, .ztree li span.button.pIcon01_ico_close,
+        .ztree li span.button.pIcon01_ico_docu {
+            margin-right: 2px;
+            background: url('../../static/plugin/ztree/img/diy/1_open.png') no-repeat scroll 0 0 transparent;
+            vertical-align: top;
+            *vertical-align: middle
+        }
+
+        .ztree li span.button.pIcon02_ico_open, .ztree li span.button.pIcon02_ico_close,
+        .ztree li span.button.pIcon02_ico_docu {
+            margin-right: 2px;
+            background: url('../../static/plugin/ztree/img/diy/2.png') no-repeat scroll 0 0 transparent;
+            vertical-align: top;
+            *vertical-align: middle
+        }
+
+        .print{
+            float:left;
+            width:75px;
+            height:30px;
+            border-radius: 5px;
+            background: #1E90FF;
+            color: white !important;
+            font-size: 16px;
+            cursor: pointer;
+            text-align:center;
+            line-height:30px
+        }
+
+        .print:hover{
+            color:red
+        }
+
+        table tr td,th{
+
+            color:#000;
+        }
+
+        .nocnt{
+            color:red;
+            font-size:16px;
+            padding-left:6px;
+            padding-top:20px
+        }
+
+        .cntpep{
+            color: red;
+            font-size: 16px;
+            padding-top: 60px;
+            font-weight: 600;
+            margin-left: 20px;
+
+        }
+    </style>
+</css>
+<div class="row">
+    <input type="hidden" id="reOutId" value="">
+    <input type="hidden" id="deptname" th:value="${deptname}">
+    <input type="hidden" id="deptId" th:value="${deptId}">
+    <div class="col-sm-12"></div>
+    <div class="content">
+        <div class="">
+
+        </div>
+        <div class="container-fluid">
+            <div class="row" style="margin-bottom: 120px" th:if="${roleflg == '1'}">
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label for="pName" class="col-sm-4 control-label">请选择需要查询的工会：</label>
+                        <div class="col-sm-5">
+                            <input id="pName" class="form-control" style="color: black; background-color: #E3E3E3" type="text" name="pName" value="" onclick="showPNameSelectTree();" onfocus=this.blur();>
+                        </div>
+                    </div>
+                    <div id="pNameContent" class="menuContent" style="display: none; position: absolute; z-index: 200; top: 40px">
+                        <ul id="pNameTree" class="ztree tree-box" style="width: 250px !important; margin-top:-20px; height:150px;"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 120px" th:if="${roleflg != '1'}">
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card ">
+                        <div class="header">
+                            <h4 class="title" style="margin-bottom: -60px" id="titleName">省总工会直属工会农民工返乡统计表</h4>
+                            <h4 style="margin: 0; color: #252422; font-weight: 300;">“暖心返乡路” 农民工春节返乡购票补贴行动线上申请人数：&nbsp;&nbsp;
+                                <span id="totalcnt" style="font-size: 16px; font-weight: 600; color: red">
+                                </span>人
+                            </h4>
+                            <p class="category"></p>
+                        </div>
+                        <p class='cntpep' style="display: none">该工会及下属工会暂时没有返乡人数</p>
+                        <div class="content">
+                            <div id="szgzAllRehomeStat" class="ct-chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script th:src="@{/static/assets/js/chartist.min.js}"></script>
+    <script th:src="@{/static/assets/js/bootstrap-notify.js}"></script>
+    <script th:src="@{/static/assets/js/paper-dashboard.js}"></script>
+    <script th:src="@{/static/plugin/echarts/echarts.min.js}"></script>
+    <script th:src="@{/static/js/jquery.jqprint-0.3.js}"></script>
+    <script th:src="@{/static/js/layui.all.js}"></script>
+    <div th:replace="fragment/fargment :: treeJs"></div>
+    <script th:src="@{/static/plugin/ztree/jquery.ztree.core.min.js}"></script>
+    <script th:src="@{/static/plugin/ztree/jquery.ztree.exhide.min.js}"></script>
+    <script type="text/javascript">
+
+        var allPnameTree = null;
+        $(document).ready(function () {
+            var pNameTree = new $ZTree("pNameTree", "dept/treebylevelTwo");
+            pNameTree.bindOnClick(onClickPName);
+            pNameTree.init();
+            allPnameTree = pNameTree;
+
+            var pName = $("#deptname").val();
+            var deptId = $("#deptId").val();
+            getAllunionStatistics(deptId, pName);
+
+        });
+
+        /**
+         * 显示父级菜单下拉框
+         * @returns
+         */
+        function showPNameSelectTree() {
+            App.showInputTree("pName", "pNameContent", 309);
+        }
+
+        /**
+         * 点击父级菜单下拉框input框时
+         * @param e
+         * @param treeId
+         * @param treeNode
+         * @returns
+         */
+        function onClickPName(e, treeId, treeNode) {
+
+            $("#pName").attr("value", allPnameTree.getSelectedVal());
+            $("#reOutId").attr("value", treeNode.id);
+
+            var deptId = $("#reOutId").val();
+            var pName = $("#pName").val();
+            getAllunionStatistics(deptId, pName);
+
+        }
+
+        /**
+         * 获取统计数据
+         */
+        function getAllunionStatistics(deptId, pName) {
+
+            $(".card .cntpep").hide();
+
+            if(deptId != "" && deptId != null && deptId != undefined){
+                $("#titleName").text(pName + "及下级工会“暖心返乡路” 农民工春节返乡购票补贴行动线上申请统计表")
+            } else {
+                deptId = "";
+            }
+            App.loadingAjax({
+                url: App.ctxPath + "allunionrehome/getAllRehomeStat?deptId=" + deptId,
+                success: function (data) {
+                    var result = data.data;
+                    if(result.allRehomeStat.cntFlg == 0){
+                        $(".card .cntpep").show();
+                        $("#totalcnt").text(result.totalcnt);
+                        var szghEchart = echarts.init(document.getElementById('szgzAllRehomeStat'));
+                        szghEchart.clear();
+                    } else {
+                        szgzAllRehomeStat(result.allRehomeStat, result.heightFlg, result.totalcnt);
+                    }
+
+                }
+            })
+
+
+        }
+
+
+        /**
+         * 返乡统计
+         * @param data
+         */
+        function szgzAllRehomeStat(data, heightFlg, totalcnt) {
+
+            if(heightFlg == "2"){
+                $("#szgzAllRehomeStat").attr('style','height:1300px !important');
+            } else if(heightFlg == "3"){
+                $("#szgzAllRehomeStat").attr('style','height:1900px !important');
+            } else {
+                $("#szgzAllRehomeStat").attr('style','height:600px !important');
+            }
+
+            $("#totalcnt").text(totalcnt);
+            var szgzAllRehomeStat = echarts.init(document.getElementById('szgzAllRehomeStat'));
+            var values=data.fullname;
+            var option = {
+                title: {
+                    text: '',
+                    subtext: ''
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    y:'-7.5',
+                    data: ['省总下级工会返乡统计']
+                },
+                toolbox: {
+                    y:'-7.5',
+                    show: true,
+                    feature: {
+                        mark: {show: true},
+                        dataView: {show: true, readOnly: false},
+                        magicType: {show: true, type: ['line', 'bar']},
+                        restore: {show: true}
+                    }
+                },
+                calculable: true,
+                xAxis: [
+                    {
+                        type: 'value',
+                        boundaryGap: [0, 0.01]
+                    }
+                ],
+                grid:{x:'36%',y:'5%', right:'15%',bottom:'9%',containLable:true},//修改样式
+                yAxis: [
+                    {
+                        type: 'category',
+                        data: values,
+                        axisLabel:{
+                            interval:0//横轴信息全部显示
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '返乡人数',
+                        type: 'bar',
+                        color: ['#ae81ff'],
+                        data: data.count,
+                        itemStyle: {
+                            normal: {
+                                label: {
+                                    show: true, //开启显示
+                                    position: 'right', //在上方显示
+                                    textStyle: { //数值样式
+                                        color: ['#ae81ff'],
+                                        fontSize: 15
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            };
+            szgzAllRehomeStat.setOption(option);
+            szgzAllRehomeStat.resize();
+
+        }
+
+
+
+        function dateFormat(dateStr){
+            return dateStr.substr(4,2)+'月'+dateStr.substr(6,2)+'日';
+        }
+
+
+    </script>
+    <script th:src="@{http://www.jq22.com/jquery/jquery-migrate-1.2.1.min.js}"></script>
+</js>
+
+</body>

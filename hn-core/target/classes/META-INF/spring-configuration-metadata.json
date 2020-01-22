@@ -1,0 +1,17 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "com.gobestsoft.core.util.WebSiteUtil",
+      "name": "uploadSite",
+      "type": "com.gobestsoft.core.util.WebSiteUtil"
+    }
+  ],
+  "properties": [
+    {
+      "sourceType": "com.gobestsoft.core.util.WebSiteUtil",
+      "name": "uploadSite.address",
+      "type": "java.lang.String"
+    }
+  ]
+}

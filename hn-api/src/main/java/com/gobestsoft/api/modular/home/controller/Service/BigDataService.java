@@ -1,0 +1,940 @@
+package com.gobestsoft.api.modular.home.controller.Service;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.gobestsoft.api.modular.basic.BasicRowBounds;
+import com.gobestsoft.api.modular.home.controller.model.DeptMemberDocile;
+
+import com.gobestsoft.api.modular.system.service.DictService;
+import com.gobestsoft.common.constant.BigDataConstant;
+import com.gobestsoft.common.constant.model.*;
+import com.gobestsoft.common.modular.appuser.dao.AppUserDao;
+import com.gobestsoft.common.modular.bigdata.service.JobService;
+import com.gobestsoft.common.modular.dept.mapper.BigDataMapper;
+import com.gobestsoft.common.modular.dept.mapper.DeptMemberDetailMapper;
+import com.gobestsoft.common.modular.model.ObjectMap;
+import com.gobestsoft.common.modular.system.dao.BlackboardDao;
+import com.gobestsoft.common.modular.system.dao.DeptDao;
+import com.gobestsoft.common.modular.system.mapper.DeptMapper;
+import com.gobestsoft.common.modular.system.mapper.DictMapper;
+import com.gobestsoft.common.modular.system.model.Dept;
+import com.gobestsoft.common.modular.system.model.Dict;
+import com.gobestsoft.core.reids.RedisCacheCoreFactory;
+import com.gobestsoft.core.reids.RedisCacheModel;
+import com.gobestsoft.core.reids.RedisConstants;
+import com.gobestsoft.core.reids.RedisUtils;
+import com.gobestsoft.core.util.BeanUtil;
+import com.gobestsoft.core.util.DateUtil;
+import com.gobestsoft.core.util.HttpUtil;
+import com.gobestsoft.core.util.ToolUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+@Service
+public class BigDataService {
+
+    @Autowired
+    BigDataMapper bigDataMapper;
+    @Resource
+    RedisUtils redisUtils;
+    @Resource
+    RedisCacheCoreFactory cacheFactory;
+
+    @Autowired
+    BlackboardDao bbDao;
+
+    @Autowired
+    DeptMapper deptMapper;
+
+    @Autowired
+    DeptDao deptDao;
+
+    @Autowired
+    DeptMemberDetailMapper deptMemberDetailMapper;
+
+    @Autowired
+    AppUserDao appUserDao;
+
+    @Autowired
+    JobService jobService;
+
+    @Autowired
+    DictService dictService;
+
+
+    /**
+     * 获取工会所有会员信息
+     *
+     * @param rowBounds 分页
+     * @param deptId    工会id
+     * @return
+     */
+    public List<Map<String, Object>> getDeptMember(BasicRowBounds rowBounds, String deptId) {
+        return deptMemberDetailMapper.getDeptMember(rowBounds, deptId);
+    }
+
+    /**
+     * 查询所有困难职工数
+     *
+     * @param type 1困难职工 2、医疗互助
+     * @return
+     */
+    public Integer getStraitenedCountAll(int type) {
+        return bigDataMapper.selectStraitenedCount(null, null, type);
+    }
+
+    /**
+     * 查询今天的所有困难职工人数
+     *
+     * @param type 1困难职工 2、医疗互助
+     * @return
+     */
+    public Integer getStraitenedDaily(int type) {
+        Calendar ca = Calendar.getInstance();
+
+        SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
+
+        String start_time = sf.format(ca.getTime());
+
+        return bigDataMapper.selectStraitenedCount(start_time, start_time, type);
+    }
+
+    /**
+     * 查询本周的所有困难职工人数
+     *
+     * @param type 1困难职工 2、医疗互助
+     * @return
+     */
+    public Integer getStraitenedWeek(int type) {
+        Calendar ca = Calendar.getInstance();
+
+
+        SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
+
+        String start_time = sf.format(ca.getTime());
+
+        ca.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+
+        String end_time = sf.format(ca.getTime());
+
+        return bigDataMapper.selectStraitenedCount(start_time, end_time, type);
+    }
+
+    /**
+     * 查询本月的所有困难职工人数
+     *
+     * @param type 1困难职工 2、医疗互助
+     * @return
+     */
+    public Integer getStraitenedMonth(int type) {
+        Calendar ca = Calendar.getInstance();
+
+
+        SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
+
+        String start_time = sf.format(ca.getTime());
+
+
+        ca.set(Calendar.DAY_OF_MONTH, 1);
+
+        String end_time = sf.format(ca.getTime());
+        return bigDataMapper.selectStraitenedCount(start_time, end_time, type);
+    }
+
+    /**
+     * 获取困难帮扶的相关数据
+     *
+     * @return
+     */
+    public HelpData getKNBF_data() {
+        HelpData helpData = new HelpData();
+
+        //困难帮扶统计
+        HelpItem knzg = new HelpItem();
+
+        knzg.setTotal_count(getStraitenedCountAll(1));
+
+        knzg.setDaily_count(getStraitenedDaily(1));
+
+        knzg.setWeek_count(getStraitenedWeek(1));
+
+        knzg.setMonth_count(getStraitenedMonth(1));
+
+        //困难职工
+        helpData.setKunNan(knzg);
+
+
+        HelpItem ylhz = new HelpItem();
+
+        ylhz.setDaily_count(getStraitenedDaily(2));
+
+        ylhz.setWeek_count(getStraitenedWeek(2));
+
+        ylhz.setMonth_count(getStraitenedMonth(2));
+
+        ylhz.setTotal_count(getStraitenedCountAll(2));
+
+        helpData.setYiLiao(ylhz);
+
+        //帮扶金额 假数据！！！！！！！！！！！！！！！！！
+        HelpItem bfje = new HelpItem();
+
+        String[] exclude = {"total_count"};
+
+        try {
+            //复制帮扶的人数
+            BeanUtil.tranferValues(knzg, bfje, exclude);
+            bfje.setTotal_count(0);
+            helpData.setBangFu(bfje);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        helpData.setReXian(new HelpItem());
+
+
+        return helpData;
+    }
+
+    /**
+     * 获取大数据真实数据
+     *
+     * @return
+     */
+    public BigData getBigData(String bigDataAdditionTime) {
+
+
+        BigData bigData = new BigData();
+
+
+        //困难帮扶         部分数据需要客户提供
+        HelpData knbf_data = getKNBF_data();
+
+        bigData.setHelpData(knbf_data);
+        //新媒体
+        NewMediaData newMediaData = bigDataMapper.selectUnionMediaData();
+
+        if (newMediaData != null) {
+            Integer anInt = redisUtils.getInt(RedisConstants.APP_OPEN_COUNT);
+            newMediaData.setApp_visit_count(newMediaData.getApp_visit_count() + (anInt == null ? 0 : anInt));
+            newMediaData.setApp_signUp_count(bigDataMapper.selectAppUser());
+        }
+
+
+        //法律援助
+        SeekLegalAdviceData seekLegalAdviceData = bigDataMapper.selectLawAdviceData();
+        //组织建设
+        OrganizationData organizationData = selectOrgBuildData(bigDataAdditionTime);
+
+        bigData.setSeekLegalAdviceData(seekLegalAdviceData);
+
+        bigData.setOrganizationData(organizationData);
+
+        bigData.setNewMediaData(newMediaData);
+        //普惠商城数据
+        HPMallData mallData = getPuHuiMallData();
+
+        bigData.setHpMallData(mallData);
+
+        String[] arr = {"海口市", "三亚市", "琼中", "白沙"};
+
+        //活动数据暂时为假数据
+        for (int i = 0; i < 2; i++) {
+            ActivityOrEducationData bean = new ActivityOrEducationData();
+
+            List<JSONObject> jsonObjectList = new ArrayList<>();
+
+            if (i == 0) {
+
+                for (int j = 0; j < 3; j++) {
+                    JSONObject obj = new JSONObject();
+                    obj.put("name", arr[j]);
+                    obj.put("times", 300 - 50 * j);
+                    obj.put("members", 14000 - j * 1000);
+                    jsonObjectList.add(obj);
+                }
+                bean.setTotal_participation_number(120000);
+                bean.setTotal_times(999);
+                bean.setDataListSort(jsonObjectList);
+                bigData.setHd(bean);
+
+            } else {
+                Calendar calendar = Calendar.getInstance();
+                for (int j = 0; j < 6; j++) {
+                    JSONObject obj = new JSONObject();
+                    obj.put("name", DateUtil.getMonthCnName(calendar));
+                    obj.put("times", 300 - 50 * j);
+                    obj.put("members", 15000 - 500 * j);
+                    jsonObjectList.add(obj);
+                    calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) - 1);
+                }
+                bean.setTotal_participation_number(120000);
+                bean.setTotal_times(999);
+                bean.setDataListSort(jsonObjectList);
+                bigData.setPx(bean);
+
+            }
+
+        }
+
+        return bigData;
+
+    }
+
+    /**
+     * 获取普惠商城的数据
+     *
+     * @return
+     */
+    public HPMallData getPuHuiMallData() {
+
+        HPMallData hpMallData = new HPMallData();
+
+        String puhuiUrl = "http://shop.hnszgh.org:9087/b2b2c/public/index.php/api/getStatisticalData";
+
+        String json = HttpUtil.sendGet(puhuiUrl);
+
+        try {
+            if (StringUtils.isNotEmpty(json)) {
+
+                JSONObject jsonObject = JSON.parseObject(json);
+                if (jsonObject.getInteger("code") == 200) {
+                    JSONObject data = jsonObject.getJSONObject("data");
+
+                    hpMallData.setProduct_count(data.getIntValue("goodsAmount"));
+                    hpMallData.setLocate_vendor(data.getIntValue("shopAmount"));
+                    hpMallData.setCover_member_count(data.getIntValue("userAmount"));
+                    hpMallData.setTrade_count(data.getIntValue("tradeAmount"));
+                    hpMallData.setTotal_amount(data.getDouble("tradeTotal"));
+
+                    return hpMallData;
+                } else {
+                    throw new RuntimeException(jsonObject.getString("message"));
+                }
+            } else {
+                throw new RuntimeException("获取普惠商城数据失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("解析普惠商城数据失败");
+        }
+
+    }
+
+    /**
+     * 获取建会数据
+     *
+     * @param bigDataAdditionTime
+     * @return
+     */
+    public OrganizationData selectOrgBuildData(String bigDataAdditionTime) {
+
+        OrganizationData organizationData = bigDataMapper.selectOrgBuildData(bigDataAdditionTime);
+        return organizationData;
+    }
+
+    /**
+     * 查询会员年龄分布
+     *
+     * @return
+     */
+    public ObjectMap getMemberInfoByAge(Integer deptId) {
+        ObjectMap map = ObjectMap.getInstance();
+
+
+        List<String> legend = new ArrayList<>();
+        List<Map<String, Object>> list = new ArrayList<>();
+        legend.add("16-20岁");
+        Map<String, Object> memberInfoByAge = bigDataMapper.getMemberInfoByAge(getDateSubYear(20), getDateSubYear(16), deptId);
+        memberInfoByAge.put("name", "16-20岁");
+        list.add(memberInfoByAge);
+        legend.add("20-30岁");
+        Map<String, Object> memberInfoByAge2 = bbDao.getMemberInfoByAge(getDateSubYear(30), getDateSubYear(20));
+        memberInfoByAge2.put("name", "20-30岁");
+        list.add(memberInfoByAge2);
+        legend.add("30-40岁");
+        Map<String, Object> memberInfoByAge3 = bbDao.getMemberInfoByAge(getDateSubYear(40), getDateSubYear(30));
+        memberInfoByAge3.put("name", "30-40岁");
+        list.add(memberInfoByAge3);
+        legend.add("40-50岁");
+        Map<String, Object> memberInfoByAge4 = bbDao.getMemberInfoByAge(getDateSubYear(50), getDateSubYear(40));
+        memberInfoByAge4.put("name", "40-50岁");
+        list.add(memberInfoByAge4);
+        legend.add("50-60岁");
+        Map<String, Object> memberInfoByAge5 = bbDao.getMemberInfoByAge(getDateSubYear(60), getDateSubYear(50));
+        memberInfoByAge5.put("name", "50-60岁");
+        list.add(memberInfoByAge5);
+        legend.add("60岁以上");
+        Map<String, Object> memberInfoByAge6 = bbDao.getMemberInfoByAge(null, getDateSubYear(60));
+        memberInfoByAge6.put("name", "60岁以上");
+        list.add(memberInfoByAge6);
+        map.put("legend", legend);
+        map.put("list", list);
+
+        return map;
+
+
+    }
+
+    /**
+     * 会员总量排名前十工会统计
+     *
+     * @return
+     */
+    public List<Map<String, Object>> getmemberTop10Statistics(Integer deptId) {
+        if (deptId == null) {
+            deptId = 1;
+        }
+        List<Map<String, Object>> maps = bigDataMapper.memberTop10Statistics(deptId);
+        return maps;
+    }
+
+    /**
+     * 分组查询民族人数
+     *
+     * @return
+     */
+    public List<Map<String, Object>> getMemberInfoByNation(Integer deptId) {
+
+        List<Map<String, Object>> memberInfoByNation = bigDataMapper.getMemberInfoByNation(deptId);
+        memberInfoByNation.forEach( item -> {
+            Dict dict = dictService.getDicByGroupCodeAndCode("lib_ethnic_group", item.get("nation"));
+            item.put("name", dict.getName());
+            item.remove("nation");
+        });
+        Collections.sort(memberInfoByNation, new Comparator<Map<String, Object>>() {
+            @Override
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                Long value1 = (Long) o1.get("value");
+                Long value2 = (Long) o2.get("value");
+                if (value1 == null) {value1 = 0L;}
+                if (value2 == null) {value2 = 0L;}
+                return (int) (value2 - value1);
+            }
+        });
+
+        return memberInfoByNation;
+    }
+
+    /**
+     * 分组查询学历人数
+     *
+     * @return
+     */
+    public List<Map<String, Object>> getMemberInfoByEducation(Integer deptId) {
+
+        return bigDataMapper.getMemberInfoByEducation(deptId);
+    }
+
+    /**
+     * 获取指定年份以前的日期
+     *
+     * @param year
+     * @return
+     */
+    public String getDateSubYear(int year) {
+        SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
+        Calendar instance = Calendar.getInstance();
+        instance.add(Calendar.YEAR, -year);
+        return sf.format(instance.getTime());
+
+    }
+
+    /**
+     * 近一年各月注册和入会人员统计
+     *
+     * @return
+     */
+    public Map<String, Object> lastYearMonthStatistics() {
+        Map<String, Object> result = new HashMap<>();
+//        Map<String, Object> registerMember = bbDao.registerMember();
+//        result.put("registerCount", registerMember.get("registerCount"));
+//        result.put("memberCount", registerMember.get("memberCount"));
+//        result.put("bindUserCount", registerMember.get("bindUserCount"));
+
+        List<Map<String, String>> selectMonths = new ArrayList<>();
+        Calendar date = Calendar.getInstance();
+        Map<String, String> m = new HashMap<>();
+        m.put("month", DateUtil.format(date.getTime(), "yyyy-MM"));
+        date.set(Calendar.DAY_OF_MONTH, 1);
+        m.put("startTime", DateUtil.format(date.getTime(), "yyyyMMdd") + "000000");
+        date.set(Calendar.DAY_OF_MONTH, date.getActualMaximum(Calendar.DAY_OF_MONTH));
+        m.put("endTime", DateUtil.format(date.getTime(), "yyyyMMdd") + "235959");
+        selectMonths.add(m);
+        for (int i = 1; i < 12; i++) {
+            m = new HashMap<>();
+            date.add(Calendar.MONTH, -1);
+            m.put("month", DateUtil.format(date.getTime(), "yyyy-MM"));
+            date.set(Calendar.DAY_OF_MONTH, 1);
+            m.put("startTime", DateUtil.format(date.getTime(), "yyyyMMdd") + "000000");
+            date.set(Calendar.DAY_OF_MONTH, date.getActualMaximum(Calendar.DAY_OF_MONTH));
+            m.put("endTime", DateUtil.format(date.getTime(), "yyyyMMdd") + "235959");
+            selectMonths.add(m);
+        }
+        Collections.reverse(selectMonths);
+
+        List<Map<String, Object>> lastYear = bbDao.lastYearMonthStatistics(selectMonths);
+        List<Object> months = new ArrayList<>();
+//        List<Object> register = new ArrayList<>();
+        List<Object> member = new ArrayList<>();
+//        List<Object> bindUser = new ArrayList<>();
+        lastYear.forEach(l -> {
+            months.add(l.get("month"));
+//            register.add(l.get("registerCount"));
+//            member.add(l.get("memberCount"));
+        });
+        result.put("months", months);
+//        result.put("register", register);
+        result.put("member", member);
+//        result.put("bindUser", bindUser);
+        return result;
+    }
+
+    /**
+     * 按时间维度统计会员数变化
+     *
+     * @param deptId
+     * @return
+     */
+    public Map<String, Object> getMemberCountByTimeRange(Integer deptId) {
+        List<Map<String, Object>> dayMemberStatistics = getDayMemberStatistics(deptId);
+        List<Map<String, Object>> monthMemberStatistics = getMonthMemberStatistics(deptId);
+        List<Map<String, Object>> yearMemberStatistics = getYearMemberStatistics(deptId);
+        Map<String, Object> map = new HashMap<>();
+        map.put("dayMemberStatistics", dayMemberStatistics);
+        map.put("monthMemberStatistics", monthMemberStatistics);
+        map.put("yearMemberStatistics", yearMemberStatistics);
+        return map;
+
+    }
+
+    /**
+     * 近30天会员趋势
+     *
+     * @return
+     */
+    public List<Map<String, Object>> getDayMemberStatistics(Integer deptId) {
+        if (deptId == null) {deptId = 1;}
+        //查询直属下级
+        SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
+        Calendar calendar = Calendar.getInstance();
+        String endDate = sf.format(calendar.getTime());
+        calendar.add(Calendar.DAY_OF_YEAR, -30);
+        String startDate = sf.format(calendar.getTime());
+        List<Map<String, Object>> list = bigDataMapper.monthMemberStatistics(deptId, startDate, endDate, 1);
+        if (list != null) {
+
+            Collections.reverse(list);
+        }
+
+        return list;
+
+    }
+
+    /**
+     * 全年各月份会员趋势
+     *
+     * @return
+     */
+    public List<Map<String, Object>> getMonthMemberStatistics(Integer deptId) {
+        if (deptId == null) deptId = 1;
+        //查询直属下级
+        SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
+        Calendar calendar = Calendar.getInstance();
+        String endDate = sf.format(calendar.getTime());
+        calendar.add(Calendar.MONTH, -11);
+        String startDate = sf.format(calendar.getTime());
+
+
+        List<Map<String, Object>> list = bigDataMapper.monthMemberStatistics(deptId, startDate, endDate, 2);
+        if (list != null) {
+
+            Collections.reverse(list);
+        }
+
+        return list;
+
+    }
+
+    /**
+     * 近5年各月份会员趋势
+     *
+     * @return
+     */
+    public List<Map<String, Object>> getYearMemberStatistics(Integer deptId) {
+        if (deptId == null) deptId = 1;
+        //查询直属下级
+        SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
+        Calendar calendar = Calendar.getInstance();
+        String endDate = sf.format(calendar.getTime());
+        calendar.add(Calendar.YEAR, -5);
+        String startDate = sf.format(calendar.getTime());
+        List<Map<String, Object>> list = bigDataMapper.monthMemberStatistics(deptId, startDate, endDate, 3);
+        if (list != null) {
+
+            Collections.reverse(list);
+        }
+
+        return list;
+
+    }
+
+    /**
+     * 分组查询性别
+     *
+     * @return
+     */
+    public List<Map<String, Object>> getMemberCountBySex(Integer deptId) {
+        if (deptId == null) {
+            deptId = 1;
+        }
+        Map<String, Object> map = null;
+        List<Map<String, Object>> list = bigDataMapper.getMemberCountBySex(deptId);
+        if (list == null) return null;
+        return list;
+
+    }
+
+    /**
+     * 查询农名工和职工比例
+     *
+     * @param deptId
+     * @return
+     */
+    public List<Map<String, Object>> getMemberInfoByFarmer(Integer deptId) {
+        if (deptId == null) {
+            deptId = 1;
+        }
+        List<Map<String, Object>> memberInfoByFarmer = bigDataMapper.getMemberInfoByFarmer(deptId);
+        return memberInfoByFarmer;
+    }
+
+    /**
+     * 会员数量
+     *
+     * @param deptId
+     * @return
+     */
+    public Integer getMemberCount(Integer deptId) {
+        if (deptId == null) {
+            deptId = 1;
+        }
+        return bigDataMapper.selectMemberCount(deptId);
+    }
+
+    /**
+     * 组织数量
+     *
+     * @param deptId
+     * @return
+     */
+    public Integer getDeptCount(Integer deptId) {
+        if (deptId == null) {
+            deptId = 1;
+        }
+        return bigDataMapper.selectDeptCount(deptId);
+    }
+
+    public List<Map<String, Object>> getDeptCountGroup(Integer deptId) {
+        EntityWrapper<Dept> wrapper = new EntityWrapper<>();
+        wrapper.eq("pid", deptId);
+        List<Dept> depts = deptMapper.selectList(wrapper);
+        List<Map<String, Object>> list = new ArrayList<>();
+        if (depts == null) return null;
+        depts.forEach(d -> {
+            Integer value = bigDataMapper.selectDeptCount(d.getId());
+            Map<String, Object> map = new HashMap<>();
+            map.put("deptId", d.getId());
+            map.put("name", d.getFullname());
+            map.put("value", value);
+            list.add(map);
+        });
+
+        list.sort(new Comparator<Map<String, Object>>() {
+            @Override
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                Integer value1 = (Integer) o1.get("value");
+                Integer value2 = (Integer) o2.get("value");
+                return value2 - value1;
+            }
+        });
+        return list;
+    }
+
+    //匹配可能存在的机关
+    private static final String citys[] = {
+            "海口", "三亚", "三沙", "儋州",
+            "五指山", "文昌", "琼海", "万宁", "东方",
+            "定安", "屯昌", "澄迈", "临高",
+            "白沙", "昌江", "乐东", "陵水", "保亭", "琼中",
+            //省份
+            "北京", "天津", "上海", "重庆", "河北", "山西",
+            "辽宁", "吉林", "黑龙江", "江苏", "浙江",
+            "安徽", "福建", "江西", "山东", "河南", "湖北",
+            "湖南", "广东", "四川", "贵州", "云南",
+            "陕西", "甘肃", "青海", "蒙古", "广西", "西藏",
+            "宁夏", "新疆", "香港", "澳门", "台湾"
+
+    };
+
+    private static final String hainan_citys[] = {
+            "海口", "三亚", "三沙", "儋州",
+            "五指山", "文昌", "琼海", "万宁", "东方",
+            "定安", "屯昌", "澄迈", "临高",
+            "白沙", "昌江", "乐东", "陵水", "保亭", "琼中"
+    };
+
+    /**
+     * 根据户籍
+     *
+     * @param deptId
+     * @return
+     */
+    public List<Map<String, Object>> getMemberInfoByCity(Integer deptId) {
+
+        List<Map<String, Object>> obj = new ArrayList<>();
+        List<DeptMemberDocile> result = new ArrayList<>();
+
+        String historyStatisticsCacheKey = "BIG:DATA:DEPT:MEMBER:DOCILE:HISTORY:" + deptId;
+
+        List<DeptMemberDocile> historyStatistics = (List<DeptMemberDocile>) redisUtils.get(historyStatisticsCacheKey);
+
+        Calendar thisMonth = Calendar.getInstance();
+
+        String month;
+        String startTime;
+        String endTime;
+        List<DeptMemberDocile> deptMemberDociles;
+
+        //查询历史，不含当月
+        if (historyStatistics == null) {
+
+            historyStatistics = new ArrayList<>();
+
+            //上一月遍历至项目发布月（2018年6月）
+            //项目发布日期
+            Calendar projectInitTime = Calendar.getInstance();
+            projectInitTime.setTime(DateUtil.parseDate("2018-06-01"));
+
+            //当前时间与项目发布时间的间隔月
+            int spaceMonth = DateUtil.getMonthSpace(thisMonth.getTime(), projectInitTime.getTime());
+
+
+            //查询项目发布月之后，每个月的数据,不包含最后一个月
+            for (int i = 0; i < spaceMonth; i++) {
+
+                //查询项目发布月之前及当月的数据
+                month = DateUtil.format(projectInitTime.getTime(), "yyyyMM");
+
+                String cacheKey = getCacheKey(deptId, month);
+
+                deptMemberDociles = (List<DeptMemberDocile>) redisUtils.get(cacheKey);
+
+                if (deptMemberDociles == null) {
+
+                    //开始时间
+                    startTime = DateUtil.getDays(DateUtil.getMonthFirstDay(projectInitTime));
+                    //结束时间
+                    endTime = DateUtil.getDays(DateUtil.getMonthLastDay(projectInitTime));
+
+                    if (i == 0) {
+                        deptMemberDociles = getDeptMemberDocileByTime(deptId, null, endTime + "235959");
+                    } else {
+                        deptMemberDociles = getDeptMemberDocileByTime(deptId, startTime + "000000", endTime + "235959");
+                    }
+
+                    redisUtils.set(cacheKey, deptMemberDociles);
+                }
+
+                //填充历史数据
+                fillDociles(deptMemberDociles, historyStatistics);
+
+                projectInitTime.add(Calendar.MONTH, 1);
+            }
+
+            redisUtils.set(historyStatisticsCacheKey, historyStatistics);
+
+        }
+
+        result.addAll(historyStatistics);
+
+        Calendar today = Calendar.getInstance();
+        //查询昨天之前，当月的数据
+        if (today.get(Calendar.DAY_OF_MONTH) > 1) {
+            today.add(Calendar.DAY_OF_MONTH, -1);
+
+            String yesterday = DateUtil.format(today.getTime(), "yyyyMMdd");
+            String monthBeforeToday = "BIG:DATA:DEPT:MEMBER:DOCILE:MONTH-BEFORE-TODAY:" + deptId + yesterday;
+
+            deptMemberDociles = (List<DeptMemberDocile>) redisUtils.get(monthBeforeToday);
+
+            if (deptMemberDociles == null) {
+                startTime = DateUtil.getDays(DateUtil.getMonthFirstDay(today));
+
+                deptMemberDociles = getDeptMemberDocileByTime(deptId, startTime + "000000", yesterday + "235959");
+
+
+                redisUtils.set(monthBeforeToday, deptMemberDociles);
+            }
+
+            //填充返回结果
+            fillDociles(deptMemberDociles, result);
+        }
+
+        today = Calendar.getInstance();
+
+        //查询今日数据
+        endTime = DateUtil.getDays(today.getTime());
+
+        startTime = DateUtil.getDays(today.getTime());
+
+        deptMemberDociles = getDeptMemberDocileByTime(deptId, startTime + "000000", endTime + "235959");
+
+        //填充返回结果
+        fillDociles(deptMemberDociles, result);
+
+//        Integer memberCount = result.stream().mapToInt(DeptMemberDocile::getCount).sum();
+        Integer memberCount = result.get(hainan_citys.length).getCount();
+
+        result.sort((o1, o2) -> {
+            Integer value1 = o1.getCount();
+            Integer value2 = o1.getCount();
+            return value2 - value1;
+        });
+
+        //如果超过10个,就取前9，最后一个拼为其他
+        if (result.size() >= 10) {
+            int index = 0;
+            List<DeptMemberDocile> list = new ArrayList<>();
+            for (DeptMemberDocile m : result) {
+                if (index > 9) {
+                    break;
+                }
+                list.add(m);
+                memberCount -= m.getCount();
+                index++;
+            }
+            if (memberCount > 0) {
+                result = list;
+                result.add(new DeptMemberDocile("其他", memberCount));
+            }
+        }
+
+        result.forEach(r -> {
+            Map<String, Object> m = new HashMap<>();
+            m.put("name", r.getCity());
+            m.put("value", r.getCount());
+            obj.add(m);
+        });
+
+
+        return obj;
+    }
+
+    private String getCacheKey(Integer deptId, String month) {
+        return "BIG:DATA:DEPT:MEMBER:DOCILE:" + deptId + ":" + month;
+    }
+
+    /**
+     * 填充户籍
+     *
+     * @param selectDociles 查询结果
+     * @param result        填充结果
+     */
+    private void fillDociles(List<DeptMemberDocile> selectDociles, List<DeptMemberDocile> result) {
+        for (DeptMemberDocile dDocile : selectDociles) {
+            DeptMemberDocile docile = null;
+
+            for (DeptMemberDocile d : result) {
+                if (d.getCity().equals(dDocile.getCity())) {
+                    docile = d;
+                }
+            }
+
+            if (docile == null) {
+                result.add(dDocile);
+            } else {
+                docile.setCount(docile.getCount() + dDocile.getCount());
+            }
+
+        }
+    }
+
+    /**
+     * 根据时间查询工会会员的户籍
+     *
+     * @param deptId    组织ID
+     * @param startTime 查询开始时间
+     * @param endTime   查询结束时间
+     * @return
+     */
+    private List<DeptMemberDocile> getDeptMemberDocileByTime(Integer deptId, String startTime, String endTime) {
+
+        List<DeptMemberDocile> result = new ArrayList<>();
+
+        List<Map<String, Object>> memberInfoByDocile = bigDataMapper.getMemberInfoByDocile(deptId, startTime, endTime);
+
+        if (memberInfoByDocile != null) {
+
+//            Integer otherCount = memberInfoByDocile.stream().mapToInt((o) -> Integer.valueOf(o.get("value") + "")).sum();
+            Integer otherCount = 0;
+
+            for (String city : hainan_citys) {
+
+                int count = 0;
+                for (Map o : memberInfoByDocile) {
+                    Integer value = Integer.valueOf(o.get("value") + "");
+                    String name = o.get("name").toString();
+                    if (name.contains(city)) {
+                        try {
+                            count += value;
+                        } catch (Exception e) {
+
+                        }
+                    }
+                }
+
+                result.add(new DeptMemberDocile(city, count));
+                otherCount += count;
+            }
+
+            result.add(new DeptMemberDocile("其他", otherCount));
+        }
+        return result;
+
+    }
+
+    /**
+     * 普惠活动大屏数据
+     */
+    public Map<String, Object> getGspShopInfo(){
+        Map<String, Object> map = new HashMap<>();
+
+        // 模糊匹配 查缓存
+        Set<String> keys = redisUtils.getKeyLike(BigDataConstant.bigData_gsp_active);
+        RedisCacheModel model = cacheFactory.getCacheModel(keys);
+        if(model != null){
+            map = (Map<String, Object>) model.getData();
+        }
+
+        if(ToolUtil.isEmpty(map)){
+            // 查数据库 同时 保存到缓存
+            map = jobService.getGspShopInfoMysql();
+            Long now = Long.parseLong(DateUtil.getAllTime());
+            cacheFactory.cacheModel(BigDataConstant.bigData_gsp_active + now, map);
+        }
+
+        return map;
+    }
+
+}
+
+
+

@@ -1,0 +1,372 @@
+package com.gobestsoft.mamage.config.member;
+
+
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.gobestsoft.common.modular.system.dao.DeptDao;
+import com.gobestsoft.common.modular.system.mapper.DictMapper;
+import com.gobestsoft.common.modular.system.model.Dict;
+import com.gobestsoft.core.reids.RedisUtils;
+import com.gobestsoft.core.support.HttpKit;
+import com.gobestsoft.core.util.SpringContextHolder;
+import com.gobestsoft.core.util.UUIDUtil;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
+import java.util.Random;
+
+
+public class MemberUtil {
+
+
+    private final static String FLOW_NAME = "MEMBER_FLOW";
+
+    private static RedisUtils redisUtils = SpringContextHolder.getBean(RedisUtils.class);
+
+    private static DeptDao deptDao = SpringContextHolder.getBean(DeptDao.class);
+
+    private static DictMapper dictMapper = SpringContextHolder.getBean(DictMapper.class);
+
+
+    static {
+        init();
+    }
+
+    /**
+     * 初始化方法
+     */
+    private static Long init() {
+        //取数据库中流水
+        Long MEMBER_FLOW;
+        String dbMemberNo = deptDao.selRecentNo();
+        if (StringUtils.isNotEmpty(dbMemberNo)) {
+            MEMBER_FLOW = Long.valueOf(dbMemberNo);
+        } else {
+            MEMBER_FLOW = 1L;
+        }
+        //使用此方法确保只插入一次 防止分布式造成的数据错误
+        boolean flag = redisUtils.tryGetDistributedLock(FLOW_NAME, MEMBER_FLOW, 0);
+        //如果为false，则说明其他系统已经提前初始化，则获取自增后的值
+        if(!flag){
+           return redisUtils.incr(FLOW_NAME) +1;
+        }
+        return MEMBER_FLOW;
+    }
+
+
+    private static String LOCK_KEY="LOCK_KEY_";
+    private static Long makeMemberFlow() {
+        if (redisUtils.exists(FLOW_NAME) && redisUtils.get(FLOW_NAME) != null) {
+            Long MEMBER_FLOW =redisUtils.incr(FLOW_NAME)+1;
+            return MEMBER_FLOW;
+        }else{
+            return init();
+        }
+    }
+
+    /**
+     * 获取会员卡号
+     *
+     * @param sex              会员性别
+     * @param deptName         工会名称
+     * @param deptDistrictCode
+     * @return
+     */
+    public synchronized static String getMemberCardNo(String sex, String deptName, String deptDistrictCode) {
+        StringBuffer memberCardNo = new StringBuffer("46");//固定46开头
+        System.out.println("SEX+" + sex + ",DeptName:+" + deptName + ",deptDistrictCode:" + deptDistrictCode);
+        String districtCode = "";
+        //获得流水号
+        String requestId = UUIDUtil.getUUID();
+        //先获取锁
+        while (!redisUtils.tryGetDistributedLock(LOCK_KEY + FLOW_NAME, requestId, 10)){
+
+        }
+        Long MEMBER_FLOW = makeMemberFlow();
+
+        //会员卡号流水
+        String cardNoFlow = String.format("%08d", MEMBER_FLOW);//流水号改为8位
+        //释放redis锁
+        redisUtils.releaseLock(LOCK_KEY+FLOW_NAME,requestId);
+        //性别code【1位】
+        String sexCode = "";
+        String [] male ={"1","3","5","7","9"};
+        String [] female ={"0","2","4","6","8"};
+
+        if ("女".equals(sex) || "2".equals(sex)) {
+            sexCode = female[new Random().nextInt(female.length)]; //性别随机选取偶数
+        }else{
+            sexCode = male[new Random().nextInt(male.length)]; //性别随机选取奇数
+        }
+
+        if (getDistrictCodeByDept(deptName) == null) {
+            districtCode = getDistrictCodeByAddress(deptDistrictCode);
+        } else {
+            districtCode = getDistrictCodeByDept(deptName);
+        }
+        //如果查不到的话，就默认为海口市
+        if (StringUtils.isEmpty(districtCode)) {
+            districtCode = "02";
+        }
+        //当前没有区的字段，先写死
+        districtCode += "01";
+        String preNum = memberCardNo.append(districtCode).append(sexCode).append(cardNoFlow).toString();
+        String verifyCode = verifyCode(preNum);
+        memberCardNo.append(verifyCode);
+
+
+        return memberCardNo.toString();
+
+    }
+
+    /**
+     * 获取工会编码
+     *
+     * @param deptName
+     * @return
+     */
+    private static String getDistrictCodeByDept(String deptName) {
+        String code = "";
+//		String deptName = user.getDeptName();
+        switch (deptName) {
+            case "海南省总工会":
+                code = "01";
+                break;
+            case "海南省直机关工会工委":
+                code = "22";
+                break;
+            case "海南省科教文卫邮电工会":
+                code = "23";
+                break;
+            case "海南省农林水利交通建设工会":
+                code = "24";
+                break;
+            case "海南省机械能源石化医药工会":
+                code = "25";
+                break;
+            case "海南省财贸旅游烟草工会":
+                code = "26";
+                break;
+            case "海南省地方税局":
+                code = "27";
+                break;
+            case "海南省工商行政管理工会":
+                code = "28";
+                break;
+            default:
+                code = null;
+                break;
+        }
+        return code;
+    }
+
+    /**
+     * 获取市县的code
+     *
+     * @param districtCode
+     * @return
+     */
+    private static String getDistrictCodeByAddress(String districtCode) {
+        if (StringUtils.isNumeric(districtCode)) {
+            List<Dict> dicts = dictMapper.selectList(new EntityWrapper().eq("group_code", "unit_district_code").eq("code", districtCode));
+            if (dicts == null || dicts.size() == 0) {
+                districtCode = dicts.get(0).getCode();
+            } else {
+                districtCode = "海口市";
+            }
+        }
+
+        String code = "";
+        switch (districtCode) {
+            case "海口市":
+                code = "02";
+                break;
+            case "三亚市":
+                code = "03";
+                break;
+            case "三沙市":
+                code = "04";
+                break;
+            case "儋州市":
+                code = "05";
+                break;
+            case "琼海市":
+                code = "06";
+                break;
+            case "文昌市":
+                code = "07";
+                break;
+            case "万宁市":
+                code = "08";
+                break;
+            case "东方市":
+                code = "09";
+                break;
+            case "五指山市":
+                code = "10";
+                break;
+            case "乐东县":
+                code = "11";
+                break;
+            case "澄迈县":
+                code = "12";
+                break;
+            case "临高县":
+                code = "13";
+                break;
+            case "定安县":
+                code = "14";
+                break;
+            case "屯昌县":
+                code = "15";
+                break;
+            case "陵水县":
+                code = "16";
+                break;
+            case "昌江县":
+                code = "17";
+                break;
+            case "保亭县":
+                code = "18";
+                break;
+            case "琼中县":
+                code = "19";
+                break;
+            case "白沙县":
+                code = "20";
+                break;
+            case "洋浦经济开发区":
+                code = "21";
+                break;
+            default:
+                code = null;
+                break;
+        }
+        return code;
+    }
+
+    /**
+     * 获取校验码
+     *
+     * @param sexNum
+     * @param flowNum
+     * @param districtNum
+     * @return
+     */
+    private static String verifyCode(int sexNum, String flowNum, int districtNum) {
+        String code = "";
+        char[] charArray = flowNum.toCharArray();
+        int verifyNum = 4 * 7 + 6 * 9 + (districtNum / 10) * 10 + (districtNum % 10) * 5 + sexNum * 8 + charArray[0] * 4 + charArray[1] * 2 + charArray[2] * 1 + charArray[3] * 6 + charArray[4] * 3 + charArray[5] * 7 + charArray[6] * 9;
+        verifyNum %= 11;
+        switch (verifyNum) {
+            case 0:
+                code = "1";
+                break;
+            case 1:
+                code = "0";
+                break;
+            case 2:
+                code = "X";
+                break;
+            case 3:
+                code = "9";
+                break;
+            case 4:
+                code = "8";
+                break;
+            case 5:
+                code = "7";
+                break;
+            case 6:
+                code = "6";
+                break;
+            case 7:
+                code = "5";
+                break;
+            case 8:
+                code = "4";
+                break;
+            case 9:
+                code = "3";
+                break;
+            case 10:
+                code = "2";
+                break;
+            default:
+                code = null;
+                break;
+        }
+        return code;
+    }
+
+
+    /**
+     * 获取校验码 用已生成的前15位流水号
+     * @param preNum
+     * @return
+     */
+    public static String verifyCode(String preNum) {
+        String xishu [] ="7-9-10-5-8-4-2-1-6-3-7-9-10-5-8".split("-");
+        if(preNum==null||preNum.length()!=xishu.length){
+            throw new RuntimeException("传入的流水号位数与系数的个数不一致");
+        }
+        String code = "";
+
+        char[] charArray = preNum.toCharArray();
+        int verifyNum=0;
+        for(int i =0;i<xishu.length;i++){
+            try {
+                verifyNum += (charArray[i]*Integer.parseInt(xishu[i]));//各位数字与系统相乘 求和
+            }catch (Exception e){
+                e.printStackTrace();
+                throw new RuntimeException("数字转换异常");
+            }
+        }
+
+
+        verifyNum %= 11;
+        switch (verifyNum) {
+            case 0:
+                code = "1";
+                break;
+            case 1:
+                code = "0";
+                break;
+            case 2:
+                code = "X";
+                break;
+            case 3:
+                code = "9";
+                break;
+            case 4:
+                code = "8";
+                break;
+            case 5:
+                code = "7";
+                break;
+            case 6:
+                code = "6";
+                break;
+            case 7:
+                code = "5";
+                break;
+            case 8:
+                code = "4";
+                break;
+            case 9:
+                code = "3";
+                break;
+            case 10:
+                code = "2";
+                break;
+            default:
+                code = null;
+                break;
+        }
+        return code;
+    }
+
+
+
+
+
+}

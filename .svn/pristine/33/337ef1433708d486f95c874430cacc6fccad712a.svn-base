@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dao.mapper.SrvStraitenedExeStudyMapper">
+
+    <insert id="addAll" parameterType="java.util.List">
+        INSERT INTO srv_straitened_exe_study
+        (srv_straitened_id,name,certificate_num,age,sex,is_current,mobile,political_status,education,college_score,
+        enroll_school,enroll_major,school_year,enroll_batch,enroll_time,graduation_time,learn_money,has_loan,loan_money,
+        live_address,address,nation)
+        VALUES
+        <foreach collection="pojos" item="pojo" separator=",">
+            (#{pojo.srvStraitenedId},#{pojo.name},#{pojo.certificateNum},#{pojo.age},#{pojo.sex},#{pojo.isCurrent},#{pojo.mobile},
+            #{pojo.politicalStatus},#{pojo.education},#{pojo.collegeScore},#{pojo.enrollSchool},#{pojo.enrollMajor},#{pojo.schoolYear},
+            #{pojo.enrollBatch},#{pojo.enrollTime},#{pojo.graduationTime},#{pojo.learnMoney},#{pojo.hasLoan},#{pojo.loanMoney},
+            #{pojo.liveAddress},#{pojo.address},#{pojo.nation})
+        </foreach>
+    </insert>
+
+
+
+</mapper>

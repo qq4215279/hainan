@@ -1,0 +1,346 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:search="http://www.w3.org/1999/xhtml">
+<css>
+    <div th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="row">
+    <input type="hidden" id="deptIdInfo" th:value="${deptIdInfo}">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <div class="input-group">
+                                    <div class="input-group-btn">
+                                        <button data-toggle="dropdown" class="btn btn-white dropdown-toggle"
+                                                type="button">申请类型
+                                        </button>
+                                    </div>
+                                    <select class="form-control" id="type" name="type">
+                                        <option value="" selected="true">请选择</option>
+                                        <option value="">全部</option>
+                                        <option value="1">中彩金</option>
+                                        <option value="2">中心项目</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-5">
+                                <search:input id="name" label="姓名" name="name" value=""
+                                              type="text"></search:input>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <search:select label="状态" name="status"
+                                               code="lib_support_status" id="status"></search:select>
+                            </div>
+                            <div class="col-sm-5">
+                                <search:input id="workUnit" label="工作单位" name="workUnit" value=""
+                                              type="text"></search:input>
+                            </div>
+                            <div class="col-sm-5" th:if="${deptIdInfo == 1}">
+                                <search:input id="examine" label="操作工会" name="examine" value=""
+                                              type="text"></search:input>
+                            </div>
+                            <div class="col-sm-2">
+                                <qx:btn class="btn btn-primary" fa="fa fa-search" label="搜索" permission=""
+                                        onclick="OptLawSupport.search()"></qx:btn>
+                            </div>
+                        </div>
+                    </div>
+                    <table id="OptLawSupportTable" data-mobile-responsive="true" data-click-to-select="true">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+        /**
+         * 初始化表格对象
+         */
+        var OptLawSupport = {
+            id: "OptLawSupportTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         *
+         */
+        OptLawSupport.initColumn = function () {
+            return [
+                {field: 'selectItem', radio: true},
+                {title: '日志id', field: 'supportLogId', visible: false, align: 'center', valign: 'middle'},
+                {
+                    title: '申请类型',
+                    field: 'type',
+                    visible: true,
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: initTypeField
+                },
+                {
+                    title: '法律援助事由',
+                    field: 'cause',
+                    visible: true,
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: initCauseField
+                },
+                {
+                    title: '法律援助形式',
+                    field: 'shape',
+                    visible: true,
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: initShapeField
+                },
+                {title: '姓名', field: 'name', visible: true, align: 'center', valign: 'middle'},
+                {title: '性别', field: 'sex', visible: true, align: 'center', valign: 'middle', formatter: initSexField},
+                {title: '身份证号', field: 'certificateNum', align: 'center', valign: 'middle'},
+                {title: '当前工作单位', field: 'workUnit', align: 'center', valign: 'middle'},
+                {title: '联系电话', field: 'mobile', align: 'center', valign: 'middle'},
+                {title: '操作工会', field: 'examine', align: 'center', valign: 'middle'},
+                {title: '状态', field: 'status', align: 'center', valign: 'middle', formatter: initStatusField},
+                // {title: '创建人', field: 'account', align: 'center', valign: 'middle'},
+                {title: '创建时间', field: 'createTime', align: 'center', valign: 'middle', formatter: initCreateTimeField},
+                {title: '过期时间', field: 'expireTime', align: 'center', valign: 'middle', formatter: initExpireTimeField},
+                {
+                    title: '操作', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        if (row.logStatus == 1) {
+                            return '<a href="javascript:OptLawSupport.examine(' + row.id + "," + row.supportLogId + ')">审核</a>';
+                        } else {
+                            return '<a href="javascript:OptLawSupport.detail(' + row.id + "," + row.supportLogId + ')">查看</a>';
+                        }
+                    }
+                },
+                {
+                    title: '查看流程', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        return '<a href="javascript:OptLawSupport.log(' + row.id + ')">审核流程</a>';
+                    }
+                }
+            ];
+        }
+
+        /**
+         * 申请类型
+         */
+        function initTypeField(value, row, index) {
+            if (row.type == 1) {
+                return '海南职工法律援助申请';
+            } else if (row.type == 0) {
+                return '中彩金法律援助申请';
+            } else {
+                return '-';
+            }
+        }
+
+        /**
+         * 法律援助事由
+         */
+        function initCauseField(value, row, index) {
+            if (row.cause == "110") {
+                return '劳动合同';
+            } else if (row.cause == "120") {
+                return '工伤';
+            } else if (row.cause == "130") {
+                return '工资';
+            } else if (row.cause == "140") {
+                return '社会保险';
+            } else if (row.cause == "150") {
+                return '休息休假';
+            } else if (row.cause == "160") {
+                return '退休';
+            } else if (row.cause == "170") {
+                return '企业改制破产';
+            } else if (row.cause == "180") {
+                return '解除合同';
+            } else if (row.cause == "190") {
+                return '其他';
+            } else {
+                return '-';
+            }
+        }
+
+        /**
+         * 法律援助形式
+         */
+        function initShapeField(value, row, index) {
+            if (row.shape == "1") {
+                return '协商、调解代理';
+            } else if (row.shape == "2") {
+                return '法律文书代写';
+            } else if (row.shape == "3") {
+                return '劳动仲裁代理';
+            } else if (row.shape == "4") {
+                return '诉讼代理';
+            } else if (row.shape == "5") {
+                return '强制执行代理';
+            } else {
+                return '-';
+            }
+        }
+
+        /**
+         * 初始化性别字段
+         */
+        function initSexField(value, row, index) {
+            if (row.sex && row.sex == 1) {
+                return '男';
+            }
+            return '女';
+        }
+
+        /**
+         *初始化状态
+         */
+        function initStatusField(value, row, index) {
+            if (row.status == 1 && row.logStatus == 4) {
+                return '已转办';
+            }
+            if (row.status == 4) {
+                return '已重新提交';
+            }
+            if (row.status == 1) {
+                return '待处理';
+            } else if (row.status == 2) {
+                return '通过';
+            } else if (row.status == 3) {
+                return '拒绝';
+            } else if (row.status == 0) {
+                return '待查看';
+            } else {
+                return '-';
+            }
+        }
+
+        /**
+         * 初始化列表的创建时间类型的字段
+         */
+        function initCreateTimeField(value, row, index) {
+            if (row.createTime) {
+                return returnTimeStr(row.createTime);
+            }
+        }
+
+        /**
+         * 初始化列表的过期时间类型的字段
+         */
+        function initExpireTimeField(value, row, index) {
+            if (row.expireTime) {
+                return returnTimeStr(row.expireTime);
+            }
+        }
+
+        /**
+         * 返回组装好的日期字符串
+         */
+        function returnTimeStr(time) {
+            return time.substring(0, 4) + "-" + time.substring(4, 6) + "-" + time.substring(6, 8);
+        }
+
+        /**
+         * 检查是否选中
+         */
+        OptLawSupport.check = function () {
+            var selected = $('#' + this.id).bootstrapTable('getSelections');
+            if (selected.length == 0) {
+                App.info("请先选中表格中的某一记录！");
+                return false;
+            } else {
+                OptLawSupport.seItem = selected[0];
+                return true;
+            }
+        };
+
+        /**
+         *点击审核进入审核页面
+         */
+        OptLawSupport.examine = function (id, supportLogId) {
+            var index = layer.open({
+                type: 2,
+                title: '法律援助申请审核',
+                area: ['100%', '100%'], //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: App.ctxPath + 'law/support/examine?id=' + id + "&supportLogId=" + supportLogId
+            });
+            this.layerIndex = index;
+        };
+
+        /**
+         * 点击查看详情操作
+         */
+        OptLawSupport.detail = function (id, supportLogId) {
+            var index = layer.open({
+                type: 2,
+                title: '查看详情',
+                area: ['100%', '100%'], //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: App.ctxPath + 'law/support/detail?id=' + id + "&supportLogId=" + supportLogId
+            });
+            this.layerIndex = index;
+        }
+
+        /**
+         * 点击查看审核流程
+         */
+        OptLawSupport.log = function (id) {
+            var index = layer.open({
+                type: 2,
+                title: '',
+                area: ['100%', '100%'], //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: App.ctxPath + 'law/support/log?id=' + id
+            });
+            this.layerIndex = index;
+        }
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        OptLawSupport.formParams = function () {
+            var queryData = {};
+            queryData['type'] = $("#type").val();
+            queryData['name'] = $("#name").val();
+            queryData['status'] = $("#status").val();
+            queryData['workUnit'] = $("#workUnit").val();
+            queryData['examine'] = $("#examine").val();
+            return queryData;
+        }
+
+        /**
+         * 查询列表
+         */
+        OptLawSupport.search = function () {
+            OptLawSupport.table.refresh({query: OptLawSupport.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = OptLawSupport.initColumn();
+            var table = new BSTable(OptLawSupport.id, "law/support/list", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(OptLawSupport.formParams());
+            OptLawSupport.table = table.init();
+        });
+
+    </script>
+</js>
+</body>
+</html>

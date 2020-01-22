@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.cms.dao.CategoryDao">
+
+<!--  	<resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.cms.model.Category"> -->
+<!--    		<id column="id"  property="id" /> -->
+<!--    		<result column="pid" property="pid"/> -->
+<!--     	<result column="title" property="title"/> -->
+<!--     	<result column="mode" property="mode"/> -->
+<!--     	<result column="org_id" property="orgId"/> -->
+<!--     	<result column="description" property="description"/> -->
+<!--     	<result column="sort" property="sort"/> -->
+<!--     	<result column="cat_type" property="catType"/> -->
+<!--     	<result column="tag" property="tag" /> -->
+<!--     	<result column="create_time" property="create_time"/> -->
+<!--     	<result column="update_time" property="update_time"/> -->
+<!--     	<result column="del_flg" property="del_flg"/> -->
+<!--     	<result column="district_id" property="district_id"/> -->
+<!--     	<result column="tags" property="tags"/> -->
+<!--     </resultMap> -->
+    
+    <select id="selectCategoryById" resultType="com.gobestsoft.common.modular.cms.model.Category">
+    	SELECT
+			*
+		FROM
+			cms_category
+		WHERE
+			ID = #{id}
+    </select>
+    
+    <insert id="insertRArticleCategory" >
+    	INSERT INTO r_article_category
+    	(
+    		
+    		article_id,
+    		category_id,
+    		pub_status,
+    		published_time
+    	)
+		VALUES (
+			
+			#{articleid},
+			#{categoryid},
+			#{pubStatus},
+    		#{published_time}
+		)    
+    </insert>
+    
+    <update id="updateRArticleCategory" >
+    	UPDATE r_article_category
+    	SET pub_status = #{pubStatus},
+    		published_time =#{publishedTime}
+    	WHERE article_id = #{articleid}
+    	AND	category_id = #{categoryid}
+    </update>
+    
+    
+    <select id="checkDown" resultType="java.lang.Integer">
+    	SELECT COUNT(0) FROM r_article_category
+    	WHERE article_id = #{articleid}
+    	AND	category_id = #{categoryid}
+    </select>
+    
+    <select id="getCategoryByConditionWithTree" resultType="com.gobestsoft.common.modular.cms.model.Category">
+    	SELECT
+			*
+		FROM
+			cms_category t1
+		WHERE
+			t1.cat_type = #{catType}
+		AND t1.del_flg = 0
+		<choose>
+			<when test="'leaf' == tree">
+				AND NOT EXISTS (
+					SELECT
+						NULL
+					FROM
+						cms_category t2
+					WHERE
+						t1.id = t2.pid
+				)
+			</when>
+			<otherwise>
+				
+			</otherwise>
+		</choose>
+		ORDER BY t1.id
+    </select>
+    
+    
+    <select id="getAll" resultType="com.gobestsoft.common.modular.cms.model.Category">
+    	SELECT
+			*
+		FROM
+			cms_category
+		WHERE
+			del_flg = 0
+		ORDER BY id
+    </select>
+    
+	<select id="getTopicList" resultType="java.util.Map">
+		SELECT t.id, t.name, t.icon, t.create_time
+		FROM cms_category t
+		WHERE
+		t.del_flg = 0
+		and t.pid != 0
+		and t.pid= 1000
+		ORDER BY t.create_time DESC
+	</select>
+</mapper>

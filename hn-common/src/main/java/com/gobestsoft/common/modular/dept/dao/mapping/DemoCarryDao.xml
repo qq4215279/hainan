@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dept.dao.DemoCarryDao">
+
+    <!-- 	三表链表 查询 及条件查询  -->
+    <select id="selectByCondition" resultType="map">
+        SELECT
+        T1.id,T1.simplename,T1.dept_no,T1.pic_name,T2.org_code,T1.establish_date,T2.staff_home_flag,T2.staff_home_level,T2.advanced_flag,T2.advanced_level,T2.member_number,
+        T2.organization_tenure,T2.female_committee_flag,T2.plate_flag,T2.funds_examination_committee_flag,T2.chairman_flag,T2.expenditure,T2.negotiate_flag
+        FROM sys_dept AS T1
+        INNER JOIN mst_enterprise_ext AS T2 ON T1.id=T2.dept_id
+        WHERE 1 = 1
+        <if test="deptNo != null and deptNo != ''">
+            AND T1.dept_no like CONCAT('%',#{deptNo},'%')
+        </if>
+        <if test="simplename != null and simplename != ''">
+            AND T1.simplename like CONCAT('%',#{simplename},'%')
+        </if>
+        <if test="orgCode != null and orgCode != ''">
+            AND T2.org_code like CONCAT('%',#{orgCode},'%')
+        </if>
+        ORDER BY T2.create_time DESC
+    </select>
+
+
+    <!-- 	根据命主id查询 三表联合查询   -->
+    <select id="selectById" resultType="map">
+		SELECT * FROM mst_enterprise_ext WHERE dept_id=#{deptId}
+
+	</select>
+
+    <!-- 	修改命主表  -->
+    <update id="updDemoCarry">
+		UPDATE org_democracy SET init_date=#{initDate}
+							 WHERE democracy_id=#{democracyId}
+	</update>
+
+    <!-- 	<update id="updDept"> -->
+    <!-- 		UPDATE sys_dept SET simplename=#{simplename}  -->
+    <!-- 						, p_dept_name=#{pDeptName}  -->
+    <!-- 						, pic_name=#{picName} -->
+    <!-- 						WHERE id=#{id} -->
+    <!-- 	</update> -->
+
+    <!-- 	<update id="updDeptExt"> -->
+    <!-- 		UPDATE org_dept_ext SET org_code=#{orgCode} -->
+    <!-- 							WHERE dept_id=#{deptId} -->
+    <!-- 	</update> -->
+</mapper>

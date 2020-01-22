@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>jQuery弹窗大图展示代码</title>
+
+<link rel="stylesheet" type="text/css" href="http://www.jq22.com/jquery/bootstrap-3.3.4.css">
+<link rel="stylesheet" type="text/css" href="css/jq22-demo.css">
+<link type="text/css" rel="stylesheet" href="css/jquery.galpop.css" media="screen" />
+
+</head>
+<body>
+
+<div class="container">
+	<h1 class="page-title">示例演示 | Galpop Image Gallery Popup</h1>
+	<div class="row">
+		<div class="col-md-12">
+			<h2 id="single-head">1、单张图片</h2>
+			<p>Just bind galpop to the anchor link.</p>
+			<div class="gallery-wrapper">
+				<a class="galpop-single" href="images/gallery/large/apocalypse.png">
+					<img src="images/gallery/thumbs/apocalypse.png" class="img-thumbnail" alt="An apocalyptic Earth." />
+				</a>
+			</div>
+			<h2 id="single-head">2、多张图片</h2>
+			<p>Bind a series of images with the same "data-galpop-group" attribute value.</p>
+			<div class="gallery-wrapper">
+				<a class="galpop-multiple" data-galpop-group="multiple" href="images/gallery/large/apocalypse.png"><img src="images/gallery/thumbs/apocalypse.png" class="img-thumbnail" alt="An apocalyptic Earth." /></a>
+				<a class="galpop-multiple" data-galpop-group="multiple" href="images/gallery/large/vintage.png"><img src="images/gallery/thumbs/vintage.png" class="img-thumbnail" alt="An old, vintage poster." /></a>
+				<a class="galpop-multiple" data-galpop-group="multiple" href="images/gallery/large/magicLake.png"><img src="images/gallery/thumbs/magicLake.png" class="img-thumbnail" alt="A scene of a magical forest." /></a>
+				<a class="galpop-multiple" data-galpop-group="multiple" href="images/gallery/large/underwater.png"><img src="images/gallery/thumbs/underwater.png" class="img-thumbnail" alt="An underwater scene with lots of tension." /></a>
+				<h2 id="info-head">3、带标题和链接的图片lightbox</h2>
+				<p>Galpop has a box on the lower left corner for captions. If the anchor contains a "title" attribute, that will be added to the box. If the anchor contains a "data-galpop-link" attribute, it will add an anchor to the box. Adding a "data-galpop-link-title" attribute will change the text of the anchor, and adding a "data-galpop-link-target" attribute will change the target of the anchor.</p>
+				<div class="gallery-wrapper">
+					<a class="galpop-info" data-galpop-group="info" data-galpop-link="http://www.magicmediamuse.com/graphic/apocalypse" data-galpop-link-title="Click Here For More Info" data-galpop-link-target="_blank" title="An apocalyptic Earth." href="images/gallery/large/apocalypse.png">
+						<img src="images/gallery/thumbs/apocalypse.png" class="img-thumbnail" alt="An apocalyptic Earth." />
+					</a>
+					<a class="galpop-info" data-galpop-group="info" data-galpop-link="http://www.magicmediamuse.com/graphic/vintage" data-galpop-link-title="Click Here For More Info" data-galpop-link-target="_blank" title="An old, vintage poster." href="images/gallery/large/vintage.png">
+						<img src="images/gallery/thumbs/vintage.png" class="img-thumbnail" alt="An old, vintage poster." />
+					</a>
+					<a class="galpop-info" data-galpop-group="info" data-galpop-link="http://www.magicmediamuse.com/graphic/magicLake" data-galpop-link-title="Click Here For More Info" data-galpop-link-target="_blank" title="A scene of a magical forest." href="images/gallery/large/magicLake.png">
+						<img src="images/gallery/thumbs/magicLake.png" class="img-thumbnail" alt="A scene of a magical forest." />
+					</a>
+					<a class="galpop-info" data-galpop-group="info" data-galpop-link="http://www.magicmediamuse.com/graphic/underwater" data-galpop-link-title="Click Here For More Info" data-galpop-link-target="_blank" title="An underwater scene with lots of tension." href="images/gallery/large/underwater.png">
+						<img src="images/gallery/thumbs/underwater.png" class="img-thumbnail" alt="An underwater scene with lots of tension." />
+					</a>
+					<a class="galpop-info" data-galpop-group="info" data-galpop-link="http://www.magicmediamuse.com/graphic/goodBoy" data-galpop-link-title="Click Here For More Info" data-galpop-link-target="_blank" title="A dog and his pet." href="images/gallery/large/goodBoy.png">
+						<img src="images/gallery/thumbs/goodBoy.png" class="img-thumbnail" alt="A dog and his pet." />
+					</a>			
+				</div>
+				<h2 id="callback-head">4、回调函数</h2>
+				<p>You can add a callback function to fire after every completion of an image. You can grab the index and count from the "#galpop-wrapper" element.</p>
+					<div class="gallery-wrapper">
+					<a class="galpop-callback" data-galpop-group="callback" href="images/gallery/large/apocalypse.png">
+						<img src="images/gallery/thumbs/apocalypse.png" class="img-thumbnail" alt="An apocalyptic Earth." /></a>
+					<a class="galpop-callback" data-galpop-group="callback" href="images/gallery/large/vintage.png">
+						<img src="images/gallery/thumbs/vintage.png" class="img-thumbnail" alt="An old, vintage poster." /></a>
+					<a class="galpop-callback" data-galpop-group="callback" href="images/gallery/large/magicLake.png">
+						<img src="images/gallery/thumbs/magicLake.png" class="img-thumbnail" alt="A scene of a magical forest." /></a>
+					<a class="galpop-callback" data-galpop-group="callback" href="images/gallery/large/underwater.png">
+						<img src="images/gallery/thumbs/underwater.png" class="img-thumbnail" alt="An underwater scene with lots of tension." /></a>
+					<a class="galpop-callback" data-galpop-group="callback" href="images/gallery/large/goodBoy.png">
+						<img src="images/gallery/thumbs/goodBoy.png" class="img-thumbnail" alt="A dog and his pet." /></a>			
+				</div><!-- end callback galpop wrapper -->
+				<h2 id="manual-head">5、手动打开Lightbox</h2>
+				<p>You can also manually open the popup whenever you wish. You will have to use the "openBox" method and pass it the settings and image URL to open.</p>
+				<div class="manual-wrapper">
+					<select class="manual-open form-control">
+						<option value="">Choose Image</option>
+						<option value="images/gallery/large/apocalypse.png">An apocalyptic Earth.</option>
+						<option value="images/gallery/large/vintage.png">An old, vintage poster.</option>
+						<option value="images/gallery/large/magicLake.png">A scene of a magical forest.</option>
+						<option value="images/gallery/large/underwater.png">An underwater scene with lots of tension.</option>
+					</select>
+				</div><!-- end callback galpop wrapper -->
+				<h2 id="manual-group-head">6、手动打开一组图片</h2>
+				<p>You can also manually open the popup as a group. Instead of passing it one url, you can use an array.</p>
+				<div class="manual-group-wrapper">
+					<select class="manual-open-group form-control">
+						<option value="">Choose Image</option>
+						<option value="0">An apocalyptic Earth.</option>
+						<option value="1">An old, vintage poster.</option>
+						<option value="2">A scene of a magical forest.</option>
+						<option value="3">An underwater scene with lots of tension.</option>
+					</select>
+				</div><!-- end manual open group wrapper -->
+				<h2 id="load-iframe-head">7、加载 iframe 内容</h2>
+				<p>In addition to images, you can also load an iframe into the popup.</p>
+				<p><a href="ajax-content.html" class="click-open-iframe" style="color:#fff;text-decoration:underline;"><span class="glyphicon glyphicon-hand-right"></span> 点击这里打开 iframe 内容</a></p>
+				<h2 id="load-iframe-head">8、加载 AJAX 内容</h2>
+				<p>If you don't want to load the entire window into an iframe, you can pick specific elements to load.</p>
+				<p><a href="ajax-content.html" data-galpop-container=".text-content" class="click-open-ajax" style="color:#fff;text-decoration:underline;"><span class="glyphicon glyphicon-hand-right"></span> 点击这里打开 ajax 内容</a></p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="http://www.jq22.com/jquery/jquery-1.10.2.js"></script>
+<script type="text/javascript" src="js/jquery.galpop.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('.galpop-single').galpop();
+
+		$('.galpop-multiple').galpop();
+
+		$('.galpop-info').galpop();
+
+
+		var callback = function() {
+			var wrapper = $('#galpop-wrapper');
+			var info    = $('#galpop-info');
+			var count   = wrapper.data('count');
+			var index   = wrapper.data('index');
+			var current = index + 1;
+			var string  = 'Image '+ current +' of '+ count;
+
+			info.append('<p>'+ string +'</p>').fadeIn();
+
+		};
+		$('.galpop-callback').galpop({
+			callback: callback
+		});
+
+		$('.manual-open').change(function(e) {
+			var image = $(this).val();
+			if (image) {
+				var settings = {};
+				$.fn.galpop('openBox',settings,image);
+			}
+		});
+
+		$('.manual-open-group').change(function(e) {
+			var v = $(this).val();
+			var images = [
+				'images/gallery/large/apocalypse.png',
+				'images/gallery/large/vintage.png',
+				'images/gallery/large/magicLake.png',
+				'images/gallery/large/underwater.png',			
+			];
+			var settings = {};
+			$.fn.galpop('openBox',settings,images,v);
+		});
+
+		$('.click-open-iframe').galpop({
+			contentType: 'iframe',
+		});
+
+		$('.click-open-ajax').galpop({
+			contentType: 'AJAX',
+		});
+	});
+</script>
+
+</body>
+</html>

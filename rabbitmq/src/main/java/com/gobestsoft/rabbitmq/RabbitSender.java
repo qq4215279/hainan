@@ -1,0 +1,86 @@
+package com.gobestsoft.rabbitmq;
+
+import com.gobestsoft.rabbitmq.config.MQConstant;
+import com.gobestsoft.rabbitmq.processor.AbstractProcessor;
+import com.gobestsoft.rabbitmq.processor.ExcludeLoginProcessor;
+import com.gobestsoft.rabbitmq.processor.MemberImportProcessor;
+import com.gobestsoft.rabbitmq.processor.MessageProcessor;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessagePostProcessor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+/**
+ * Rabbit消息发送者
+ * Created by gutongwei on 2018/2/7.
+ */
+@Component
+public class RabbitSender {
+    @Autowired
+    private RabbitTemplate template;
+
+
+    /**
+     * 后台发送接口
+     *
+     * @param str
+     */
+    public void adminGiveApi(String str) {
+        template.convertAndSend(MQConstant.DEFAULT_EXCHANGE, MQConstant.ADMIN_GIVE_API_QUEUE, str);
+    }
+
+    /**
+     * 接口发送后台消息
+     *
+     * @param processor
+     */
+    public void apiGiveAdminMessage(MessageProcessor processor) {
+        template.convertAndSend(MQConstant.DEFAULT_EXCHANGE, MQConstant.API_GIBE_ADMIN, processor);
+    }
+
+    /**
+     * 接口发送后台消息
+     *
+     * @param processor
+     */
+    public void apiGiveAdminMessage(ExcludeLoginProcessor processor) {
+        template.convertAndSend(MQConstant.DEFAULT_EXCHANGE, MQConstant.API_GIBE_ADMIN_EXCLUDE, processor);
+    }
+
+    /**
+     * 发送实时消息
+     *
+     * @param message
+     */
+    public void sendMessage(AbstractProcessor message) {
+        template.convertAndSend(MQConstant.DEFAULT_EXCHANGE, MQConstant.DEFAULT_LETTER_SENDER_QUEUE_NAME, message);
+    }
+
+    /**
+     * 发送延时消息
+     *
+     * @param message 消息
+     * @param time    延迟时间
+     */
+    public void sendDelayMessage(AbstractProcessor message, int time) {
+        template.convertAndSend(MQConstant.DEFAULT_EXCHANGE, MQConstant.DEFAULT_LETTER_SENDER_QUEUE_NAME,
+                message, new MessagePostProcessor() {
+                    @Override
+                    public Message postProcessMessage(Message message) throws AmqpException {
+                        message.getMessageProperties().setExpiration(String.valueOf(time));
+                        return message;
+                    }
+                });
+    }
+
+    /**
+     * 发送实时消息
+     * 会员导入
+     * @param message
+     */
+    public void sendMemberImportMessage(MemberImportProcessor message) {
+        template.convertAndSend(MQConstant.DEFAULT_EXCHANGE, MQConstant.MEMBER_IMPORT_QUEUE, message);
+    }
+}

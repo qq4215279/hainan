@@ -1,0 +1,796 @@
+package com.gobestsoft.mamage.moudle.dept.service;
+
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
+import com.baomidou.mybatisplus.plugins.Page;
+import com.gobestsoft.common.constant.DictCodeConstants;
+import com.gobestsoft.common.modular.dept.dao.MemberDao;
+import com.gobestsoft.common.modular.dept.mapper.DeptOrganizationMapper;
+import com.gobestsoft.common.modular.dept.model.DeptOrganization;
+import com.gobestsoft.common.modular.system.mapper.DeptMapper;
+import com.gobestsoft.common.modular.system.mapper.RelationMapper;
+import com.gobestsoft.common.modular.system.model.Dept;
+import com.gobestsoft.common.modular.system.model.Relation;
+import com.gobestsoft.core.reids.RedisUtils;
+import com.gobestsoft.core.util.*;
+import com.gobestsoft.mamage.moudle.dept.model.ImportModel;
+import com.gobestsoft.mamage.moudle.system.service.DictService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
+
+import javax.annotation.Resource;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+
+@Service
+@Slf4j
+public class DeptOrganizationService {
+
+    private final static String xls = ".xls";
+    private final static String xlsx = ".xlsx";
+
+    @Resource
+    DeptOrganizationMapper organizationMapper;
+    @Resource
+    RelationMapper relationMapper;
+    @Resource
+    DictService dictService;
+    @Resource
+    DeptMapper deptMapper;
+    @Resource
+    DeptMemberService memberService;
+
+    @Autowired
+    private DeptOtherService deptOtherService;
+
+    private final static String UNION_POSITION = "1";//工会职务是主席的code
+
+    @Resource
+    private RedisUtils redisUtils;
+
+    @Autowired
+    MemberDao memberDao;
+
+    /**
+     * 条件查询（工会名称，组织机构代码）
+     *
+     * @author cxl
+     * @Date 2017/11/26 22:23
+     */
+    public List<Map<String, Object>> selectByCondition(Page<Map<String, Object>> page, String unionName, String deptNo, Integer deptId) {
+        List<Map<String, Object>> list = this.organizationMapper.selectByCondition(page, unionName, deptNo, deptId);
+        list.forEach( item -> {
+            Integer memberCount = 0;
+            if(ToolUtil.isNotEmpty(item.get("dept_id"))){
+                memberCount = organizationMapper.selectMemberCount((Long) item.get("dept_id"));
+            }
+            item.put("member_count", memberCount);
+        });
+        return list;
+    }
+
+    /**
+     * 根据用户id,角色id,判断用户是否具有该角色的权限；有权限返回true；反之返回false
+     *
+     * @param uid    用户id
+     * @param roleId 角色id
+     * @return
+     */
+    public boolean getRoleRelationByRoleAndUid(String uid, Integer roleId) {
+        Relation entity = new Relation();
+        entity.setRoleid(roleId);
+        entity.setUid(uid);
+        Relation relation = relationMapper.selectOne(entity);
+        if (ToolUtil.isNotEmpty(relation)) {
+            return true;
+        }
+        return false;
+    }
+
+    public DeptOrganization selectById(Integer id) {
+        return organizationMapper.selectById(id);
+    }
+
+    /**
+     * 绑定工会信息所需字典项的list集合绑定至Model对象
+     *
+     * @param model
+     */
+    public void bindDicToModel(Model model) {
+        //获取工会类型字典集合
+        model.addAttribute("unionTypeList", dictService.getDicByGroupCode(DictCodeConstants.LIB_ORG_TYPE));
+        //获取所属业务领域 字典集合
+        model.addAttribute("unitPlateList", dictService.getDicByGroupCode(DictCodeConstants.LIB_BUSINESS_FIELD));
+    }
+
+    /**
+     * 更新方法
+     *
+     * @param model 实体对象
+     */
+    @Transactional
+    public DeptOrganization updateAllColumnById(DeptOrganization model) {
+        model.setUpdateTime(DateUtil.getAllTime());
+        organizationMapper.updateById(model);
+        //organizationMapper.updateAllColumnById(model);
+        //若工会的序号、全称、简称字典值发生变动，则更新关联的部门信息
+        updateDeptByOrganization(model);
+        return model;
+    }
+
+    /**
+     * 若工会的序号、全称、简称字典值发生变动，则更新关联的部门信息
+     *
+     * @param model
+     */
+    private void updateDeptByOrganization(DeptOrganization model) {
+        Dept dept = deptMapper.selectById(model.getDeptId());
+        Dept dept1=deptMapper.selectById(model.getPId());
+        if (dept != null) {
+            dept.setFullname(model.getUnionName());
+            dept.setSimplename(model.getUnionName());
+            dept.setPid(model.getPId());
+            dept.setPids(dept1.getPids()+","+model.getPId());
+            deptMapper.updateById(dept);
+        }
+    }
+
+    /**
+     * 根据传入的sys_dept表id,查询工会基本信息
+     *
+     * @param deptId
+     */
+    public List<DeptOrganization> getDeptOrganizationByDeptId(Integer deptId) {
+        Wrapper<DeptOrganization> wrapper = new EntityWrapper<>();
+        wrapper.eq("dept_id", deptId);
+        return organizationMapper.selectList(wrapper);
+    }
+
+    /**
+     * 根据deptid获取工会基本信息
+     *
+     * @param deptId
+     * @return
+     */
+    public DeptOrganization getDomainByDeptId(Integer deptId) {
+        List<DeptOrganization> list = getDeptOrganizationByDeptId(deptId);
+        if (list != null && list.size() > 0) {
+            return list.get(0);
+        }
+        return new DeptOrganization();
+    }
+
+    /**
+     * 获取单条组织信息
+     *
+     * @param deptId
+     * @return
+     */
+    public DeptOrganization getOneDeptOrganizationByDeptId(Integer deptId) {
+        return organizationMapper.selectByDeptId(deptId);
+    }
+
+
+    /**
+     * 根据传入的flag参数,判断其是数据新增还是编辑
+     * 绑定部门信息至Model对象中
+     *
+     * @param id       选中节点id
+     * @param deptType 部门类型 0:工会；1：部门
+     * @param model
+     * @param flag     true:当前是进入添加页面；false:当前是进入编辑页面
+     */
+    public void bindDeptDataToModel(Integer id, Integer deptType, Model model, boolean flag) {
+        Dept dept = new Dept();
+        if (flag) {
+            //跳转至新增页面,绑定部门信息
+            dept.setPid(id);
+            dept.setDeptType(deptType);
+        } else {
+            //跳转至编辑页面,绑定部门信息
+            dept = deptMapper.selectById(id);
+            //根据工会组织信息对象，将工会全称、序号、工会简称等字段值绑定至部门信息对象
+            bindDeptByOrganizationToModel(id, dept, deptType);
+        }
+        model.addAttribute(dept);
+    }
+
+    /**
+     * 根据工会组织信息对象，将地址等字段值绑定至部门信息对象
+     *
+     * @param id
+     * @param dept
+     * @param deptType
+     */
+    private void bindDeptByOrganizationToModel(Integer id, Dept dept, Integer deptType) {
+        if (deptType != 1) {
+            //绑定工会信息至Dept对象
+            DeptOrganization entity = new DeptOrganization();
+            entity.setDeptId(id);
+            DeptOrganization deptOrganization = organizationMapper.selectOne(entity);
+            dept.setAddr(deptOrganization.getUnitAddress());
+        }
+    }
+
+    /**
+     * 根据deptId,删除其节点、子节点、关联的工会信息等
+     *
+     * @param deptId 部门信息id
+     */
+    @Transactional
+    public void removeOrganizationAndDept(Integer deptId) {
+        Dept dept = deptMapper.selectById(deptId);
+        if (dept.getDeptType() == 1) {
+            //执行删除部门信息操作
+            deptMapper.deleteById(deptId);
+            return;
+        }
+        DeptOrganization entity = new DeptOrganization();
+        entity.setDeptId(deptId);
+        DeptOrganization orgOrganization = organizationMapper.selectOne(entity);
+        if (ToolUtil.isEmpty(orgOrganization)) {
+            //执行删除部门信息操作
+            deptMapper.deleteById(deptId);
+            return;
+        }
+        //查询工会组织下是否存在会员信息，存在则需删除会员
+        String memberId = memberService.getMemberIdsByUnionId(deptId);
+        if (ToolUtil.isEmpty(memberId)) {
+            organizationMapper.deleteById(orgOrganization.getId());
+            deptMapper.deleteById(deptId);
+            return;
+        }
+        List<String> memberIds = Arrays.asList(memberId.split(","));
+        memberIds.forEach(id -> {
+            //删除会员信息及干部信息
+            memberService.remove(Integer.parseInt(id));
+        });
+        organizationMapper.deleteById(orgOrganization.getId());
+        deptMapper.deleteById(deptId);
+
+    }
+
+
+    /**
+     * 导入并且导出
+     */
+    public void importAndExport(String importFileName, InputStream is, String createUid, String fileUpload) {
+        try {
+            Integer logId = deptOtherService.addImportLog(createUid, 0);
+
+            ImportModel importModel = null;
+
+            synchronized (this){
+                if (importFileName.toLowerCase().endsWith(xls)) {
+                    importModel = uploadOrganization(xls, is, createUid);
+                } else if (importFileName.toLowerCase().endsWith(xlsx)) {
+                    importModel = uploadOrganization(xlsx, is, createUid);
+                }
+            }
+            deptOtherService.uploadSaveFile(importModel, fileUpload, deptOtherService, logId);
+            memberDao.updateMemberCountTable1();
+            memberDao.updateBindMemberCountTable1();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 批量导入组织信息
+     *
+     * @param type
+     * @param is
+     * @return
+     * @throws Exception
+     */
+    public ImportModel uploadOrganization(String type, InputStream is, String createUid) throws Exception {
+        ImportModel importModel = new ImportModel();
+        List<Map<String, Object>> logs = readXls(type, is, createUid, importModel);
+        if (!importModel.isHasError()) {
+            exportOrganization(logs, importModel);
+        }
+        return importModel;
+    }
+
+    /**
+     * 导出excel
+     *
+     * @param logs
+     * @param importModel
+     */
+    private void exportOrganization(List<Map<String, Object>> logs, ImportModel importModel) {
+        // 第一步，创建一个webbook，对应一个Excel文件
+        HSSFWorkbook wb = new HSSFWorkbook();
+        //生成一个表格
+        HSSFSheet sheet = wb.createSheet("导入组织明细");
+        // 第三步，在sheet中添加表头第0行
+        HSSFRow titleRow = sheet.createRow(0);
+        HSSFCell titleCell = titleRow.createCell(0);
+        titleCell.setCellValue("序号");
+        titleCell = titleRow.createCell(1);
+        titleCell.setCellValue("单位名称");
+        titleCell = titleRow.createCell(2);
+        titleCell.setCellValue("单位法人和其他组织统一社会信用代码");
+        titleCell = titleRow.createCell(3);
+        titleCell.setCellValue("单位地址");
+        titleCell = titleRow.createCell(4);
+        titleCell.setCellValue("单位所在政区");
+        titleCell = titleRow.createCell(5);
+        titleCell.setCellValue("单位性质类别");
+        titleCell = titleRow.createCell(6);
+        titleCell.setCellValue("经济类型");
+        titleCell = titleRow.createCell(7);
+        titleCell.setCellValue("单位所属行业");
+        titleCell = titleRow.createCell(8);
+        titleCell.setCellValue("职工人数");
+        titleCell = titleRow.createCell(9);
+        titleCell.setCellValue("工会名称");
+        titleCell = titleRow.createCell(10);
+        titleCell.setCellValue("工会法人和其他组织统一社会信用代码");
+        titleCell = titleRow.createCell(11);
+        titleCell.setCellValue("上级工会名称");
+        titleCell = titleRow.createCell(12);
+        titleCell.setCellValue("建会日期（格式：yyyy/MM/dd）");
+        titleCell = titleRow.createCell(13);
+        titleCell.setCellValue("基层工会类型");
+        titleCell = titleRow.createCell(14);
+        titleCell.setCellValue("会员人数");
+        titleCell = titleRow.createCell(15);
+        titleCell.setCellValue("工会负责人");
+        titleCell = titleRow.createCell(16);
+        titleCell.setCellValue("联系电话");
+        titleCell = titleRow.createCell(17);
+        titleCell.setCellValue("是否成功");
+        titleCell = titleRow.createCell(18);
+        titleCell.setCellValue("错误原因");
+        try {
+            Integer indexRow = titleRow.getRowNum() + 1;
+            int errorCount = 0;
+            for (Map<String, Object> record : logs) {
+                HSSFRow newRow = sheet.createRow(indexRow);
+                HSSFCell cell = newRow.createCell(0);
+                cell.setCellValue(convertToStr(record.get("index")));
+                cell = newRow.createCell(1);
+                cell.setCellValue(convertToStr(record.get("unit_name")));
+                cell = newRow.createCell(2);
+                cell.setCellValue(convertToStr(record.get("unit_org_code")));
+                cell = newRow.createCell(3);
+                cell.setCellValue(convertToStr(record.get("unit_address")));
+                cell = newRow.createCell(4);
+                cell.setCellValue(convertToStr(record.get("unit_district")));
+                cell = newRow.createCell(5);
+                cell.setCellValue(convertToStr(record.get("unit_nature")));
+                cell = newRow.createCell(6);
+                cell.setCellValue(convertToStr(record.get("unit_economic_type")));
+                cell = newRow.createCell(7);
+                cell.setCellValue(convertToStr(record.get("unit_industry")));
+                cell = newRow.createCell(8);
+                cell.setCellValue(convertToStr(record.get("unit_number")));
+                cell = newRow.createCell(9);
+                cell.setCellValue(convertToStr(record.get("union_name")));
+                cell = newRow.createCell(10);
+                cell.setCellValue(convertToStr(record.get("others_org_code")));
+                cell = newRow.createCell(11);
+                cell.setCellValue(convertToStr(record.get("p_name")));
+                cell = newRow.createCell(12);
+                cell.setCellValue(convertToStr(record.get("createunion_time")));
+                cell = newRow.createCell(13);
+                cell.setCellValue(convertToStr(record.get("union_type")));
+                cell = newRow.createCell(14);
+                cell.setCellValue(convertToStr(record.get("membership")));
+                cell = newRow.createCell(15);
+                cell.setCellValue(convertToStr(record.get("union_leader")));
+                cell = newRow.createCell(16);
+                cell.setCellValue(convertToStr(record.get("union_leader_phone")));
+                cell = newRow.createCell(17);
+                cell.setCellValue("1".equals(record.get("if_success")) ? "是" : "否");
+                cell = newRow.createCell(18);
+                cell.setCellValue(convertToStr(record.get("errors_message")));
+                // 统计未成功的数据
+                if (!"1".equals(record.get("if_success"))) {
+                    errorCount += 1;
+                }
+                indexRow += 1;
+            }
+
+            if (errorCount > 0) {
+                importModel.setRemark("当前共导入" + logs.size() + "条数据，其中：" + errorCount + "条导入失败,请点击查看原因!");
+            } else {
+                importModel.setRemark("当前共导入" + logs.size() + "条数据,无导入失败数据!");
+            }
+
+            HSSFRow tipRow = sheet.createRow(indexRow);
+            HSSFCell tipCell = tipRow.createCell(0);
+            tipCell.setCellValue("当前共导入" + logs.size() + "条数据，其中：" + errorCount + "条导入失败!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        importModel.setWorkbook(wb);
+    }
+
+
+    /**
+     * 转字符串
+     *
+     * @param o
+     * @return
+     */
+    private String convertToStr(Object o) {
+        if (o == null) {return "";}
+        return String.valueOf(o);
+    }
+
+
+    /**
+     * 读取Excel数据
+     *
+     * @param type
+     * @param is
+     * @return
+     * @throws IOException
+     */
+    private List<Map<String, Object>> readXls(String type, InputStream is, String createUid, ImportModel importModel) throws IOException {
+        List<Map<String, Object>> export = null;
+
+        Workbook workbook = null;
+        if (type.equals(xls)) {
+            workbook = new HSSFWorkbook(is);
+        } else if (type.equals(xlsx)) {
+            workbook = new XSSFWorkbook(is);
+        }
+        // 获得工作表Sheet
+        Sheet sheet = workbook.getSheetAt(0);
+        int lastRow = sheet.getLastRowNum();
+
+        List<CellRangeAddress> cellRangeAddresses = sheet.getMergedRegions();
+
+        //判断是否含有其他的和并单元格，含有就不导入
+        for (CellRangeAddress address : cellRangeAddresses) {
+            //最后5行排除
+            if (address.getFirstRow() != lastRow && address.getFirstRow() > 4) {
+                importModel.setHasError(true);
+                importModel.setRemark("模板最后一行为" + (lastRow + 1) + "行，但是第" + (address.getFirstRow() + 1) + "行到第" + (address.getLastRow() + 1) + "行含有合并单元格，" +
+                        "不符合导入模板规则，请下载模板参照格式后重试!若最后一行是填表说明，请将后一行至" + (lastRow + 1) + "行选中右击删除行！");
+            }
+        }
+
+        // 循环列取得数据
+        List<Map<String, String>> parameters = new ArrayList<>();
+        for (int rowNum = 5; rowNum <= lastRow - 1; rowNum++) {
+            Map<String, String> organizationMap = new HashMap<>();
+            Row row = sheet.getRow(rowNum);
+            if (!ExcelReaderUtil.isRowEmpty(row)) {
+                checkCellData(row, organizationMap);
+                parameters.add(organizationMap);
+            }
+        }
+
+        if (!importModel.isHasError() && parameters.size() > 0) {
+            //建临时表
+            String tableName = "dept_organization_" + DateUtil.getAllTime() + NumUtil.nextInt(100, 1000);
+            String procedureName = "import_dept_" + DateUtil.getAllTime() +  NumUtil.nextInt(100, 1000);
+            try {
+                organizationMapper.createTemporaryTable(tableName);
+                //数据插入临时表
+                organizationMapper.insertList(tableName, parameters);
+                //创建存储过程
+                organizationMapper.createImportDeptProcedure(procedureName, tableName, createUid, DateUtil.getAllTime());
+                // call存储过程
+                export = organizationMapper.callImportDeptProcedure(procedureName);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                redisUtils.removePattern("DEPT_TREELIST_*");
+                // 删除存储过程
+                organizationMapper.dropImportDeptProcedure(procedureName);
+                //drop table
+                organizationMapper.dropTemporaryTable(tableName);
+            }
+        }
+        return export;
+    }
+
+    /**
+     * 获取单元格数据并检查单元格数据是否正确
+     *
+     * @param hssfRow
+     * @return
+     */
+    private void checkCellData(Row hssfRow, Map<String, String> organizationMap) {
+        if (hssfRow == null) {
+            return;
+        }
+
+        StringBuilder errorMessage = new StringBuilder("错误信息：");
+        Integer ifSuccess = null;
+
+
+        //序号
+        Cell cell = hssfRow.getCell(0);
+        String index = ExcelReaderUtil.cellData(cell);
+        if (StringUtils.isEmpty(index)){
+            errorMessage.append("-序号为空");
+            ifSuccess = 0;
+        }
+        organizationMap.put("index", ExcelReaderUtil.cellData(cell));
+
+        // 单位名称
+        cell = hssfRow.getCell(1);
+        String unitName = ExcelReaderUtil.cellData(cell);
+        organizationMap.put("unit_name", unitName);
+        if (StringUtils.isEmpty(unitName)) {
+            errorMessage.append("-单位名称为空");
+            ifSuccess = 0;
+        }
+
+        // 单位法人和其他组织统一社会信用代码
+        cell = hssfRow.getCell(2);
+        String unitOrgCodeValue = ExcelReaderUtil.cellData(cell);
+        organizationMap.put("unit_org_code", unitOrgCodeValue);
+        if (StringUtils.isEmpty(unitOrgCodeValue) && (unitOrgCodeValue.length() < 18 || unitOrgCodeValue.length() > 18)) {
+            errorMessage.append("-单位法人和其他组织统一社会信用代码格式错误");
+            ifSuccess = 0;
+        }
+
+        // 单位地址
+        cell = hssfRow.getCell(3);
+        String unit_address = ExcelReaderUtil.cellData(cell);
+        if (StringUtils.isEmpty(unit_address)){
+            errorMessage.append("-单位地址为空");
+            ifSuccess = 0;
+        }
+        organizationMap.put("unit_address", ExcelReaderUtil.cellData(cell));
+
+        // 单位所在政区
+        cell = hssfRow.getCell(4);
+        String unit_district = ExcelReaderUtil.cellData(cell);
+        if (StringUtils.isEmpty(unit_district)){
+            errorMessage.append("-单位所在政区为空");
+            ifSuccess = 0;
+        }
+        organizationMap.put("unit_district", unit_district);
+
+
+        //单位类别
+        cell = hssfRow.getCell(5);
+        String unit_nature = ExcelReaderUtil.cellData(cell);
+        if (StringUtils.isEmpty(unit_nature)){
+            errorMessage.append("-单位类别为空");
+            ifSuccess = 0;
+        }
+        organizationMap.put("unit_nature", ExcelReaderUtil.cellData(cell));
+
+        // 经济类型
+        cell = hssfRow.getCell(6);
+        String unit_economic_type = ExcelReaderUtil.cellData(cell);
+        if (StringUtils.isEmpty(unit_economic_type)){
+            errorMessage.append("-经济类型为空");
+            ifSuccess = 0;
+        }
+        organizationMap.put("unit_economic_type", ExcelReaderUtil.cellData(cell));
+
+
+        // 单位所属行业 LIB_INDUSTRY_TYPE
+        cell = hssfRow.getCell(7);
+        String unit_industry = ExcelReaderUtil.cellData(cell);
+        if (StringUtils.isEmpty(unit_industry)){
+            errorMessage.append("-单位所属行业为空");
+            ifSuccess = 0;
+        }
+        organizationMap.put("unit_industry", ExcelReaderUtil.cellData(cell));
+
+
+        // 职工人数
+        cell = hssfRow.getCell(8);
+        String unitNumber = ExcelReaderUtil.checkChange(cell);
+        if (StringUtils.isEmpty(unitNumber)) {
+            unitNumber = "0";
+        } else {
+            if (!ExcelReaderUtil.checkNum(unitNumber)) {
+                unitNumber = "0";
+            }
+        }
+        organizationMap.put("unit_number", unitNumber);
+
+
+        // 工会名称
+        cell = hssfRow.getCell(9);
+        String unionName = ExcelReaderUtil.cellData(cell);
+        if (StringUtils.isEmpty(unionName)) {
+            errorMessage.append("-工会名称为空");
+            ifSuccess = 0;
+        }
+        organizationMap.put("union_name", unionName);
+        organizationMap.put("union_simple_name", unionName);
+
+
+        // 工会法人和其他组织统一社会信用代码
+        cell = hssfRow.getCell(10);
+        String othersOrgCode = ExcelReaderUtil.cellData(cell);
+        organizationMap.put("others_org_code", othersOrgCode);
+        if (StringUtils.isEmpty(othersOrgCode) || (othersOrgCode.length() < 18 || othersOrgCode.length() > 18)) {
+            errorMessage.append("-工会法人和其他组织统一社会信用代码格式错误");
+            ifSuccess = 0;
+        }
+
+
+        // 上级工会名称
+        cell = hssfRow.getCell(11);
+        String pName = ExcelReaderUtil.cellData(cell);
+        organizationMap.put("p_name", pName);
+        if (StringUtils.isEmpty(pName)) {
+            errorMessage.append("-上级工会名称为空");
+            ifSuccess = 0;
+        }
+
+        // 建会日期
+        cell = hssfRow.getCell(12);
+        String createunionTime = ExcelReaderUtil.cellData(cell);
+        if (StringUtils.isNotEmpty(createunionTime)) {// 判空
+            try {
+                createunionTime = StringRegularUtil.TimeRegular.validateWithFormatDays(createunionTime, "yyyyMMdd");
+                if (StringUtils.isEmpty(createunionTime)) {
+                    createunionTime = DateUtil.getDays();
+                }
+            } catch (Exception ex) {
+                createunionTime = DateUtil.getDays();
+            }
+        }
+        organizationMap.put("createunion_time", createunionTime);
+
+        // 基层工会类型
+        cell = hssfRow.getCell(13);
+        String union_type = ExcelReaderUtil.cellData(cell);
+        if (StringUtils.isEmpty(union_type)){
+            errorMessage.append("-基层工会类型为空");
+            ifSuccess = 0;
+        }
+        organizationMap.put("union_type", ExcelReaderUtil.cellData(cell));
+
+
+        // 会员人数
+        cell = hssfRow.getCell(14);
+        String membership = ExcelReaderUtil.checkChange(cell);
+        if (StringUtils.isEmpty(membership)) {
+            membership = "0";
+        } else {
+            if (!StringUtils.isNumeric(membership)) {
+                membership = "0";
+            }
+        }
+        organizationMap.put("membership", membership);
+
+
+        // 工会负责人
+        cell = hssfRow.getCell(15);
+        String union_leader = ExcelReaderUtil.cellData(cell);
+        if (StringUtils.isEmpty(union_leader)){
+            errorMessage.append("-工会负责人为空");
+            ifSuccess = 0;
+        }
+        organizationMap.put("union_leader", ExcelReaderUtil.cellData(cell));
+
+        // 联系电话
+        cell = hssfRow.getCell(16);
+        String union_leader_phone = ExcelReaderUtil.cellData(cell);
+        if (StringUtils.isEmpty(union_leader_phone)){
+            errorMessage.append("-联系电话为空");
+            ifSuccess = 0;
+        }
+        organizationMap.put("union_leader_phone", ExcelReaderUtil.checkChange(cell));
+
+        if (ifSuccess != null && ifSuccess == 0) {
+            organizationMap.put("if_success", "0");
+            organizationMap.put("errors_message", errorMessage.toString());
+        }
+    }
+
+    /**
+     * 获取组织编号
+     *
+     * @param district
+     * @return
+     */
+    private String getDeptOrganizationCode(String district) {
+        StringBuilder sb = new StringBuilder("46");
+
+        if (district.contains("海南省工商行政管理工会")) {
+            sb.append("28");
+        } else if (district.contains("海南省地方税务局")) {
+            sb.append("27");
+        } else if (district.contains("海南省财贸旅游烟草工会")) {
+            sb.append("26");
+        } else if (district.contains("海南省机械能源石化医药工会")) {
+            sb.append("25");
+        } else if (district.contains("海南省农林水利交通建设工会")) {
+            sb.append("24");
+        } else if (district.contains("海南省科教文卫邮电工会")) {
+            sb.append("23");
+        } else if (district.contains("海南省直机关工会工委")) {
+            sb.append("22");
+        } else if (district.contains("洋浦经济开发区")) {
+            sb.append("21");
+        } else if (district.contains("白沙")) {
+            sb.append("20");
+        } else if (district.contains("琼中")) {
+            sb.append("19");
+        } else if (district.contains("保亭")) {
+            sb.append("18");
+        } else if (district.contains("昌江")) {
+            sb.append("17");
+        } else if (district.contains("陵水")) {
+            sb.append("16");
+        } else if (district.contains("屯昌")) {
+            sb.append("15");
+        } else if (district.contains("定安")) {
+            sb.append("14");
+        } else if (district.contains("临高")) {
+            sb.append("13");
+        } else if (district.contains("澄迈")) {
+            sb.append("12");
+        } else if (district.contains("乐东")) {
+            sb.append("11");
+        } else if (district.contains("五指山")) {
+            sb.append("10");
+        } else if (district.contains("东方")) {
+            sb.append("09");
+        } else if (district.contains("万宁")) {
+            sb.append("08");
+        } else if (district.contains("文昌")) {
+            sb.append("07");
+        } else if (district.contains("琼海")) {
+            sb.append("06");
+        } else if (district.contains("儋州")) {
+            sb.append("05");
+        } else if (district.contains("三沙")) {
+            sb.append("04");
+        } else if (district.contains("三亚")) {
+            sb.append("03");
+        } else if (district.contains("海口")) {
+            sb.append("02");
+        } else {
+            sb.append("01");
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * 获取所有组织，用于导出到表格
+     *
+     * @param unionName
+     * @param deptNo
+     * @param deptId
+     * @return
+     */
+    public List<Map<String, Object>> getAllOrganizationList(String unionName, String deptNo, Integer deptId) {
+        List<Map<String, Object>> list = organizationMapper.selectAllByCondition(unionName, deptNo, deptId);
+        for (Map<String, Object> m : list) {
+            if (m.get("createunion_time") != null) {
+                String createunion_time = DateUtil.parseAndFormat(m.get("createunion_time").toString(), "yyyyMMdd", "yyyy/MM/dd");
+                m.put("createunion_time", createunion_time);
+            }
+        }
+
+        return list;
+    }
+
+}

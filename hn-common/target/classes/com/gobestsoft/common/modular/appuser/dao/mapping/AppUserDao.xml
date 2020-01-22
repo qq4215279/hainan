@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.appuser.dao.AppUserDao">
+
+    <resultMap type="com.gobestsoft.common.modular.appuser.model.AppUserEntity"
+               id="appUserMap">
+        <id column="auid" property="auId"/>
+        <result column="avatar" property="avatar"/>
+        <result column="account" property="account"/>
+        <result column="password" property="password"/>
+        <result column="nick_name" property="nickname"/>
+        <result column="member_id" property="member_id"/>
+        <result column="registration_id" property="registerId"/>
+        <result column="sex" property="sex"/>
+        <result column="real_name" property="real_name"/>
+        <result column="create_time" property="createTime"/> 
+    </resultMap>
+
+    <sql id="selectItem">
+		auid,avatar,account,password,nick_name,member_id,registration_id,sex,real_name
+	</sql>
+
+
+    <insert id="register">
+		INSERT INTO
+		app_user(auid,account,nick_name,password,create_time)
+		VALUES(#{auId},#{account},#{nickName},#{password},#{createTime});
+	</insert>
+	
+	<select id="appuUserList" resultMap="appUserMap">
+		SELECT * from (SELECT * ,(case when ISNULL(member_id) THEN 0 else 1 end) isMember from app_user) t2 where 1=1
+		<if test="isMember != null">
+            AND isMember = #{isMember}
+        </if>
+		<if test="account != null and account != ''">
+            AND t2.account LIKE CONCAT('%',#{account},'%')
+        </if>
+        <if test="nickname != null and nickname != ''">
+            AND (
+            t2.nick_name LIKE CONCAT('%',#{nickname},'%')
+            )
+        </if>
+        <if test="begDate != null and begDate != ''">
+            AND t2.create_time &gt;= #{begDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND t2.create_time &lt;= #{endDate}
+        </if>
+	</select>
+	
+	<select id="appUserByAuid" resultType="map">
+		SELECT * ,(case when ISNULL(member_id) THEN 0 else 1 end) isMember from app_user where auid = #{auid}
+	</select>
+	
+    <select id="selectOrgNameByOrgId" resultType="String">
+		Select simplename from sys_dept where id = #{orgId}
+	</select>
+
+
+    <select id="getAppUserByMobile" resultMap="appUserMap">
+        SELECT
+        <include refid="selectItem"></include>
+        FROM app_user WHERE account=#{mobile}
+    </select>
+
+
+    <select id="getAppUserByAuid" resultMap="appUserMap">
+        SELECT
+        <include refid="selectItem"></include>
+        FROM app_user WHERE auid=#{auid}
+    </select>
+
+    <delete id="deleteByAuid">
+        DELETE FROM app_user where auid=#{auid}
+
+    </delete>
+
+
+    <update id="modifyPassword">
+		update app_user set password=#{password} where account=#{mobile}
+	</update>
+
+    <update id="setUserInfo">
+        update app_user set auid=#{auId}
+        <if test=" avatar!=null and avatar!=''">
+            ,avatar=#{avatar}
+        </if>
+        <if test=" nickname!=null and nickname!='' ">
+            ,nick_name=#{nickname}
+        </if>
+        <if test=" realName!=null and realName!=''">
+            ,real_name=#{realName}
+        </if>
+        <if test=" sex!=null ">
+            ,sex=${sex}
+        </if>
+        where auid=#{auId}
+    </update>
+
+    <insert id="addVerification">
+		insert into
+		app_verification(mobile,verification,create_time)
+		values(#{mobile},#{code},#{createTime})
+	</insert>
+
+    <resultMap
+            type="com.gobestsoft.common.modular.appuser.model.VerificationMobile"
+            id="verificationMap">
+        <id column="id" property="id"/>
+        <result column="mobile" property="mobile"/>
+        <result column="verification" property="code"/>
+        <result column="create_time" property="create_time"/>
+    </resultMap>
+
+    <select id="getVerificationByMobile" resultMap="verificationMap">
+		select
+		id,mobile,verification,create_time from app_verification where
+		mobile=#{mobile}
+		order by id desc limit 1
+	</select>
+
+    <delete id="deleteVerificationByMobile">
+		DELETE FROM app_verification WHERE mobile=#{mobile}
+	</delete>
+
+    <select id="getUserIntegral" resultType="java.lang.Integer">
+        SELECT IFNULL(SUM(value),0) FROM APP_INTEGRAL WHERE  auid=#{auId}
+	</select>
+
+    <select id="getUserExperience" resultType="java.lang.Integer">
+        SELECT IFNULL(SUM(value),0) FROM APP_INTEGRAL WHERE  auid= #{auId} AND value &gt; 0
+	</select>
+
+    <update id="cleanRegisterId">
+        UPDATE app_user SET registration_id =NULL WHERE registration_id=#{registerId}
+    </update>
+
+    <update id="bindDeviceInfo">
+        UPDATE app_user SET auid=auid ,registration_id=#{registerId} ,device_info=#{deviceInfo} ,platform=#{platform} WHERE auid=#{auId};
+    </update>
+
+    <!-- 根据会员id,判断该会员信息是否被其他用户认证 -->
+    <select id="selectAuidByMemberId" resultType="long">
+		Select count(app_user.auid) from app_user where member_id = #{memberId}
+	</select>
+
+    <!-- 更新app_user表的会员id、真实姓名、性别字段 -->
+    <update id="updateByAuid">
+        update app_user
+        <set>
+            <if test="appUser.member_id != null and appUser.member_id != ''">
+                member_id=#{appUser.member_id},
+            </if>
+            <if test="appUser.sex != null and appUser.sex != ''">
+                sex=#{appUser.sex},
+            </if>
+            <if test="appUser.real_name != null and appUser.real_name != ''">
+                real_name=#{appUser.real_name},
+            </if>
+        </set>
+        where auid = #{appUser.auId}
+    </update>
+
+    <!--保存留言信息-->
+    <insert id="insertLeaveMessage" parameterType="map">
+		INSERT INTO
+		app_leave_message(id,content,contact,auid,create_time)
+		VALUES(#{id},#{content},#{contact},#{auid},#{createTime});
+	</insert>
+
+    <select id="appuUserLeaveMessageList" parameterType="map" resultType="map">
+      SELECT
+	    *
+      FROM
+	    app_leave_message
+      <where>
+          <if test="content != null and content != ''">
+              AND content LIKE CONCAT('%',#{content},'%')
+          </if>
+          <if test="begDate != null and begDate != ''">
+              AND create_time &gt;= #{begDate}
+          </if>
+          <if test="endDate != null and endDate != ''">
+              AND create_time &lt;= #{endDate}
+          </if>
+      </where>
+        order  by create_time desc
+    </select>
+
+    <select id="appUserLeaveMessageById" resultType="map">
+		SELECT * from app_leave_message where id = #{id}
+	</select>
+
+
+    <select id="getAccountCreateTime" resultType="java.lang.String">
+      SELECT create_time FROM app_user WHERE   auid=#{auid}
+    </select>
+    <!--查询所有有效经验-->
+    <select id="selectTotalPointByUser" resultType="Integer">
+        select sum(value)
+        from  app_integral where auid=#{auid}
+        and (type=0 or type=2)
+    </select>
+
+
+    <update id="updateMessageReadByCat">
+        call readProcedure(#{auid},#{cat_id})
+
+    </update>
+
+    <update id="updateAccount" >
+        update app_user set account =#{mobile}
+        where auid=#{auid}
+
+    </update>
+    <update id="updateMobile">
+        update person_info set mobile = #{mobile}
+        where mobile =#{oldMobile}
+
+    </update>
+
+    <!--未审核完的困难帮扶-->
+    <select id="selectCountStraitened" resultType="Integer">
+
+        select count(1) from srv_straitened_log
+        where create_uid=#{uid}
+        and status=1
+
+    </select>
+    <!--未完成的法律援助申请-->
+    <select id="selectCountSupport" resultType="Integer">
+
+        select count(1) from srv_law_support_log
+        where create_uid=#{uid}
+        and status=1
+
+    </select>
+    <!--入会-->
+    <select id="selectCountMemberApply" resultType="Integer">
+
+        select count(1) from dept_member_apply
+        where auid=#{uid} and apply_status=-1
+    </select>
+    <!--转会-->
+    <select id="selectCountMemberTransferApply" resultType="Integer">
+
+        select count(1) from dept_member_transfer
+        where auid=#{uid} and status=-1
+
+    </select>
+
+    <select id="selectAuid" resultType="String">
+		Select auid from app_user where member_id = #{memberId}
+	</select>
+
+
+</mapper>

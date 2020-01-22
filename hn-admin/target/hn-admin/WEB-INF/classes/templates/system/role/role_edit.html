@@ -1,0 +1,62 @@
+<css>
+    <div th:include="fragment/fargment :: treeCss"></div>
+    <link th:href="@{/static/css/_fstyle.css}" rel="stylesheet">
+    <style type="text/css">
+        .ztree li span.button.pIcon01_ico_open, .ztree li span.button.pIcon01_ico_close,
+        .ztree li span.button.pIcon01_ico_docu {
+            margin-right: 2px;
+            background: url('static/plugin/ztree/img/diy/1_open.png') no-repeat scroll 0 0 transparent;
+            vertical-align: top;
+            *vertical-align: middle
+        }
+
+        .ztree li span.button.pIcon02_ico_open, .ztree li span.button.pIcon02_ico_close,
+        .ztree li span.button.pIcon02_ico_docu {
+            margin-right: 2px;
+            background: url('static/plugin/ztree/img/diy/2.png') no-repeat scroll 0 0 transparent;
+            vertical-align: top;
+            *vertical-align: middle
+        }
+    </style>
+</css>
+<body>
+<input type="hidden" id="id" th:value="${role.id}">
+<input type="hidden" id="pid" th:value="${role.pid}">
+<!-- <input type="hidden" id="deptid" th:value="${role.deptid}"> -->
+<div class="form-horizontal" id="roleInfoForm">
+    <form:text id="name" label="角色名称" name="name" must="true" line="true" value="${role.name}"></form:text>
+    <form:text id="pName" label="上级名称" name="pName" must="true" line="true"
+               onclick="RolInfoDlg.showPNameSelectTree();" value="${pName}"></form:text>
+    <!--<form:text id="deptName" label="部门名称" name="deptName" line="true"-->
+               <!--onclick="RolInfoDlg.showDeptSelectTree();" value="${deptName}"></form:text>-->
+    <form:text id="tips" label="别名" name="tips" must="true" line="true" value="${role.tips}"></form:text>
+    <form:text id="sort" label="排序" name="sort" value="${role.sort}"></form:text>
+    <!-- 这是部门下拉框 -->
+    <div id="deptContent" class="menuContent"
+         style="display: none; position: absolute; z-index: 200;">
+        <ul id="deptTree" class="ztree tree-box"
+            style="width: 250px !important;"></ul>
+    </div>
+
+    <!-- 这是父级菜单下拉框 -->
+    <div id="pNameContent" class="menuContent"
+         style="display: none; position: absolute; z-index: 200;">
+        <ul id="pNameTree" class="ztree tree-box"
+            style="width: 250px !important;"></ul>
+    </div>
+
+    <div class="row text-center">
+        <qx:btn id="ensure" class="btn btn-primary" fa="fa fa-check" label="提交"
+                onclick="RolInfoDlg.editSubmit()"></qx:btn>
+        <qx:btn id="cancel" class="btn btn-default" fa="fa fa-eraser" label="取消"
+                onclick="RolInfoDlg.close()"></qx:btn>
+    </div>
+</div>
+</body>
+
+<js>
+    <script th:src="@{/static/plugin/webuploader/webuploader.min.js}"></script>
+    <script th:src="@{/static/js/web-upload-object.js}"></script>
+    <div th:include="fragment/fargment :: treeJs"></div>
+    <script th:src="@{/static/modular/system/role/role_info.js}"></script>
+</js>

@@ -1,0 +1,81 @@
+<body xmlns:th="http://www.w3.org/1999/xhtml">
+    <div class="ibox float-e-margins">
+        <div class="ibox-content">
+            <div class="form-horizontal" id="contractForm">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form enctype="multipart/form-data" name="uploadForm" id="uploadForm">
+                            <form:text id="name" label="母版名称" value="${pojo.name}" />
+                            <div class="form-group">
+                                <input class="btn btn-primary" type="file" id="uploadFile" name="uploadFile" accept=".doc,.docx" style="margin-left: 15px;" />
+                            </div>
+                        </form>
+                        <div class="col-sm-7" role="group">
+                            <qx:btn class="btn btn-primary" fa="fa fa-check" label="提交" onclick="ContractAdd.addSubmit()" />
+                            <qx:btn class="btn btn-primary" fa="fa fa-eraser" label="取消" onclick="ContractAdd.close()" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<js>
+    <script>
+
+        /**
+         * 角色详情对话框（可用于添加和修改对话框）
+         */
+        let ContractAdd = {
+            articleData: {},
+            baseUrl: App.ctxPath + 'contract/master'
+        };
+
+        /**
+         * 清除数据
+         */
+        ContractAdd.clearData = function () {
+            this.articleData = new FormData();
+        };
+
+
+        /**
+         * 收集数据
+         */
+        ContractAdd.collectData = function () {
+            this.articleData.append("name", $("#name").val());
+            this.articleData.append("uploadFile", $('#uploadFile')[0].files[0]);
+        };
+
+        /**
+         * 关闭此对话框
+         */
+        ContractAdd.close = function () {
+            parent.layer.close(window.parent.Contract.layerIndex);
+        };
+
+        /**
+         * 提交添加用户
+         */
+        ContractAdd.addSubmit = function () {
+            this.clearData();
+            this.collectData();
+
+            $.ajax({
+                url: this.baseUrl + "/doSave",
+                type: 'post',
+                processData: false,
+                contentType: false,
+                data: this.articleData,
+                success: function () {
+                    App.success("修改成功!");
+                    window.parent.Contract.table.refresh();
+                    ContractAdd.close();
+                },
+                fail: function () {
+                    App.error("修改失败!");
+                }
+            })
+        };
+    </script>
+</js>
+</body>

@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="hn-company:war" />
+    </artifacts-to-build>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7d923de1-c008-4c51-ae55-9bd5e858f80c" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/hn-admin/hn-admin.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hn-api/hn-api.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hn-common/hn-common.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hn-core/hn-core.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hn-mail/hn-mail.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/hn-parent/hn-parent.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/jpush/jpush.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rabbitmq/rabbitmq.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/hn-zgh-cloud.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/hn-zgh-cloud.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hn-admin/src/main/resources/application-gtw.yml" beforeDir="false" afterPath="$PROJECT_DIR$/hn-admin/src/main/resources/application-gtw.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hn-api/src/main/resources/application-gtw.yml" beforeDir="false" afterPath="$PROJECT_DIR$/hn-api/src/main/resources/application-gtw.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hn-company/src/main/resources/application-deve.yml" beforeDir="false" afterPath="$PROJECT_DIR$/hn-company/src/main/resources/application-deve.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hn-core/src/main/java/com/gobestsoft/core/util/MD5Util.java" beforeDir="false" afterPath="$PROJECT_DIR$/hn-core/src/main/java/com/gobestsoft/core/util/MD5Util.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hn-manage/src/main/resources/static/modular/dept/organization/organization_ztree.js" beforeDir="false" afterPath="$PROJECT_DIR$/hn-manage/src/main/resources/static/modular/dept/organization/organization_ztree.js" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CompilerWorkspaceConfiguration">
+    <option name="MAKE_PROJECT_ON_SAVE" value="true" />
+  </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="localRepository" value="G:\专业工具安装\Maven\maven_repository" />
+        <option name="mavenHome" value="G:/专业工具安装/Maven/apache-maven-3.5.2" />
+        <option name="userSettingsFile" value="C:\Users\liu86\.m2\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="1Sp1l2sJpKE9GH3cPY2dbjshbIx" />
+  <component name="ProjectLevelVcsManager">
+    <OptionsSetting value="false" id="Update" />
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ExpandSpringBootJavaOptionsPanel" value="true" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder0" value="0" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder1" value="1" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder2" value="2" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder3" value="3" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder4" value="4" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder5" value="5" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth0" value="256" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth1" value="256" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth2" value="255" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth3" value="256" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth4" value="255" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth5" value="176" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder0" value="0" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder1" value="1" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder2" value="2" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder3" value="3" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder4" value="4" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder5" value="5" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth0" value="256" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth1" value="256" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth2" value="255" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth3" value="256" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth4" value="255" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth5" value="176" />
+    <property name="GenerateAntBuildDialog.backupFiles" value="true" />
+    <property name="GenerateAntBuildDialog.enableUiFormCompile" value="true" />
+    <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
+    <property name="GenerateAntBuildDialog.outputFileNameProperty" value="hainan" />
+    <property name="RequestMappingsPanelOrder0" value="0" />
+    <property name="RequestMappingsPanelOrder1" value="1" />
+    <property name="RequestMappingsPanelOrder2" value="2" />
+    <property name="RequestMappingsPanelWidth0" value="75" />
+    <property name="RequestMappingsPanelWidth1" value="75" />
+    <property name="RequestMappingsPanelWidth2" value="75" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1572231287077" />
+    <property name="extract.method.default.visibility" value="public" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../code/hunan/source/gbs-enterprise-server" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.32873562" />
+    <property name="restartRequiresConfirmation" value="false" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.tabs" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.gobestsoft.common.modular.dao.model" />
+      <recent name="com.gobestsoft.common.modular.dao.mapper" />
+      <recent name="com.gobestsoft.common.modular.dao.mapper.mapping" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="H:\MajorData\IDEAWorkspace\SvnResp\hainan\hn-manage\src\main\resources\templates\account" />
+      <recent name="H:\MajorData\IDEAWorkspace\SvnResp\hainan\hn-common\src\main\java\com\gobestsoft\common\modular\dao\mapper\mapping" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+    <option name="contentProportion" value="0.18374316" />
+  </component>
+  <component name="RunManager" selected="Application.MD5Util">
+    <configuration default="true" type="Applet">
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MD5Util" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.gobestsoft.core.util.MD5Util" />
+      <module name="hn-core" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.gobestsoft.core.util.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="PingYinUtil" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.gobestsoft.core.util.PingYinUtil" />
+      <module name="hn-core" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.gobestsoft.core.util.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <option name="TEST_OBJECT" value="class" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ApiApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="hn-api" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gobestsoft.api.ApiApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="HnAdminApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="hn-admin" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gobestsoft.admin.HnAdminApplication" />
+      <option name="WORKING_DIRECTORY" value="file://$MAVEN_REPOSITORY$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
+      <option name="UPDATE_ACTION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="HnCompanyApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="hn-company" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gobestsoft.company.HnCompanyApplication" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
+      <option name="UPDATE_ACTION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="TestNG">
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType">
+      <module name="" />
+      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
+      <option name="PROGRAM_PARAMETERS" />
+      <predefined_log_file enabled="true" id="idea.log" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.PingYinUtil" />
+      <item itemvalue="Application.MD5Util" />
+      <item itemvalue="Spring Boot.ApiApplication" />
+      <item itemvalue="Spring Boot.HnAdminApplication" />
+      <item itemvalue="Spring Boot.HnCompanyApplication" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.MD5Util" />
+        <item itemvalue="Application.PingYinUtil" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="allServicesViewState">
+      <serviceView>
+        <option name="contentProportion" value="0.17144808" />
+        <treeState>
+          <expand>
+            <path>
+              <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
+              <item name="com.intellij.execution.services.ServiceModel$ServiceGroupNode@f8909c7" type="7427dc5b:ServiceModel$ServiceGroupNode" />
+            </path>
+            <path>
+              <item name="services root" type="e789fda9:ObjectUtils$Sentinel" />
+              <item name="com.intellij.execution.services.ServiceModel$ServiceGroupNode@f8909c7" type="7427dc5b:ServiceModel$ServiceGroupNode" />
+              <item name="com.intellij.execution.services.ServiceModel$ServiceGroupNode@95202765" type="7427dc5b:ServiceModel$ServiceGroupNode" />
+            </path>
+          </expand>
+          <select />
+        </treeState>
+      </serviceView>
+    </option>
+  </component>
+  <component name="SvnConfiguration" cleanupOnStartRun="true">
+    <configuration>C:\Users\liu86\AppData\Roaming\Subversion</configuration>
+    <supportedVersion>125</supportedVersion>
+  </component>
+  <component name="SvnFileUrlMappingImpl">
+    <option name="myMappingRoots">
+      <list>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="H:\MajorData\IDEAWorkspace\SvnResp\hainan" />
+          <option name="myCopyRoot" value="H:\MajorData\IDEAWorkspace\SvnResp\hainan" />
+        </SvnCopyRootSimple>
+      </list>
+    </option>
+    <option name="myMoreRealMappingRoots">
+      <list>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="H:\MajorData\IDEAWorkspace\SvnResp\hainan" />
+          <option name="myCopyRoot" value="H:\MajorData\IDEAWorkspace\SvnResp\hainan" />
+        </SvnCopyRootSimple>
+      </list>
+    </option>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7d923de1-c008-4c51-ae55-9bd5e858f80c" name="Default Changelist" comment="" />
+      <created>1541035363468</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1541035363468</updated>
+      <workItem from="1541035370456" duration="176000" />
+      <workItem from="1569488589494" duration="1801000" />
+      <workItem from="1569490425346" duration="617000" />
+      <workItem from="1569491096664" duration="2865000" />
+      <workItem from="1569494030892" duration="1883000" />
+      <workItem from="1569546017129" duration="25451000" />
+      <workItem from="1569632850091" duration="12208000" />
+      <workItem from="1569652297831" duration="8204000" />
+      <workItem from="1569719082114" duration="25029000" />
+      <workItem from="1569748494823" duration="5688000" />
+      <workItem from="1569805580060" duration="6190000" />
+      <workItem from="1569824222683" duration="6648000" />
+      <workItem from="1570413160589" duration="7000" />
+      <workItem from="1570413176502" duration="939000" />
+      <workItem from="1570496543692" duration="10071000" />
+      <workItem from="1570521899443" duration="6625000" />
+      <workItem from="1570583438522" duration="10560000" />
+      <workItem from="1570686879143" duration="847000" />
+      <workItem from="1570693285766" duration="991000" />
+      <workItem from="1570698561918" duration="1674000" />
+      <workItem from="1570758555738" duration="21669000" />
+      <workItem from="1570841633751" duration="10961000" />
+      <workItem from="1571014921628" duration="72000" />
+      <workItem from="1571017004813" duration="5844000" />
+      <workItem from="1571103370191" duration="1832000" />
+      <workItem from="1571106402374" duration="10520000" />
+      <workItem from="1571134086953" duration="18000" />
+      <workItem from="1571187565829" duration="20927000" />
+      <workItem from="1571274281879" duration="30083000" />
+      <workItem from="1571361474890" duration="6087000" />
+      <workItem from="1571621109205" duration="1350000" />
+      <workItem from="1571643944999" duration="1202000" />
+      <workItem from="1571714622588" duration="3000" />
+      <workItem from="1571726864593" duration="4722000" />
+      <workItem from="1571797583681" duration="1000" />
+      <workItem from="1571797597302" duration="1241000" />
+      <workItem from="1571823691320" duration="1809000" />
+      <workItem from="1571878760085" duration="2709000" />
+      <workItem from="1571900683568" duration="20000" />
+      <workItem from="1571966721016" duration="5186000" />
+      <workItem from="1571988836623" duration="686000" />
+      <workItem from="1572105677576" duration="457000" />
+      <workItem from="1572228938901" duration="2038000" />
+    </task>
+    <task id="LOCAL-00001">
+      <created>1569657789047</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1569657789048</updated>
+    </task>
+    <task id="LOCAL-00002">
+      <created>1569752252760</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1569752252774</updated>
+    </task>
+    <task id="LOCAL-00003">
+      <created>1569752328414</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1569752328414</updated>
+    </task>
+    <task id="LOCAL-00004">
+      <created>1569752373051</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1569752373051</updated>
+    </task>
+    <task id="LOCAL-00005">
+      <created>1569752388309</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1569752388309</updated>
+    </task>
+    <task id="LOCAL-00006">
+      <created>1569752413297</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1569752413297</updated>
+    </task>
+    <task id="LOCAL-00007">
+      <created>1569752442799</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1569752442799</updated>
+    </task>
+    <task id="LOCAL-00008">
+      <created>1569752476631</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1569752476631</updated>
+    </task>
+    <task id="LOCAL-00009">
+      <created>1569753036241</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1569753036241</updated>
+    </task>
+    <task id="LOCAL-00010">
+      <created>1570527297155</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1570527297155</updated>
+    </task>
+    <task id="LOCAL-00011">
+      <created>1570527370784</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1570527370784</updated>
+    </task>
+    <task id="LOCAL-00012">
+      <created>1571279851203</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1571279851203</updated>
+    </task>
+    <task id="LOCAL-00013">
+      <created>1571292177184</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1571292177184</updated>
+    </task>
+    <task id="LOCAL-00014">
+      <created>1571292194934</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1571292194934</updated>
+    </task>
+    <task id="LOCAL-00015">
+      <created>1571292245374</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1571292245374</updated>
+    </task>
+    <task id="LOCAL-00016">
+      <created>1571292276074</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1571292276074</updated>
+    </task>
+    <task id="LOCAL-00017">
+      <created>1571292312884</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1571292312884</updated>
+    </task>
+    <task id="LOCAL-00018">
+      <created>1571292449905</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1571292449905</updated>
+    </task>
+    <task id="LOCAL-00019">
+      <created>1571292544920</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1571292544920</updated>
+    </task>
+    <task id="LOCAL-00020">
+      <created>1571292755249</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1571292755249</updated>
+    </task>
+    <task id="LOCAL-00021">
+      <created>1571303353406</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1571303353406</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="257911000" />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="as" />
+    <MESSAGE value="弱密码校验" />
+    <MESSAGE value="打开弱密码校验判断" />
+    <MESSAGE value="栏目管理模块增加制度文件" />
+    <MESSAGE value="栏目管理模块增加财务资产" />
+    <MESSAGE value="修改法律援助审核对象与审核流程" />
+    <MESSAGE value="农民工数-&gt;农民工" />
+    <MESSAGE value="农名工数-&gt;农民工数" />
+    <option name="LAST_COMMIT_MESSAGE" value="" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints-defaults>
+        <breakpoint suspend="THREAD" type="java-line" />
+      </breakpoints-defaults>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="SpringBootApplicationConfigurationType">
+        <watch expression="deptIds.get(0)" />
+        <watch expression="deptIds.get(0)" />
+        <watch expression="level" />
+      </configuration>
+    </watches-manager>
+  </component>
+</project>

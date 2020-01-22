@@ -1,0 +1,99 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+	<div class="ibox-content">
+		<div class="form-horizontal" id="mailForm">
+			<input type="hidden" id="searchType" value="${searchType}"> <input
+				type="hidden" id="mailId" value="${mail.mailId}">
+
+			<div class="row">
+				<div class="col-sm-8">
+					<#input id="subject" name="邮件主题" value="${mail.subject}"
+						readonly="readonly" />
+					<#input id="sendId" name="发件人" value="${mail.sendName}"
+						readonly="readonly" style="width:180px" />
+					<#input id="sendTime" name="收件时间" value="${mail.creatTime}"
+						readonly="readonly" style="width:180px" />
+					<#input id="recId" name="收件人" value="${mail.acceptName}"
+						readonly="readonly" />
+					<div class="form-group">
+						<label class="col-sm-3 control-label">邮件内容</label>
+						<div class="col-sm-9">
+							<textarea class="form-control" rows="15" id="context"
+								readonly="readonly" style="resize: none;">${mail.context}</textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row btn-group-m-t" id="canDelete" style="display: none;">
+				<div class="col-sm-1 col-sm-offset-2">
+					<#button btnCss="info" name="删除" id="cancel" icon="fa-plus"
+						clickFun="MailDlg.delete()" />
+				</div>
+				<div class="col-sm-1">
+					<#button btnCss="danger" name="关闭" id="cancel" icon="fa-close"
+						clickFun="MailDlg.close()" />
+				</div>
+			</div>
+			<div class="row btn-group-m-t" id="cantDelete" style="display: none;">
+				<div class="col-sm-1 col-sm-offset-2">
+					<#button btnCss="danger" name="关闭" id="cancel" icon="fa-close"
+						clickFun="MailDlg.close()" />
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+/**
+ * 会员信息详情对话框（可用于添加对话框）
+ */
+var MailDlg = {
+};
+/**
+ * 关闭此对话框
+ */
+ MailDlg.close = function () {
+		 window.parent.Mail.table.refresh();
+		 parent.layer.close(window.parent.Mail.layerIndex);
+};
+
+/**
+ * 删除邮件
+ */
+ MailDlg.delete = function () {
+	if ($("#searchType").val()==2){
+		var ajax = new $ax(Feng.ctxPath + "/mail/deleteDetail", function (data) {
+			 window.parent.Mail.table.refresh();
+			 parent.layer.close(window.parent.Mail.layerIndex);
+			 Feng.success("删除成功!");
+		 }, function (data) {
+			 Feng.error("删除失败!" + data.responseJSON.message + "!");
+		 });
+	}else{
+	 var ajax = new $ax(Feng.ctxPath + "/mail/delete", function (data) {
+		 window.parent.Mail.table.refresh();
+		 parent.layer.close(window.parent.Mail.layerIndex);
+		 Feng.success("删除成功!");
+	 }, function (data) {
+		 Feng.error("删除失败!" + data.responseJSON.message + "!");
+	 });
+	}
+	    ajax.set("mailId",$('#mailId').val());
+	    ajax.start();
+};
+
+
+
+$(function () {
+		if($("#searchType").val()==3){
+			$("#cantDelete").show();
+			$("#canDelete").hide();
+		}else{
+			$("#canDelete").show();
+			$("#cantDelete").hide();
+		}
+});
+    </script>
+
+
+	@}

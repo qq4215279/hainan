@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dept.mapper.BigDataMapper">
+	<!--困难职工总数-->
+	<select id="selectStraitenedCount" resultType="Integer">
+
+		select
+		ifnull(sum(daily_count),0)daily_count
+		from srv_straitened_data t
+		<where>
+			<if test="start_time!=null and start_time!=''">
+				and t.create_time <![CDATA[>=]]> #{start_time}
+			</if>
+			<if test="end_time!=null and end_time!=''">
+				and t.create_time <![CDATA[<=]]> #{end_time}
+			</if>
+			and type=#{type}
+		</where>
+
+	</select>
+
+	<resultMap id="NewMediaData" type="com.gobestsoft.common.constant.model.NewMediaData">
+
+		<result property="publish_count" column="publish_count"></result>
+		<result property="app_signUp_count" column="app_signUp_count"></result>
+		<result property="wechat_fans_count" column="wechat_fans_count"></result>
+		<result property="app_visit_count" column="app_visit_count"></result>
+		<result property="website_view_count" column="website_view_count"></result>
+		<result property="click_count" column="click_count"></result>
+		<result property="comment_count" column="comment_count"></result>
+		<result property="read_count" column="read_count"></result>
+
+	</resultMap>
+	<resultMap id="OrganizationData" type="com.gobestsoft.common.constant.model.OrganizationData">
+
+		<result property="org_count" column="org_count"></result>
+		<result property="member_count" column="member_count"></result>
+		<result property="addition_member_count" column="addition_member_count"></result>
+		<result property="transfer_member_count" column="transfer_member_count"></result>
+		<result property="new_member_company_established" column="new_member_company_established"></result>
+
+	</resultMap>
+	<resultMap id="SeekLegalAdviceData" type="com.gobestsoft.common.constant.model.SeekLegalAdviceData">
+
+		<result property="total_count" column="total_count"></result>
+		<result property="inProcess_count" column="inProcess_count"></result>
+		<result property="toDo_count" column="toDo_count"></result>
+
+	</resultMap>
+
+	<!--查询所有工会新媒体的数据-->
+	<select id="selectUnionMediaData" resultMap="NewMediaData">
+select
+		sum(publish_count)publish_count,
+-- 		sum(app_signUp_count)app_signUp_count,
+    	(select count(1) as  app_signUp_count from app_user where app_user.status=0 ),
+		9998 wechat_fans_count,
+		ifnull(sum(app_visit_count),0)app_visit_count,
+		sum(website_view_count)website_view_count,
+		sum(click_count)click_count,
+		sum(comment_count)comment_count,
+		sum(read_count)read_count
+		from union_media_data
+	</select>
+
+	<select id="selectOrgBuildData" resultMap="OrganizationData">
+		select
+
+
+		(select count(1) from sys_dept ) as org_count,
+		(select count(1) from dept_member inner join person_info on person_info.id = dept_member.person_id) as member_count,
+		(select count(1) from dept_member where create_time <![CDATA[>=]]> concat('',#{bigDataAdditionTime},' 000000')) as addition_member_count,
+		(select count(1) from dept_organization INNER JOIN sys_dept on  dept_organization.dept_id = sys_dept.id
+		where dept_organization.create_time  <![CDATA[>=]]> concat('',#{bigDataAdditionTime},' 000000')) as new_member_company_established,
+		(select count(1) from dept_member_transfer where out_status =2) as transfer_member_count
+
+
+	</select>
+	
+	<select id="selectLawAdviceData" resultMap="SeekLegalAdviceData">
+		select
+	(select count(1)  from srv_law_consultation where   type=1 and  status= 0 )as total_count,
+		(select  count(1)  from srv_law_consultation where   type=1 and  status= 1 )as inProcess_count,
+	(select count(1) from srv_law_consultation where  type=1 and  status= 2 ) as toDo_count
+
+
+	</select>
+
+	<select id="selectAppUser" resultType="Integer">
+
+		select count(1 )from app_user
+	</select>
+	<!--会员人数前10的单位和人数-->
+	<select id="memberTop10Statistics" resultType="java.util.Map">
+		select dept_id as deptId,member_whole_count as value,sys_dept.fullname as name
+		from  t_member_count t inner join sys_dept on sys_dept.id = t.dept_id
+		and sys_dept.pid =#{deptId}
+		order by value desc
+	</select>
+	<!--按月查询会员人数-->
+	<select id="monthMemberStatistics" resultType="java.util.Map">
+		select temp.* from (
+
+		select count(1) as value
+		<if test="type==1">
+			,substring(t.create_time,1,8)as name
+		</if>
+		<if test="type==2">
+			,substring(t.create_time,1,6)as name
+		</if>
+		<if test="type==3">
+			,substring(t.create_time,1,4)as name
+		</if>
+		from dept_member t
+		inner join sys_dept on sys_dept.id = t.dept_id
+		and (
+		sys_dept.pid = #{deptId} or sys_dept.pids like concat(',%',#{deptId},'%')
+		)
+		and t.create_time <![CDATA[>=]]> concat(#{startDate},'000000')
+		and t.create_time <![CDATA[<=]]> concat(#{endDate},'235959')
+		group by name
+		order by name desc
+		) temp
+		<if test="type==1">
+			limit 12
+		</if>
+		<if test="type==2">
+			limit 12
+		</if>
+		<if test="type==3">
+			limit 5
+		</if>
+
+	</select>
+
+	<!--分组查询学历人数-->
+	<select id="getMemberInfoByEducation" resultType="java.util.Map">
+        select count(1) as value,ifnull(sys_dict.name,'其他')as name , ifnull(sys_dict.code,999) sort
+        from dept_member t inner join person_info p on p.id = t.person_id
+        left join sys_dict on sys_dict.code is not null and sys_dict.group_code='lib_education_code'
+        and sys_dict.code = p.education
+        INNER join sys_dept on sys_dept.id = t.dept_id
+		and (
+			sys_dept.id = #{deptId} or sys_dept.pids like concat(',%',#{deptId},'%')
+		)
+        group by name
+        order by sort asc
+
+    </select>
+
+	<!--农民工比例-->
+	<select id="getMemberInfoByFarmer" resultType="java.util.Map">
+         select count(1) as value,
+        (case when p.is_farmer =1 then '农民工' else '职工' end)as name from person_info p
+        INNER JOIN dept_member on p.id = dept_member.person_id
+        INNER join sys_dict dict on dict.group_code ='lib_is_not' and dict.code= p.is_farmer and dict.`code`!=''
+		INNER join sys_dept on sys_dept.id = dept_member.dept_id
+		and (
+			sys_dept.id = #{deptId} or sys_dept.pids like concat(',%',#{deptId},'%')
+		)
+        group by p.is_farmer
+    </select>
+
+	<!--按年龄查询会员人数-->
+	<select id="getMemberInfoByAge" resultType="java.util.Map">
+		select count(1) as value from dept_member t inner join person_info p on p.id = t.person_id
+		<if test="startTime!=null and startTime!=''" >
+			and SUBSTRING(p.certificate_num,7,8)   >=   #{startTime}
+		</if>
+		<if test="endTime!=null and endTime!=''" >
+			and SUBSTRING(p.certificate_num,7,8)   &lt;   #{endTime}
+		</if>
+		where exists (select 1 from sys_dept
+						where (sys_dept.id = #{deptId}
+								or sys_dept.pids like concat(',%',#{deptId},'%'))
+								and sys_dept.id=t.dept_id )
+	</select>
+
+
+	<!--根据性别分组查询人数-->
+	<select id="getMemberCountBySex" resultType="java.util.Map">
+        select count(t.id) as value,dict.name   as name
+        from dept_member t inner join person_info p on p.id = t.person_id
+        INNER join sys_dict dict on dict.group_code ='lib_sex' and dict.code= p.sex and p.sex is not null
+        INNER join sys_dept on sys_dept.id = t.dept_id
+		and (
+		sys_dept.id = #{deptId} or sys_dept.pids like concat(',%',#{deptId},'%')
+		)
+        group by p.sex
+    </select>
+
+	<select id="selectMemberCount" resultType="Integer">
+
+		select IFNULL(member_whole_count,0)
+		from t_member_count t
+		INNER JOIN sys_dept ON sys_dept.id = t.dept_id
+		where sys_dept.id = #{deptId}
+    </select>
+	<!--selectMemberCount方法之前的查询-->
+	<!--select count(1) from dept_member
+	INNER JOIN person_info ON person_info.id = dept_member.person_id
+	INNER join sys_dept on sys_dept.id = dept_member.dept_id
+	and (
+	sys_dept.id = #{deptId} or sys_dept.pids like concat(',%',#{deptId},'%')
+	)-->
+	<!--分组查询民族人数-->
+	<select id="getMemberInfoByNation" resultType="java.util.Map">
+		select count(t.id) as value,p.nation from dept_member t inner join person_info p on p.id = t.person_id
+		   and p.nation is not null
+		   and p.nation != ''
+		   INNER join sys_dept on sys_dept.id = t.dept_id
+		   and (
+		   sys_dept.id = 1 or sys_dept.pids like concat(',%',1,'%')
+		   )
+		   group by nation
+		   order by value desc
+		   limit 0,5
+
+    </select>
+
+	<select id="selectDeptCount" resultType="Integer">
+        select count(1) from sys_dept where 1=1
+		and (
+		sys_dept.id = #{deptId} or sys_dept.pids like concat(',%',#{deptId},'%')
+		)
+
+    </select>
+
+	<!--查询户籍分布，需要java重新处理-->
+	<select id="getMemberInfoByDocile" resultType="java.util.Map">
+		select count(t.id) as value,p.domicile as name from dept_member t
+		inner join person_info p on p.id = t.person_id
+		<if test="startTime !=null and startTime != '' ">
+			and t.create_time &gt;= #{startTime}
+		</if>
+		<if test="entTime !=null and entTime != '' ">
+			and t.create_time &lt;= #{entTime}
+		</if>
+		INNER join sys_dept on sys_dept.id = t.dept_id
+		and (
+		sys_dept.id = 1 or sys_dept.pids like concat(',%',1,'%')
+		)
+		where p.domicile is not null and p.domicile !=''
+		group by p.domicile;
+	</select>
+
+	<!--查询普惠商城活动 参与人数-->
+	<select id="getGspShopJoinActivityNum" resultType="int">
+		SELECT count(distinct user_id) FROM `syspromotion_prefer_activity_appoint`
+	</select>
+	<!--查询普惠商城活动 总金额-->
+	<select id="getGspShopTotalAllFree" resultType="double">
+		select sum(total_fee) from systrade_order where `status`='TRADE_FINISHED'
+	</select>
+	<!--查询普惠商城活动 订单数量-->
+	<select id="getGspShopAllOrderNum" resultType="int">
+		select count(1) from systrade_order
+	</select>
+	<!--查询普惠商城活动 订单数量-->
+	<select id="getGspShopAllItemNum" resultType="int">
+		select count(1) from sysitem_item where is_offline = 0
+	</select>
+	<!--查询普惠商城活动 进行中活动-->
+	<select id="getGspShopAllOrgIds" resultType="string">
+		SELECT limit_union FROM `syspromotion_prefer_activity` where limit_union is not null
+	</select>
+	<!--查询普惠商城活动 进行中活动-->
+	<select id="getGspShopIngActives" resultType="string">
+		SELECT title FROM `syspromotion_prefer_activity`
+			where start_time >= #{now}
+			order by created_time desc
+			limit 20
+	</select>
+	<!--查询普惠商城活动 已结束活动-->
+	<select id="getGspShopEndActives" resultType="string">
+		SELECT title FROM `syspromotion_prefer_activity`
+			where end_time &lt;= #{now}
+			order by created_time desc
+			limit 20
+	</select>
+	<!--查询普惠商城活动 参与人员-->
+	<select id="getGspShopJoinMembers" resultType="map">
+		select a.title activeName,u.created_time time,ua.app_uid appUid
+			from syspromotion_prefer_activity_item u
+			join syspromotion_prefer_activity a on u.activity_id=a.id
+			join sysuser_account ua on u.user_id=ua.user_id
+			where (u.`name` is not null or u.`name`!='') and (ua.app_uid is not null or ua.app_uid!='')
+			order by u.created_time desc
+			limit 30
+	</select>
+</mapper>

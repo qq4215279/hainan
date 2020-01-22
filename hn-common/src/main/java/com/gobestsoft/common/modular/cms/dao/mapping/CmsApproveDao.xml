@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.cms.dao.CmsApproveDao">
+
+    <!--新增审核记录-->
+    <insert id="insertApproveLog" parameterType="com.gobestsoft.common.modular.cms.model.CmsApproveEntity">
+      INSERT INTO cms_approve_log (
+			info_id,
+			from_person,
+			from_dept,
+			to_person,
+			to_dept,
+			create_date,
+			check_level,
+			status,
+			comment
+		)
+		VALUES(
+			#{articleID},
+			#{fromPerson},
+			#{fromDept},
+			#{toPerson},
+			#{toDept},
+			#{createTime},
+			#{checkLevel},
+			#{status},
+			#{comment}
+		)
+    </insert>
+
+    <!--更新资讯状态-->
+    <update id="updateArticleStatus">
+        update cms_article set status = #{status} where id=#{articleId}
+    </update>
+
+	<!--获取权限操作-->
+	<select id="getCmsOperation" resultType="com.gobestsoft.common.modular.cms.model.CmsOperateEntity">
+		select title,
+			keyword,
+			cms_approve_operate.column,
+			istop,
+			sort,
+			type,
+			picture,
+			link,
+			pub_time as pubTime,
+			enable,
+			editor,
+			source_from as sourceFrom,
+			read_count as readCount,
+			publish,
+			content,
+			comment,
+			roundup,
+			author
+		from cms_approve_operate
+		where operate_type=#{operateType}
+			and role=#{role}
+	</select>
+
+	<!--获取该条资讯的最新审核状态-->
+	<select id="selectLastApprove" resultType="com.gobestsoft.common.modular.cms.model.CmsApproveEntity">
+		select * from cms_approve_log
+		where info_id = #{articleId}
+		ORDER BY create_date DESC
+		limit 1
+	</select>
+
+	<!--获取该条资讯的开始审核状态-->
+	<select id="selectFirstApprove" resultType="com.gobestsoft.common.modular.cms.model.CmsApproveEntity">
+		select * from cms_approve_log
+		where info_id = #{articleId}
+		ORDER BY create_date ASC
+		limit 1
+	</select>
+
+	<select id="selectArticlelogById" resultType="map">
+		select * from cms_approve_log
+		where info_id = #{id}
+		ORDER BY create_date DESC
+	</select>
+</mapper>

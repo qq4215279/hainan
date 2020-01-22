@@ -1,0 +1,181 @@
+<body>
+<div class="container">
+    <form class="form-horizontal" id="organizationDlgForm">
+       		<input id="id" type="hidden" th:value="${deptOrganization.id}" />
+        <div class="row">
+			<div class="col-sm-6">
+				<form:text id="pName" label="上级工会" name="pName" value="${deptOrganization.pName}"
+						   disabled="true"></form:text>
+				<form:text id="unionName" label="工会名称" name="unionName" value="${deptOrganization.unionName}"
+						   disabled="true"></form:text>
+				<form:text id="unionType" label="工会类型" name="unionType" value="${deptOrganization.unionType}"
+						   disabled="true"></form:text>
+				<form:figure id="membership" label="会员人数" name="membership" value="${deptOrganization.membership}"
+							 min="0" disabled="true"></form:figure>
+				<form:text id="unionEmail" label="工会邮箱" name="unionEmail" value="${deptOrganization.unionEmail}"
+						   disabled="true"></form:text>
+				<form:datetime id="createunionTime" label="建会时间" name="createunionTime" istime="false" format="yyyy-MM-dd"
+							   value="${deptOrganization.createunionTime}" disabled="true"></form:datetime>
+				<form:text id="unionLeader" label="工会负责人" name="unionLeader"
+						   value="${deptOrganization.unionLeader}" disabled="true"></form:text>
+				<form:text id="unionLeaderPhone" label="工会负责人电话" name="unionLeaderPhone"
+						   value="${deptOrganization.unionLeaderPhone}" disabled="true"></form:text>
+
+				<!--<form:text id="unionSimpleName" label="工会简称" name="unionSimpleName"-->
+				<!--value="${deptOrganization.unionSimpleName}" disabled="true"></form:text>-->
+				<!--<form:text id="unitZipCode" label="工会邮编" name="unitZipCode" value="${deptOrganization.unitZipCode}"-->
+				<!--disabled="true"></form:text>-->
+				<!--<form:figure id="cadresNumber" label="专职干部人数" name="cadresNumber"-->
+				<!--value="${deptOrganization.cadresNumber}" min="0" disabled="true"></form:figure>-->
+				<!--<form:text id="chairmanName" label="主席名称" name="chairmanName" value="${deptOrganization.chairmanName}"-->
+				<!--disabled="true"></form:text>-->
+			</div>
+			<div class="col-sm-6">
+				<form:text id="unitName" label="单位名称" name="unitName" value="${deptOrganization.unitName}"
+						   disabled="true"></form:text>
+				<form:text id="othersOrgCode" label="法人和其他组织统一社会信用代码" name="othersOrgCode"
+						   value="${deptOrganization.othersOrgCode}" disabled="true"></form:text>
+				<form:text id="unitOrgCode" label="组织机构代码" name="unitOrgCode"
+						   value="${deptOrganization.unitOrgCode}" disabled="true"></form:text>
+				<form:select id="unitDistrict" label="单位所在行政区" name="unitDistrict"  code="unit_district_code"
+							 value="${deptOrganization.unitDistrict}" disabled="true"></form:select>
+				<form:text id="unitAddress" label="单位地址" name="unitAddress" value="${deptOrganization.unitAddress}"
+						   disabled="true"></form:text>
+				<form:text id="unitNature" label="单位性质类别" name="unitNature" value="${deptOrganization.unitNature}"
+						   disabled="true"></form:text>
+				<form:text id="unitIndustry" label="单位所属行业" name="unitIndustry" value=${deptOrganization.unitIndustry}
+						   disabled="true"></form:text>
+				<form:text id="unitEconomicType" label="经济类型" name="unitEconomicType"
+						   value="${deptOrganization.unitEconomicType}" disabled="true"></form:text>
+				<form:figure id="unitNumber" label="职工人数" name="unitNumber" value="${deptOrganization.unitNumber}"
+							 min="0" disabled="true"></form:figure>
+				<!--<form:text id="chairmanSession" label="现任第几届主席" name="chairmanSession"-->
+				<!--value="${deptOrganization.chairmanSession}" disabled="true"></form:text>-->
+				<!--<form:figure id="chairmanMobile" label="主席手机号" name="chairmanMobile"-->
+				<!--value="${deptOrganization.chairmanMobile}" min="0" disabled="true"></form:figure>-->
+
+			</div>
+		</div>
+        <div class="row"> 	
+        	<div class="col-sm-3"></div>
+           	<div class="col-sm-6">
+    			<form:area id="reason" label="审核意见" name="reason"  must="true"></form:area>
+    		</div>
+    	</div>
+    	<div class="row text-center">
+    		<qx:btn id="save" class="btn btn-success" onclick="OrganizationAuditDlg.addSubmit(2)" 
+					fa="fa fa-eraser" label="审核通过"></qx:btn>
+			<qx:btn id="submit" class="btn btn-danger" onclick="OrganizationAuditDlg.addSubmit(3)" 
+					fa="fa fa-eraser" label="审核不通过"></qx:btn>
+			<qx:btn id="close" class="btn btn-warning" onclick="OrganizationAuditDlg.close()" 
+					fa="fa fa-eraser" label="取消"></qx:btn>
+    	</div>
+    	<br/>
+   </form>
+</div>
+</body>
+<js>
+<script >
+    /**
+     * 初始对话框
+     */
+    var OrganizationAuditDlg = {
+        organizationAuditData: {},
+        validateFields: {
+            reason: {
+                validators: {
+                    notEmpty: {
+                        message: '审核意见不能为空！'
+                    }
+                }
+            }
+        }
+    };
+
+    /**
+     * 清除数据
+     */
+    OrganizationAuditDlg.clearData = function() {
+        this.organizationAuditData = {};
+    }
+
+    /**
+     * 设置对话框中的数据
+     * param key 数据的名称
+     * param val 数据的具体值
+     */
+    OrganizationAuditDlg.set = function(key, val) {
+        this.organizationAuditData[key] = (typeof value == "undefined") ? $("#" + key).val() : value;
+        return this;
+    }
+
+    /**
+     * 关闭此对话框
+     */
+    OrganizationAuditDlg.close = function() {
+        parent.layer.close(window.parent.DeptOrganization.layerIndex);
+    }
+
+    /**
+     * 收集数据
+     */
+    OrganizationAuditDlg.collectData = function() {
+        this.set('id').set('reason');
+    }
+
+    /**
+     * 验证数据是否为空
+     */
+    OrganizationAuditDlg.validate = function () {
+        $('#organizationDlgForm').data("bootstrapValidator").resetForm();
+        $('#organizationDlgForm').bootstrapValidator('validate');
+        return $("#organizationDlgForm").data('bootstrapValidator').isValid();
+    }
+
+
+    /**
+     * 添加企业信息并提交建会事情
+     */
+    OrganizationAuditDlg.addSubmit = function(status) {
+        this.clearData();
+        this.collectData();
+        if (!this.validate()) {
+            errorFocus();
+            return;
+        }
+        var showMessage = getShowMessage(status);
+        //提交信息
+        var ajax = new $ax(App.ctxPath + "organization/check/saveAuthen", function(data){
+            App.success(showMessage+"成功 !");
+            window.parent.DeptOrganization.table.refresh();
+            OrganizationAuditDlg.close();
+        },function(data){
+            App.error(showMessage+"失败!");
+        });
+        ajax.set(this.organizationAuditData);
+        ajax.set('status',status);
+        ajax.start();
+    }
+
+    function getShowMessage(status){
+        var showMessage = "审核通过";
+        if(status == '3'){
+            showMessage = "审核不通过";
+        }
+        return showMessage;
+    }
+    //初始化时间类型的字段
+    function initTimeFun(field) {
+        if(field) {
+            return field.substring(0,4)+"-"+field.substring(4,6)+"-"+field.substring(6,8);
+        }
+        return field;
+    }
+
+    $(function() {
+        App.initValidator("organizationDlgForm", OrganizationAuditDlg.validateFields);
+        var createunionTime = $("#createunionTime").val();
+        $("#createunionTime").val(initTimeFun(createunionTime));
+    });
+</script>
+</js>

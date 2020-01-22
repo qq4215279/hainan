@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.bigdata.dao.DocileDao">
+
+
+    <select id="statistics" resultType="com.gobestsoft.common.base.StatisticsBaseEntity">
+        select count(t.id) as value,p.domicile as name from dept_member t
+        inner join person_info p on p.id = t.person_id
+        <if test="startTime !=null and startTime != '' ">
+            and t.create_time &gt;= #{startTime}
+        </if>
+        <if test="endTime !=null and endTime != '' ">
+            and t.create_time &lt;= #{endTime}
+        </if>
+        INNER join sys_dept on sys_dept.id = t.dept_id
+        and (
+        sys_dept.id = #{deptId} or sys_dept.pids like concat(',%',#{deptId},'%')
+        )
+        where p.domicile is not null and p.domicile !=''
+        group by p.domicile;
+    </select>
+
+</mapper>

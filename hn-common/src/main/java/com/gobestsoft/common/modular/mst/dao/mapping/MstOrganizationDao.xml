@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.mst.dao.MstOrganizationDao">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultBean" type="com.gobestsoft.common.modular.mst.model.MstOrganization">
+		<id column="organization_id" property="organizationId" />
+		<result column="unit_name" property="unitName" />
+		<result column="unit_org_code" property="unitOrgCode" />
+		<result column="unit_plate" property="unitPlate" />
+		<result column="unit_address" property="unitAddress" />
+		<result column="unit_number" property="unitNumber" />
+		<result column="union_name" property="unionName" />
+		<result column="union_simple_name" property="unionSimpleName" />
+		<result column="union_org_code" property="unionOrgCode" />
+		<result column="union_number" property="unionNumber" />
+		<result column="union_type" property="unionType" />
+		<result column="createunion_time" property="createUnionTime" />
+		<result column="change_time" property="changeTime" />
+		<result column="p_id" property="pId" />
+		<result column="p_name" property="pName" />
+		<result column="dept_id" property="deptId" />
+		<result column="dept_type" property="deptType" />
+		<result column="localassistmanage_unionname" property="localAssistManageUnionName" />
+		<result column="membership" property="membership" />
+		<result column="union_leader" property="unionLeader" />
+		<result column="tenure_time" property="tenureTime" />
+		<result column="full_time" property="fullTime" />
+		<result column="union_leader_phone" property="unionLeaderPhone" />
+		<result column="sort" property="sort" />
+		<result column="create_user" property="createUser" />
+		<result column="create_time" property="createTime" />
+		<result column="update_user" property="updateUser" />
+		<result column="update_time" property="updateTime" />
+	</resultMap>
+	
+	<!-- 通用版全部字段,用于插入 -->
+	<sql id="columns">
+		mst_organization.unit_name,
+		mst_organization.unit_org_code,
+		mst_organization.unit_plate,
+		mst_organization.unit_address,
+		mst_organization.unit_number,
+		mst_organization.p_id,
+		mst_organization.p_name,
+		mst_organization.union_name,
+		mst_organization.union_org_code,
+		mst_organization.union_type,
+		mst_organization.createunion_time,
+		mst_organization.change_time,
+		mst_organization.localassistmanage_unionname,
+		mst_organization.membership,
+		mst_organization.union_leader,
+		mst_organization.tenure_time,
+		mst_organization.full_time,
+		mst_organization.union_leader_phone,
+		mst_organization.sort,
+		mst_organization.create_user,
+		mst_organization.create_time,
+		mst_organization.update_user,
+		mst_organization.update_time,
+		mst_organization.union_number,
+		mst_organization.union_simple_name,
+		mst_organization.dept_id,
+		mst_organization.dept_type
+	</sql>
+	
+	<!-- 插入全部字段的值 -->
+	<sql id="columnValues">
+		#{unitName},
+		#{unitOrgCode},
+		#{unitPlate},
+		#{unitAddress},
+		#{unitNumber},
+		#{pId},
+		#{pName},
+		#{unionName},
+		#{unionOrgCode},
+		#{unionType},
+		#{createUnionTime},
+		#{changeTime},
+		#{localAssistManageUnionName},
+		#{membership},
+		#{unionLeader},
+		#{tenureTime},
+		#{fullTime},
+		#{unionLeaderPhone},
+		#{sort},
+		#{createUser},
+		#{createTime},
+		#{updateUser},
+		#{updateTime},
+		#{unionNumber},
+		#{unionSimpleName},
+		#{deptId},
+		#{deptType}
+	</sql>
+	
+	<!-- 更新全部字段 -->
+	<sql id="columnSets">
+		mst_organization.unit_name=#{unitName},
+		mst_organization.unit_org_code=#{unitOrgCode},
+		mst_organization.unit_plate=#{unitPlate},
+		mst_organization.unit_address=#{unitAddress},
+		mst_organization.unit_number=#{unitNumber},
+		mst_organization.union_name=#{unionName},
+		mst_organization.union_org_code=#{unionOrgCode},
+		mst_organization.union_type=#{unionType},
+		mst_organization.change_time=#{changeTime},
+		mst_organization.localassistmanage_unionname=#{localAssistManageUnionName},
+		mst_organization.membership=#{membership},
+		mst_organization.union_leader=#{unionLeader},
+		mst_organization.tenure_time=#{tenureTime},
+		mst_organization.full_time=#{fullTime},
+		mst_organization.union_leader_phone=#{unionLeaderPhone},
+		mst_organization.sort=#{sort},
+		mst_organization.update_user=#{updateUser},
+		mst_organization.update_time=#{updateTime},
+		mst_organization.union_simple_name=#{unionSimpleName}
+	</sql>
+	
+	<!-- 新增一条数据数据 -->
+	<insert id="insert" parameterType="com.gobestsoft.common.modular.mst.model.MstOrganization" useGeneratedKeys="true" keyProperty="organizationId" keyColumn="organization_id">
+		INSERT INTO mst_organization (<include refid="columns"></include>)
+		VALUES (<include refid="columnValues"></include>)
+	</insert>
+	
+	<!-- 更新一条数据 -->
+   	<update id="updateAllColumnById" >
+   		UPDATE mst_organization
+		<set>
+			<include refid="columnSets"></include>
+		</set>
+	 	where mst_organization.organization_id = #{organizationId}
+   	</update>
+   	
+   	 <!-- 查询一条数据-->
+	<select id="selectById" resultMap="BaseResultBean">
+		SELECT 
+			 mst_organization.organization_id,
+			<include refid="columns"></include>
+		FROM mst_organization
+		where mst_organization.organization_id = #{id}
+	</select>
+	
+	<!-- 多条件查询  -->
+    <select id="selectList" resultMap="BaseResultBean">
+		SELECT 
+			 mst_organization.organization_id,
+			<include refid="columns"></include>
+		FROM mst_organization left join sys_dept on sys_dept.id=mst_organization.dept_id
+		<where>
+			<if test="unionName != null and unionName != ''">
+				and mst_organization.union_name like '%${unionName}%'
+			</if>
+			<if test="unionNumber != null and unionNumber != ''">
+				and mst_organization.union_number like '%${unionNumber}%'
+			</if>
+			<if test="pId != null and pId != ''">
+				and mst_organization.p_id = #{pId}
+			</if>
+		</where>
+        order by sys_dept.level,sys_dept.sort,sys_dept.id
+    </select>
+	
+	<!-- 删除一条数据 -->
+    <delete id="remove">
+		delete from mst_organization where mst_organization.organization_id = #{id}
+	</delete>
+   	
+   	 <!-- 根据deptId（即：sys_dept表id）,查询关联的工会组织对象-->
+	<select id="getBeanByDeptId" resultMap="BaseResultBean">
+		SELECT 
+			 mst_organization.organization_id,
+			<include refid="columns"></include>
+		FROM mst_organization
+		where mst_organization.dept_id = #{deptId}
+	</select>
+	
+	<!-- 根据deptid数组,查询出对应的工会信息集合-->
+	<select id="getAllParentMstOrganizationBydeptIds" resultMap="BaseResultBean">
+		SELECT 
+			 mst_organization.organization_id,
+			<include refid="columns"></include>
+		FROM mst_organization
+		where mst_organization.dept_id in
+		<foreach item="item" index="index" collection="deptIds"
+	       open="(" separator="," close=")">
+	        #{item}
+	   </foreach>
+	</select>
+	
+	<!-- 根据sys_dept表id,查询直接下级工会List集合-->
+	<select id="getChildMstOrganizationByDeptId" resultMap="BaseResultBean">
+		SELECT 
+			 mst_organization.organization_id,
+			<include refid="columns"></include>
+		FROM mst_organization
+		where mst_organization.dept_id in
+		(select id from sys_dept where pid = #{deptId} order by sort,id)
+	</select>
+	
+	<!-- 根据sys_dept表id,查询全部下级工会List集合 -->
+	<select id="getAllChildMstOrganizationByDeptId" resultMap="BaseResultBean">
+		SELECT 
+			 mst_organization.organization_id,
+			<include refid="columns"></include>
+		FROM mst_organization
+		where mst_organization.dept_id in
+		(select id from sys_dept where 
+		pids like '%${deptId}%'
+		order by level,sort,id)
+	</select>
+	
+	<select id="isExistByUnitNameOrUnitOrgCode" resultType="com.gobestsoft.common.modular.mst.model.MstOrganization">
+	   SELECT 
+			 mst_organization.organization_id,
+			<include refid="columns"></include>
+		FROM mst_organization
+		<where>
+			<if test="unitName != null and unitName != ''">
+				and mst_organization.unit_name =#{unitName}
+			</if>
+			<if test="unitOrgCode != null and unitOrgCode != ''">
+				and mst_organization.unit_org_code =#{unitOrgCode}
+			</if>
+		</where>
+		limit 1
+	</select>
+</mapper>

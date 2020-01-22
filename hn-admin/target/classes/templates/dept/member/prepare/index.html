@@ -1,0 +1,31 @@
+<css>
+	<div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+	<div class="form-horizontal">
+		<div class="row">
+			<div class="col-sm-3">
+                <search:input label="单位名称" name="unitName" value=""
+                              placeholder="" type="text"></search:input>
+			</div>
+			<div class="col-sm-3">
+				<search:input label="申请用户" name="name" value=""
+                              placeholder="" type="text"></search:input>
+			</div>
+			<div class="col-sm-3">
+				<search:input label="身份证号" name="certificateNum" value=""
+                              placeholder="" type="text"></search:input>
+			</div>
+            <qx:btn id="btn1" class="btn btn-info" fa="fa fa-search" label="搜索"  onclick="IndexPage.search()"
+                    permission=""></qx:btn>
+		</div>
+		<div class="hidden-xs" id="OrgMemberTableToolbar" role="group">
+		</div>
+		<table id="OrgMemberTable" data-mobile-responsive="true" data-click-to-select="true">
+		</table>
+	</div>
+</body>
+<js>
+	<div th:include="fragment/fargment :: bootstrapTableJs"></div>
+	<script th:src="@{/static/modular/dept/member/prepare/index.js}"></script>
+</js>

@@ -1,0 +1,53 @@
+package com.gobestsoft.common.modular.dao.mapper;
+
+import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.gobestsoft.common.modular.dao.model.CkyStudioPojo;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.session.RowBounds;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * 创客园-工作室表
+ */
+@Repository
+public interface CkyStudioMapper extends BaseMapper<CkyStudioPojo> {
+    /**
+     * 工作室详细
+     * create by gutongwei
+     * on 2018/6/13
+     *
+     * @param studioId
+     * @return
+     */
+    Map<String, Object> studioDetail(@Param("studioId") int studioId);
+
+    /**
+     * 工作室列表
+     *
+     * @param rowBounds
+     * @return
+     */
+    List<Map<String, Object>> studios(@Param("page") RowBounds rowBounds);
+
+    /**
+     * 后台管理用
+     *
+     * @param name
+     * @param rowBounds
+     * @return
+     */
+    List<Map<String, String>> managementStudios(@Param("name") String name, @Param("page") RowBounds rowBounds);
+
+    /**
+     * 删除工作室
+     * create by gutongwei
+     * on 2018/6/25
+     *
+     * @param ids
+     */
+    void deleteStudio(@Param("ids") String ids);
+}

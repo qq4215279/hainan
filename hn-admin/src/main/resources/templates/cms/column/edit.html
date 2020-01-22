@@ -1,0 +1,105 @@
+<body>
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal" id="columnForm">
+            <input type="hidden" id="id" th:value="${pojo.id}">
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-6">
+                    <form:text id="name" label="栏目名称" name="name" must="true" value="${pojo.name}"></form:text>
+                </div>
+            </div>
+            <div class="row text-center">
+                <qx:btn id="ensure" class="btn btn-primary" fa="fa fa-check" label="提交" onclick="ColumnDlg.addSubmit()" ></qx:btn>
+                <qx:btn id="cancel" class="btn btn-primary" fa="fa fa-eraser" label="取消" onclick="ColumnDlg.close()" ></qx:btn>
+            </div>
+        </div>
+    </div>
+</div>
+<js>
+    <script>
+        /**
+         * 角色详情对话框（可用于添加和修改对话框）
+         */
+        var ColumnDlg = {
+            topicData: {},
+            validateFields: {
+                name: {
+                    validators: {
+                        notEmpty: {
+                            message: '栏目名称不能为空'
+                        }
+                    }
+                }
+            },
+            baseUrl: App.ctxPath + 'cms/column'
+        };
+
+        App.initValidator("columnForm", ColumnDlg.validateFields);
+
+        /**
+         * 清除数据
+         */
+        ColumnDlg.clearData = function () {
+            this.topicData = {};
+        };
+
+        /**
+         * 设置对话框中的数据
+         */
+        ColumnDlg.set = function (key) {
+            this.topicData[key] = (typeof value == "undefined") ? $("#" + key).val() : value;
+            return this;
+        };
+
+        /**
+         * 收集数据
+         */
+        ColumnDlg.collectData = function () {
+            this.set('id').set('name');
+        };
+
+        /**
+         * 关闭此对话框
+         */
+        ColumnDlg.close = function () {
+            parent.layer.close(window.parent.OptColumn.layerIndex);
+        };
+
+        /**
+         * 验证数据是否为空
+         */
+        ColumnDlg.validate = function () {
+            $('#columnForm').data("bootstrapValidator").resetForm();
+            $('#columnForm').bootstrapValidator('validate');
+            return $("#columnForm").data('bootstrapValidator').isValid();
+        };
+
+        /**
+         * 提交添加用户
+         */
+        ColumnDlg.addSubmit = function () {
+
+            this.clearData();
+            this.collectData();
+            if (!this.validate()) {
+                errorFocus();
+                return;
+            }
+
+            //提交信息
+            var ajax = new $ax(this.baseUrl + "/doSave", function (data) {
+                App.success("编辑成功!");
+                window.parent.OptColumn.table.refresh();
+                ColumnDlg.close();
+            }, function (data) {
+                App.error("编辑失败!");
+            });
+            ajax.set(ColumnDlg.topicData);
+
+            ajax.start();
+        };
+
+    </script>
+</js>
+</body>

@@ -1,0 +1,79 @@
+<css xmlns:th="http://www.thymeleaf.org">
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body xmlns:th="http://www.thymeleaf.org">
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <table id="LoginErrorTable" data-mobile-responsive="true" data-click-to-select="true">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+        /**
+         * 初始化表格对象
+         */
+        var LoginError = {
+            id: "LoginErrorTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         *
+         */
+        LoginError.initColumn = function () {
+            return [
+                {title: '请求URI', field: 'request_uri', align: 'center', valign: 'middle'},
+                {title: '请求方式', field: 'request_method', align: 'center', valign: 'middle'},
+                {title: '请求参数', field: 'request_params', align: 'center', valign: 'middle'},
+                {title: '操作IP', field: 'ip', align: 'center', valign: 'middle'},
+                {title: 'User-Agent', field: 'user_agent', align: 'center', valign: 'middle'},
+                {title: '创建时间', field: 'create_date', align: 'center', valign: 'middle',formatter: initCreateTimeField}
+            ];
+        }
+
+
+        /**
+         * 初始化列表的创建时间类型的字段
+         */
+        function initCreateTimeField(value, row, index){
+            if(row.create_date){
+                return returnTimeStr(row.create_date);
+            }
+        }
+
+        /**
+         * 返回组装好的日期字符串
+         */
+        function returnTimeStr(time) {
+            return time.substring(0,4)+"-"+time.substring(4,6)+"-"+time.substring(6,8)+" "+time.substring(8,10)+":"+time.substring(10,12)+":"+time.substring(12,14);
+        }
+
+
+        /**
+         * 查询列表
+         */
+        LoginError.search = function () {
+            LoginError.table.refresh({query: LoginError.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = LoginError.initColumn();
+            var table = new BSTable(LoginError.id, "log/list/error", defaultColunms);
+            table.setPaginationType("server");
+            LoginError.table = table.init();
+        });
+    </script>
+</js>
+</body>

@@ -1,0 +1,171 @@
+<css >
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="container">
+    <div class="form-horizontal">
+        <div class="row">
+            <input type="hidden" id="unionId" th:value="${unionId}">
+            <div class="col-sm-3">
+                <search:input id="unionName" label="所属工会名称" name="unionName" value=""
+                              type="text"></search:input>
+            </div>
+            <div class="col-sm-3">
+                <search:input id="deptNo" label="工会编号" name="deptNo" value=""
+                              type="text"></search:input>
+            </div>
+            <div class="col-sm-3">
+                <search:input id="memberCard" label="会员卡号" name="memberCard" value=""
+                              type="text"></search:input>
+            </div>
+            <div class="col-sm-2">
+                <search:input id="name" label="姓名" name="name" value=""
+                              type="text"></search:input>
+            </div>
+            <div class="col-sm-1">
+                <qx:btn class="btn btn-primary" fa="fa fa-search" label="搜索" permission=""
+                        onclick="OptDeptMember.search()"></qx:btn>
+            </div>
+        </div>
+    </div>
+    <div class="hidden-xs" id="OptDeptMemberTableToolbar" role="group">
+        <qx:btn class="btn btn-primary" fa="fa fa-plus" label="批量导入" permission=""
+                onclick="OptDeptMember.openUpload()"></qx:btn>
+    </div>
+
+    <table id="OptDeptMemberTable" data-mobile-responsive="true" data-click-to-select="true">
+    </table>
+</div>
+</body>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+        /**
+         * 初始化
+         */
+        var OptDeptMember = {
+            id: "OptDeptMemberTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        OptDeptMember.initColumn = function () {
+            return [
+                {field: 'selectItem', radio: true},
+                {title: '所属工会名称', field: 'unionName', visible: true, align: 'center', valign: 'middle'},
+                {title: '工会编号', field: 'deptNo', visible: true, align: 'center', valign: 'middle'},
+                {title: '当前工作单位', field: 'workUnit', visible: true, align: 'center', valign: 'middle'},
+                {title: '会员卡号', field: 'memberCard', align: 'center', valign: 'middle'},
+                {title: '姓名', field: 'name', align: 'center', valign: 'middle'},
+                {title: '性别', field: 'sex', align: 'center', valign: 'middle', formatter: initSexField},
+                {title: '是否农民工', field: 'isFarmer', align: 'center', valign: 'middle',formatter: initIfFarmerField},
+                {title: '创建人', field: 'createUser', align: 'center', valign: 'middle'},
+                {title: '创建时间', field: 'createTime', align: 'center', valign: 'middle', formatter: initTimeField},
+                {
+                    title: '操作', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        return '<a href="javascript:OptDeptMember.detail(' + row.id + ')">查看详情</a>';
+                    }
+                }
+            ];
+        }
+        
+        //初始化是否农名工字段
+        function initIfFarmerField(value, row, index) {
+        	if(row.isFarmer && row.isFarmer == '1'){
+        		return '是';
+        	}
+        	return '否';
+        }
+
+        /**
+         * 初始化列表的时间类型的字段
+         */
+        function initTimeField(value, row, index) {
+            if (row.createTime) {
+                return returnTimeStr(row.createTime);
+            }
+        }
+
+        /**
+         * 返回组装好的日期字符串
+         */
+        function returnTimeStr(time) {
+            return time.substring(0, 4) + "-" + time.substring(4, 6) + "-" + time.substring(6, 8);
+        }
+
+        /**
+         * 初始化性别字段
+         */
+        function initSexField(value, row, index) {
+            if (row.sex && row.sex == 1) {
+                return '男';
+            }
+            return '女';
+        }
+
+        /**
+         * 点击查看详情操作
+         */
+        OptDeptMember.detail = function (id) {
+            var index = layer.open({
+                type: 2,
+                title: '查看详情',
+                area: ['100%', '100%'], //宽高
+                fix: false, //不固定
+                maxmin: true,
+                content: App.ctxPath + 'dept/member/detail?id=' + id
+            });
+            this.layerIndex = index;
+        };
+
+        /**
+         *打开批量导入添加的窗口
+         */
+        OptDeptMember.openUpload = function () {
+            var index = layer.open({
+                type: 2,
+                title: '批量导入工会信息',
+                area: ['100%', '100%'], //宽高
+                fix: true, //不固定
+                maxmin: true,
+                content: App.ctxPath + 'dept/member/member_upload'
+            });
+            layer.full(index);
+            this.layerIndex = index;
+        };
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        OptDeptMember.formParams = function () {
+            var queryData = {};
+            queryData['unionId'] = $("#unionId").val();
+            queryData['deptNo'] = $("#deptNo").val();
+            queryData['memberCard'] = $("#memberCard").val();
+            queryData['name'] = $("#name").val();
+            queryData['unionName'] = $("#unionName").val();
+            return queryData;
+        }
+
+        /**
+         * 查询列表
+         */
+        OptDeptMember.search = function () {
+            OptDeptMember.table.refresh({query: OptDeptMember.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = OptDeptMember.initColumn();
+            var table = new BSTable(OptDeptMember.id, "dept/member/list", defaultColunms);
+            table.setPaginationType("server");
+            table.setQueryParams(OptDeptMember.formParams());
+            OptDeptMember.table = table.init();
+        });
+    </script>
+</js>

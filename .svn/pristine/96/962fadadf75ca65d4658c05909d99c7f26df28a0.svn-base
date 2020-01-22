@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.dao.mapper.SrvStraitenedExeMedicalMapper">
+
+    <insert id="addAll" parameterType="java.util.List">
+        INSERT INTO srv_straitened_exe_medical
+        (srv_straitened_id,name,relation,certificate_num,age,sex,work_unit,mobile,disease,hospitalization_num,
+        unit_donation_money,sociology_donation_money,remark)
+        VALUES
+        <foreach collection="pojos" item="pojo" separator=",">
+            (#{pojo.srvStraitenedId},#{pojo.name},#{pojo.relation},#{pojo.certificate_num},#{pojo.age},#{pojo.sex},
+            #{pojo.workUnit},#{pojo.mobile},#{pojo.disease},#{pojo.hospitalizationNum},#{pojo.unitDonationMoney},#{pojo.sociologyDonationMoney},#{pojo.remark})
+        </foreach>
+    </insert>
+
+
+
+</mapper>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.smp.mapper.ShowMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.smp.model.Show">
+		<id column="id" property="id" />
+		<result column="file_type" property="fileType" />
+		<result column="file_url" property="fileUrl" />
+		<result column="text" property="text" />
+		<result column="create_time" property="createTime" />
+		<result column="auid" property="auid" />
+		<result column="del_flg" property="delFlg" />
+		<result column="cover_map" property="coverMap" />
+	</resultMap>
+
+	<!-- 秀吧记录列表返回数据封装类 -->
+	<resultMap id="BaseResultEntity" type="com.gobestsoft.common.modular.smp.model.Entity.ShowEntity">
+		<id column="id" property="id" />
+		<result column="file_type" property="type" />
+		<result column="auid" property="auid" />
+		<result column="avatar" property="avatar" />
+		<result column="nick_name" property="nickname" />
+		<result column="text" property="content" />
+		<result column="file_url" property="attachment" />
+		<result column="create_time" property="create_time" />
+		<result column="thump_up_num" property="thump_up_num" />
+		<result column="has_thump_up" property="has_thump_up" />
+		<result column="cover_map" property="coverMap" />
+	</resultMap>
+
+	<select id="list" resultMap="BaseResultEntity">
+	SELECT
+	s.id,
+	s.file_type,
+	a.auid,
+	a.avatar,
+	a.nick_name,
+	s.text,
+	s.file_url,
+	s.create_time ,
+	s.cover_map,
+	(select count(0) from smp_show_thumbup t where t.show_id = s.id) as
+	thump_up_num,
+	(select count(0) from smp_show_thumbup t where t.show_id = s.id and t.auid =
+	 #{currentid}) as has_thump_up
+	from
+	smp_show s
+	inner JOIN app_user a ON s.auid = a.auid
+	WHERE
+	s.del_flg != 1
+	<if test="auid !=null and auid!=''">
+         and s.auid = #{auid}
+     </if>
+    ORDER BY s.create_time DESC
+    </select>
+    
+    <!-- 多条件分页查询  -->
+    <select id="selectListPage" resultType="map">
+         SELECT 
+         smp_show.id,
+         smp_show.file_type,
+         smp_show.file_url,
+         smp_show.text,
+         smp_show.create_time,
+         smp_show.auid
+         FROM smp_show
+         WHERE
+         smp_show.del_flg = 0 
+			<if test="fileType != null">
+				and smp_show.file_type = #{fileType}
+			</if>
+		ORDER BY smp_show.create_time DESC
+    </select>
+    
+    <!-- 删除一条数据 -->
+    <update id="remove">
+         UPDATE smp_show SET smp_show.del_flg = 1 WHERE smp_show.id = #{id}
+    </update>
+</mapper>

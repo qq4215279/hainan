@@ -1,0 +1,175 @@
+<css>
+    <div th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="container">
+    <div class="form-horizontal">
+        <input type="hidden" id="num" th:value="${num}"/>
+        <div class="row" th:if="${num == 0}">
+            <div class="col-sm-4">
+                <search:input id="unitName" placeholder="请输入单位名称" label="单位名称" name="unitName" value=""
+                              type="text"></search:input>
+            </div>
+            <div class="col-sm-6">
+                <search:input id="unitOrgCode" placeholder="单位法人和其他组织统一社会信用代码" label="单位法人和其他组织统一社会信用代码"
+                              name="unitOrgCode" value=""
+                              type="text"></search:input>
+            </div>
+            <div class="col-sm-1">
+                <qx:btn class="btn btn-primary" fa="fa fa-search" label="搜索单位信息" permission=""
+                        onclick="DeptOrganization.search()"></qx:btn>
+            </div>
+        </div>
+        <div class="hidden-xs" id="DeptOrganizationTableToolbar" role="group">
+            <div th:if="${num == 0}">
+                <qx:btn class="btn btn-primary" fa="fa fa-plus" label="申请建会" permission=""
+                        onclick="DeptOrganization.btnBuild()"></qx:btn>
+            </div>
+        </div>
+        <table id="DeptOrganizationTable" data-mobile-responsive="true" data-click-to-select="true">
+        </table>
+    </div>
+</div>
+</body>
+<js>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script>
+        /**
+         * 初始化
+         */
+        var DeptOrganization = {
+            id: "DeptOrganizationTable",	//表格id
+            seItem: null,		//选中的条目
+            table: null,
+            layerIndex: -1
+        };
+
+        /**
+         * 初始化表格的列
+         */
+        DeptOrganization.initColumn = function () {
+            return [
+                {field: 'selectItem', radio: true},
+                {title: '单位名称', field: 'unitName', align: 'center', valign: 'middle'},
+                {title: '统一社会信用代码', field: 'unitOrgCode', align: 'center', valign: 'middle'},
+                {title: '职工人数', field: 'unitNumber', align: 'center', valign: 'middle'},
+                {title: '单位地址', field: 'unitAddress', align: 'center', valign: 'middle'},
+                {title: '状态', field: 'status', align: 'center', valign: 'middle', formatter: initStatusFun},
+                {
+                    title: '操作', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        var build = '<a href="javascript:DeptOrganization.build(' + row.id + ')">申请建会</a>',
+                            rebuild = '<a href="javascript:DeptOrganization.build(' + row.id + ')">重新发起申请建会</a>',
+                            log = '<a href="javascript:DeptOrganization.log(' + row.id + ')">查看流程</a>',
+                            detail = '<a href="javascript:DeptOrganization.detail(' + row.id + ')">查看详情</a>';
+                        if (!row.status) {
+                            return build;
+                        }
+                        if (row.status == 3) {
+                            return rebuild + "&nbsp;&nbsp;" + log;
+                        }
+                        return detail + "&nbsp;&nbsp;" + log;
+                    }
+                }
+            ];
+        };
+
+        //初始化审核状态
+        function initStatusFun(value, row, index) {
+            var status = row.status;
+            if (status == 1) {
+                return '待审核';
+            }
+            if (status == 2) {
+                return '审核通过'
+            }
+            if (status == 3) {
+                return '审核不通过'
+            }
+        }
+
+        /**
+         * 操作中的申请建会事件方法
+         */
+        DeptOrganization.build = function (id) {
+            DeptOrganization.openBuild(id);
+        }
+
+        /**
+         * 申请建会按钮方法
+         */
+        DeptOrganization.btnBuild = function () {
+            var fun = function () {
+                openPage('申请建会', App.ctxPath + 'dept/organization/edit?id=&pageType=1');
+            }
+            App.confirm("确定不需要搜索单位信息，直接申请建会吗？", fun);
+        }
+
+
+        //打开申请建会的窗口
+        DeptOrganization.openBuild = function (id) {
+            openPage('申请建会', App.ctxPath + 'dept/organization/edit?pageType=1&id=' + id);
+        }
+
+        //打开详情的窗口
+        DeptOrganization.detail = function (id) {
+            openPage('查看详情', App.ctxPath + 'dept/organization/watch?id=' + id);
+        }
+
+        //打开查看流程的窗口
+        DeptOrganization.log = function (id) {
+            openPage('查看流程', App.ctxPath + 'company/organization/log/' + id);
+        }
+
+        /**
+         * 打开页面
+         */
+        function openPage(title, url) {
+            var index = layer.open({
+                type: 2,
+                title: title,
+                area: ['100%', '100%'], //宽高
+                fix: true, //不固定
+                maxmin: true,
+                content: url,
+                end:function () {
+                    DeptOrganization.table.refresh({query: DeptOrganization.formParams()});
+                }
+            });
+            layer.full(index);
+            this.layerIndex = index;
+        }
+
+        /**
+         * 查询表单提交参数对象
+         *
+         */
+        DeptOrganization.formParams = function () {
+            var queryData = {};
+            queryData['unitName'] = $("#unitName").val();
+            queryData['unitOrgCode'] = $("#unitOrgCode").val();
+            return queryData;
+        }
+
+        /**
+         * 查询企业信息列表
+         */
+        DeptOrganization.search = function () {
+            if ($("#num").val() == '0') {// 当前未申请建会
+                if (!$("#unitName").val() || !$("#unitOrgCode").val()) {
+                    App.info("单位名称和组织机构代码不能为空！");
+                    return;
+                }
+            }
+            DeptOrganization.table.refresh({query: DeptOrganization.formParams()});
+        };
+
+        $(function () {
+            var defaultColunms = DeptOrganization.initColumn();
+            var table = new BSTable(DeptOrganization.id, "company/organization/list", defaultColunms);
+            table.setPaginationType("server");
+            DeptOrganization.table = table.init();
+        });
+    </script>
+</js>
+

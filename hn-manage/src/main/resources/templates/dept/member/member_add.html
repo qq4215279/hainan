@@ -1,0 +1,299 @@
+<css xmlns:form="http://www.w3.org/1999/html" xmlns:form="http://www.w3.org/1999/html">
+</css>
+<body>
+        <div class="form-horizontal" id="deptMemberForm">
+			<input type="hidden" id="deptId" th:value="${deptId}">
+            <div class="row">
+				<div class="col-sm-4">
+				    <form:text label="姓名" id="name" name="name" type="text" must="true"  ></form:text>
+				    <form:select label="民族" id="nation" name="nation" code="lib_ethnic_group" type="text"must="true"  ></form:select>
+				    <form:select label="证件类型" id="certificateType" name="certificateType" code="lib_identification_type"  type="text" must="true" ></form:select>
+					<form:select label="就业情况" id="workSituation" name="workSituation" code="lib_work_situation" type="text" must="true" ></form:select>
+					<form:select label="会籍变化类型" id="memberChange" name="memberChange" code="lib_member_change" type="text" must="true" ></form:select>
+					<form:select label="户籍类型" id="household" name="household" code="lib_household" type="text" must="true" ></form:select>
+					<form:text label="籍贯" id="nativePlace" name="nativePlace"  type="text" ></form:text>
+				</div>
+				<div class="col-sm-4">
+					<form:select label="性别" id="sex" name="sex" code="lib_sex" type="text"must="true"  ></form:select>
+					<form:select label="政治面貌" id="politicalStatus" name="politicalStatus" code="lib_political_status" type="text" must="true"></form:select>
+					<form:text label="证件号" id="certificateNum" name="certificateNum" type="text"  must="true" ></form:text>
+					<form:text label="工作单位" id="workUnit" name="workUnit" type="text" ></form:text>
+					<form:datetime id="memberChangeDate" label="会籍变化日期" istime="false" format="yyyy-MM-dd" name="memberChangeDate" must="true" ></form:datetime>
+					<form:text label="出生地" id="homeplace" name="homeplace" type="text" ></form:text>
+					<form:text label="户籍所在地" id="domicile" name="domicile" type="text" ></form:text>
+                </div>
+                <div class="col-sm-4">
+                    <form:datetime label="出生日期" id="birthday" istime="false" format="yyyy-MM-dd" name="birthday" must="true" ></form:datetime>
+					<form:select label="学历" id="education" name="education" code="lib_education_code" type="text" must="true" ></form:select>
+					<form:text label="移动电话" id="mobile" name="mobile"  type="text" must="true" ></form:text>
+					<form:select label="技能等级" id="technologyLevel" name="technologyLevel" code="lib_technology" type="text"must="true"  ></form:select>
+					<form:select label="会籍变化原因" id="memberChangeReason" name="memberChangeReason" code="lib_member_change_reason" type="text" must="true" ></form:select>
+					<form:select label="是否农民工" id="isFarmer" name="isFarmer" code="lib_is_not" type="text" ></form:select>
+				</div>
+            </div>
+            <div class="row btn-group-m-t">
+                <div class="col-sm-4 col-sm-offset-5">
+                    <qx:btn  fa="fa fa-check" label="提交" permission="" onclick="DeptMemberDlg.addSubmit()"></qx:btn>
+					<qx:btn  fa="fa fa-eraser" label="取消" permission="" onclick="DeptMemberDlg.close()"></qx:btn>
+                </div>
+            </div>
+        </div>
+</body>
+<js>
+  <script type="text/javascript" >
+  $(function(){
+  	  //验证form表单
+       App.initValidator("deptMemberForm", DeptMemberDlg.validateFields);
+  });
+  /* 
+   * 初始对话框
+   */
+   var DeptMemberDlg = {
+	    recordData: {},
+	    deptZtree: null,
+	    pNameZtree: null,
+	    validateFields: {
+	    	name: {
+	             validators: {
+	                 notEmpty: {
+	                     message: '姓名不能为空！'
+	                 }
+	             }
+	         },
+            politicalStatus: {
+	             validators: {
+	                 notEmpty: {
+	                     message: '政治面貌不能为空！'
+	                 }
+	             }
+	         },
+            sex: {
+                validators: {
+                    notEmpty: {
+                        message: '性别不能为空！'
+                    }
+                }
+            },
+	         birthday: {
+	             validators: {
+	                 notEmpty: {
+	                     message: '出生日期不能为空！'
+	                 }
+	             }
+	         },
+	    	nation: {
+	             validators: {
+	                 notEmpty: {
+	                     message: '民族不能为空！'
+	                 }
+	             }
+	         },
+	         workSituation: {
+	             validators: {
+	                 notEmpty: {
+	                     message: '就业情况不能为空！'
+	                 }
+	             }
+	         },
+	         certificateType: {
+	             validators: {
+	                 notEmpty: {
+	                     message: '证件类型不能为空！'
+	                 }
+	             }
+	         },
+	         education: {
+	             validators: {
+	                 notEmpty: {
+	                     message: '学历不能为空！'
+	                 }
+	             }
+	         },
+	         technologyLevel: {
+	             validators: {
+	                 notEmpty: {
+	                     message: '技能等级不能为空！'
+	                 }
+	             }
+	         },
+	         mobile: {
+	             validators: {
+	                 notEmpty: {
+	                     message: '移动电话不能为空！'
+	                 },
+                     regexp:{
+                         regexp:/^1\d{10}$/,
+                         message:'请判断手机号是否正确'
+                     }
+
+	             }
+	         },
+	         household: {
+	             validators: {
+	                 notEmpty: {
+	                     message: '户籍类型不能为空！'
+	                 }
+	             }
+	         },
+	         memberChange: {
+	             validators: {
+	                 notEmpty: {
+	                     message: '会籍变化类型不能为空！'
+	                 }
+	             }
+	         },
+	         memberChangeDate: {
+	             validators: {
+	                 notEmpty: {
+	                     message: '会籍变化日期不能为空！'
+	                 }
+	             }
+	         },
+	         memberChangeReason: {
+	             validators: {
+	                 notEmpty: {
+	                     message: '会籍变化原因不能为空！'
+	                 }
+	             }
+	         },
+	         certificateNum: {
+	             validators: {
+	            	 notEmpty: {
+	                     message: '身份证号不能为空！'
+	                 },
+                     // regexp: {
+                     //       regexp: '^[1-9]\\d{5}[1-9]\\d{3}((0\\d)|(1[0-2]))(([0|1|2]\\d)|3[0-1])\\d{3}([0-9Xx])$',
+                     //       message: '请输入正确的身份证号！'
+                     //   },
+                     callback: {
+                         message: '证件号码格式不正确',
+                         callback: function(value, validator) {
+                             var certificateType = document.getElementById('certificateType').value;
+                             if(!certificateType){
+                                 return false;
+                             }
+                             if(certificateType=='01'){
+                                 var reg = /^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9Xx])$/;
+                                 return reg.test(value);
+                             }else if(certificateType=='02'){
+                                 var reg = /^[a-zA-Z0-9]{5,17}$/;
+                                 return reg.test(value);
+                             }else if(certificateType=='03'){
+                                 var reg = /\d/;
+                                 return reg.test(value);
+                             }else if(certificateType=='04'){
+                                 var reg = /^([A-Z]\d{6,10}(\(\w{1}\))?)$/;
+                                 return reg.test(value);
+                             }
+
+
+                         }
+                     }
+	             }
+	         }
+	  }
+   }
+  
+  /**
+   * 清除数据
+   */
+   DeptMemberDlg.clearData = function() {
+      this.recordData = {};
+      
+  }
+  /**
+   * 关闭此对话框
+   */
+   DeptMemberDlg.close = function() {
+      parent.layer.close(window.parent.OptDeptMember.layerIndex);
+  }
+   /**
+    * 设置对话框中的数据
+    * param key 数据的名称
+    */
+   DeptMemberDlg.set = function(key) {
+       this.recordData[key] = $("#" + key).val();
+       return this;
+   }
+   
+  /**
+   * 收集数据
+   */
+  DeptMemberDlg.collectData = function() {
+		  this.set('deptId')
+	      .set('name')
+	      .set('birthday')
+	      .set('politicalStatus')
+	      .set('education')
+	      .set('certificateType')
+	      .set('mobile')
+	      .set('memberChange')
+	      .set('memberChangeDate')
+	      .set('memberChangeReason')
+	      .set('nativePlace')
+	      .set('household')
+	      .set('sex')
+	      .set('nation')
+	      .set('workSituation')
+	      .set('technologyLevel')
+	      .set('certificateNum')
+	      .set('isFarmer')
+	      .set('workUnit')
+	      .set('homeplace')
+	      .set('domicile');
+		  if($("#birthday").val()) {//参加工作日期
+	   		  	 this.recordData["birthday"] = $("#birthday").val().replaceAll('-','');
+	   	  	  }
+		  if($("#memberChangeDate").val()) {//参加工作日期
+	   		  	 this.recordData["memberChangeDate"] = $("#memberChangeDate").val().replaceAll('-','');
+	   	  	  }
+  }
+  /**
+   * 验证数据是否为空
+   */
+  DeptMemberDlg.validate = function () {
+      $('#deptMemberForm').data("bootstrapValidator").resetForm();
+      $('#deptMemberForm').bootstrapValidator('validate');
+      return $("#deptMemberForm").data('bootstrapValidator').isValid();
+  }
+  
+  //验证规则：11位数字，以1开头。
+  DeptMemberDlg.checkMobile = function (str) {
+	  var  re = /^1\d{10}$/
+	  if (re.test(str)) {
+	  		return true;
+	  }
+	  return false;
+  }
+  
+  /**
+   * 添加会员信息
+   */
+  DeptMemberDlg.addSubmit = function() {
+      this.clearData();
+      this.collectData();
+	  //校验表单是否填写完整
+      if (!this.validate()) {
+    	  errorFocus();
+          return;
+      }
+	  //验证手机号是否填写正确
+	  var mobile = $("#mobile").val();
+	  if(mobile && !DeptMemberDlg.checkMobile(mobile)){
+		  App.error("请输入正确的手机号码!");
+		  return;
+	  }
+
+	  App.loadingAjax({
+		  url:App.ctxPath+"dept/member/save",
+		  type:"POST",
+		  data:this.recordData,
+		  success:function () {
+              App.success("添加成功!");
+              window.parent.OptDeptMember.table.refresh();
+              DeptMemberDlg.close();
+          }
+	  })
+  }
+    </script>
+ </js>

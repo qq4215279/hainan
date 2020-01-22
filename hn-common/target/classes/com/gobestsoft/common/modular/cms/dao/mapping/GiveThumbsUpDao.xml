@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.cms.dao.GiveThumbsUpDao">
+
+	<insert id="articeGiveThumbsUp">
+		INSERT INTO
+		cms_article_operation_log(article_id,auid,create_time,type)
+		VALUES(#{articleId},#{uId},#{createTime},${type});
+	</insert>
+
+	<update id="addArticleThumbsUp">
+		update cms_article set thumbup_num=IFNULL(thumbup_num,0)+1
+		where id=#{articleId}
+	</update>
+
+	<update id="deleteArticleThumbsUp">
+		UPDATE cms_article SET
+		thumbup_num=ifnull(thumbup_num,1)-1 where id=${articleId};
+	</update>
+
+	<update id="deleteArticleThumbsUpLog">
+		DELETE FROM cms_article_operation_log WHERE
+		article_id=${articleId} AND auid=#{uId} AND type=${type};
+	</update>
+
+
+	<select id="getArticleThumbsUpCount" resultType="Integer">
+		 SELECT thumbup_num FROM  cms_article WHERE id=${articleId};
+	</select>
+
+	<insert id="commentGiveThumbsUp">
+		INSERT INTO
+		cms_comment_thumbup(comment_id,auid,create_time,update_time)
+		VALUES(${commentId},#{uId},#{createTime},#{createTime});
+	</insert>
+
+	<update id="addCommentThumbsUp">
+		update cms_comment set thumbup_num=IFNULL(thumbup_num,0)+1
+		where id=${commentId}
+	</update>
+
+
+	<update id="deleteCommentGiveThumbsUp">
+ 		update cms_comment set
+		thumbup_num=IFNULL(thumbup_num,1)-1
+		where id=${commentId};
+	</update>
+
+	<update id="deleteCommentGiveThumbsUpLog">
+		DELETE FROM cms_comment_thumbup WHERE
+		comment_id=${commentId} AND auid=#{uId};
+	</update>
+
+	<select id="getCommentGiveThumbsUpCount" resultType="Integer">
+		SELECT thumbup_num FROM   cms_comment WHERE id=${commentId};
+	</select>
+
+	<insert id="replyGiveThumbsUp">
+		INSERT INTO
+		cms_reply_thumbup(reply_id,auid,create_time,update_time)
+		VALUES(${replyId},#{uId},#{createTime},#{createTime});
+	</insert>
+
+	<update id="addReplyThumbsUp">
+		update cms_reply set thumbup_num=thumbup_num+1
+		where
+		id=${replyId}
+	</update>
+
+	<update id="deleteReplyGiveThumbsUp">
+		update cms_reply set thumbup_num=IFNULL(thumbup_num,1)-1
+		where
+		id=${replyId};
+	</update>
+
+	<update id="deleteReplyGiveThumbsUpLog">
+		DELETE FROM cms_reply_thumbup WHERE reply_id=${replyId}
+		AND auid=#{uId}
+	</update>
+
+	<select id="getReplyGiveThumbsUpCount" resultType="Integer">
+		SELECT thumbup_num FROM cms_reply WHERE id=${replyId};
+	</select>
+
+	<select id="isGotArtileThumbsUp" resultType="java.lang.Integer">
+		SELECT COUNT(0) FROM
+		cms_article_operation_log WHERE auid=#{auId} AND article_id=${id} AND type=#{type}
+	</select>
+	<select id="isGotCommentThumbsUp" resultType="java.lang.Integer">
+		SELECT COUNT(0)
+		FROM
+		cms_comment_thumbup WHERE auid=#{auId} AND comment_id=${id}
+	</select>
+	<select id="isGotReplyThumbsUp" resultType="java.lang.Integer">
+		SELECT COUNT(0) FROM
+		cms_reply_thumbup WHERE auid=#{auId} AND reply_id=${id}
+	</select>
+</mapper>

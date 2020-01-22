@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.system.dao.UserMgrDao">
+	<resultMap type="HashMap" id="selResultMap">
+		<result property="id" column="id"/>
+		<result property="account" column="account"/>
+		<result property="name" column="name"/>
+		<result property="sexName" column="sexName"/>
+		<result property="roleName" column="roleName"/>
+		<result property="duty" column="duty"/>
+		<result property="dutyofwork" column="dutyofwork"/>
+		<result property="phone" column="phone"/>
+		<result property="createtime" column="createtime"/>
+		<result property="statusName" column="statusName"/>
+		
+	</resultMap>
+	
+	 <select id="userTree" resultType="com.gobestsoft.core.node.UserNode">
+		select concat(b.uid,'') as id,concat(b.deptid,'') as pid ,b.name as name,
+		(case when (b.uid = '' OR b.uid IS NULL) then 'false' else 'false' end) as isopen,
+		(case when (b.uid = '' OR b.uid IS NULL) then 'pIcon03'else 'pIcon03' end ) as iconSkin,
+		(case when (b.uid = '' OR b.uid IS NULL) then '1'else '1' end ) as isUser
+		from sys_dept a
+		right join sys_user b on a.id=b.deptid
+		union 
+		select concat(c.id,'') as id,concat(c.pid,'') as pid ,c.simplename as name,
+		(case when (concat(c.pid,'') = '0' ) then 'true' else 'false' end) as isopen,
+		(case when (dept_Type = 0 OR c.pid IS NULL) then 'pIcon01'else 'pIcon02' end ) as iconSkin,
+		(case when (dept_Type = 0 OR c.pid IS NULL) then '0'else '0' end ) as isUser
+		from  sys_dept c
+	</select>
+	 
+
+	<sql id="Base_Column_List">
+		uid as id, account, name, birthday, sex, email, avatar,
+		phone, roleid,
+		deptid, status,
+		createtime, version,duty,duty_of_work as dutyOfWork 
+	</sql>
+
+	<sql id="Base_Column_List_With_Pwd">
+		u.uid as id, u.account, u.name, u.birthday, u.password, u.sex, u.email, u.avatar,
+		u.phone, u.roleid, u.salt,
+		u.deptid, u.status,
+		u.createtime,  d.level, d.simplename as orgName
+	</sql>
+
+	<select id="selectUsers" resultType="map">
+		select
+		<include refid="Base_Column_List" />
+		from sys_user
+		where status != 3
+		<if test="name != null and name != ''">
+			and (phone like CONCAT('%',#{name},'%')
+			or account like CONCAT('%',#{name},'%')
+			or name like CONCAT('%',#{name},'%'))
+		</if>
+		<if test="deptid != null and deptid != 0">
+			and  deptid in ( select id from sys_dept where pids like CONCAT('%', #{deptid}, '%') )
+		</if>
+		<if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+			and (createtime between CONCAT(#{beginTime},' 00:00:00') and CONCAT(#{endTime},' 23:59:59'))
+		</if>
+	</select>
+
+	<update id="setStatus">
+		update sys_user set status = #{status} where uid =
+		#{userId}
+	</update>
+
+	<update id="changePwd">
+		update sys_user set password = #{pwd} where uid =
+		#{userId}
+	</update>
+
+	<update id="setRoles">
+		update sys_user set roleid = #{roleIds} where uid =
+		#{userId}
+	</update>
+
+	<select id="getByAccount" resultType="user">
+		select
+		<include refid="Base_Column_List_With_Pwd" />
+		from sys_user u left join sys_dept d on u.deptid = d.id where account = #{account} and status != 3
+		<if test="userType !=null and userType!='' ">
+			AND user_type=#{userType}
+		</if>
+	</select>
+	
+	<select id="selectUsersByCondition" resultMap="selResultMap">
+		select uid as id,account,name,sex as sexName,roleid as roleName,duty,
+		duty_of_work as dutyofwork,phone,createtime,status as statusName
+		from sys_user where status != 3
+		<if test="name != null and name != ''">
+			and (phone like CONCAT('%',#{name},'%')
+			or account like CONCAT('%',#{name},'%')
+			or name like CONCAT('%',#{name},'%'))
+		</if>
+		<if test="deptid != null and deptid != 0">
+			and  deptid = #{deptid}
+		</if>
+		<if test="beginTime != null and beginTime != ''">
+			and createtime <![CDATA[ >= ]]> CONCAT(#{beginTime},'000000')
+		</if>
+		<if test="endTime != null and endTime != ''">
+			and createtime <![CDATA[ <= ]]> CONCAT(#{endTime},'235959')
+		</if>
+		order by createtime desc
+	</select>
+
+	<select id="queryAccountByUsername" parameterType="string" resultType="int">
+		SELECT
+			  count(1)
+		FROM
+			  sys_user u
+		WHERE
+		      u.account = #{username};
+	</select>
+
+</mapper>

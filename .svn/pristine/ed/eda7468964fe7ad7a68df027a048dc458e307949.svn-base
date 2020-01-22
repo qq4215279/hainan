@@ -1,0 +1,72 @@
+<css>
+    <link th:href="@{/static/plugin/ztree/zTreeStyle.css}" rel="stylesheet">
+    <link th:href="@{/static/plugin/ztree/zTreeStyle.css}" rel="stylesheet">
+    <link th:href="@{/static/plugin/webuploader/webuploader.css}" rel="stylesheet">
+</css>
+<body>
+<div class="container">
+    <h3 th:text="${userAccount}"></h3>
+    <div class="ibox-content">
+        <ul id="zTree" class="ztree"></ul>
+    </div>
+</div>
+
+<div class="row text-center">
+    <qx:btn id="btn_save" class="btn btn-primary" fa="fa fa-check" label="保存"></qx:btn>
+    <qx:btn id="btn_close" class="btn btn-danger" fa="fa fa-close" label="关闭"></qx:btn>
+</div>
+</body>
+<js>
+    <script th:src="@{/static/plugin/webuploader/webuploader.min.js}"></script>
+    <script th:src="@{/static/js/web-upload-object.js}"></script>
+    <script th:src="@{/static/plugin/ztree/jquery.ztree.all.min.js}"></script>
+    <script th:src="@{/static/plugin/ztree/ztree-object.js}"></script>
+    <script th:inline="javascript">
+        var userId = [[${userId}]];
+    </script>
+    <script type="text/javascript">
+        $(function () {
+
+            var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+
+            $("#btn_close").bind("click", function () {
+                parent.layer.close(index);
+            });
+
+            $("#btn_save").bind("click", function () {
+                var ids = App.zTreeCheckedNodes("zTree");
+                var ajax = new $ax(App.ctxPath + "/mgr/setRole", function (data) {
+                    App.success("分配角色成功!");
+                    window.parent.MgrUser.table.refresh();
+                    parent.layer.close(index);
+                }, function (data) {
+                    App.error("分配角色失败!" + data.responseJSON.message + "!");
+                });
+                ajax.set("roleIds", ids);
+                ajax.set("userId", userId);
+                ajax.start();
+            });
+
+            initZtree();
+        });
+
+        function initZtree() {
+            var setting = {
+                check: {
+                    enable: true,
+                    chkboxType: {"Y": "ps", "N": "ps"}
+                },
+                data: {
+                    simpleData: {
+                        enable: true
+                    }
+                }
+            };
+
+
+            var ztree = new $ZTree("zTree", "/role/roleTreeListByUserId/" + userId);
+            ztree.setSettings(setting);
+            ztree.init();
+        }
+    </script>
+</js>

@@ -1,0 +1,86 @@
+<body xmlns:th="http://www.w3.org/1999/xhtml">
+    <div class="ibox float-e-margins">
+        <div class="ibox-content">
+            <div class="form-horizontal" id="contractForm">
+                <input type="hidden" th:value="${pojo.id}" id="id"/>
+                <div class="row">
+                    <div class="col-sm-7">
+                        <form enctype="multipart/form-data" name="uploadForm" id="uploadForm">
+                            <form:text id="name" label="母版名称" value="${pojo.name}" />
+                            <div class="form-group">
+                                <input class="btn btn-primary" type="file" id="uploadFile" name="uploadFile" accept=".doc,.docx" style="margin-left: 15px;" />
+                            </div>
+                        </form>
+                        <div class="col-sm-7" role="group">
+                            <qx:btn class="btn btn-primary" fa="fa fa-check" label="提交" onclick="ContractEdit.addSubmit()" />
+                            <qx:btn class="btn btn-primary" fa="fa fa-eraser" label="取消" onclick="ContractEdit.close()" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<js>
+    <script>
+
+        /**
+         * 角色详情对话框（可用于添加和修改对话框）
+         */
+        let ContractEdit = {
+            articleData: new FormData(),
+            baseUrl: App.ctxPath + 'contract/master'
+        };
+
+        App.initValidator("contractForm", ContractEdit.validateFields);
+
+        /**
+         * 清除数据
+         */
+        ContractEdit.clearData = function () {
+            this.articleData = new FormData();
+        };
+
+
+        /**
+         * 收集数据
+         */
+        ContractEdit.collectData = function () {
+            this.articleData.append("id", $("#id").val());
+            this.articleData.append("name", $("#name").val());
+            this.articleData.append("uploadFile", $('#uploadFile')[0].files[0]);
+        };
+
+        /**
+         * 关闭此对话框
+         */
+        ContractEdit.close = function () {
+            parent.layer.close(window.parent.Contract.layerIndex);
+        };
+
+        /**
+         * 提交
+         */
+        ContractEdit.addSubmit = function () {
+            this.clearData();
+            this.collectData();
+
+            $.ajax({
+                url: this.baseUrl + "/doSave",
+                type: 'post',
+                processData: false,
+                contentType: false,
+                data: this.articleData,
+                success: function () {
+                    App.success("修改成功!");
+                    window.parent.Contract.table.refresh();
+                    ContractEdit.close();
+                },
+                fail: function () {
+                    App.error("修改失败!");
+                }
+            })
+        };
+
+    </script>
+</js>
+</body>

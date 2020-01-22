@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gobestsoft.common.modular.system.dao.QualificationDao">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.gobestsoft.common.modular.dao.model.QualificationPojo">
+		<id column="id" property="id" />
+		<result column="p_name" property="pName" />
+		<result column="uid" property="uid" />
+		<result column="enterprise_name" property="enterpriseName" />
+		<result column="economic_type" property="economicType" />
+		<result column="industry_type" property="industryType" />
+		<result column="address" property="address" />
+		<result column="enterprise_number" property="enterpriseNumber" />
+		<result column="website" property="website" />
+		<result column="introduce" property="introduce"/>
+		<result column="qualification_path" property="qualificationPath"/>
+		<result column="status" property="status"/>
+		<result column="create_user" property="createUser"/>
+		<result column="create_time" property="createTime"/>
+		<result column="update_user" property="updateUser"/>
+		<result column="update_time" property="updateTime"/>
+	</resultMap>
+	
+	<!-- 通用插入或插入表字段 -->
+	<sql id="columns">
+		dept_enterprise_qualification.p_name,
+		dept_enterprise_qualification.uid,
+		dept_enterprise_qualification.enterprise_name,
+		dept_enterprise_qualification.economic_type,
+		dept_enterprise_qualification.industry_type,
+		dept_enterprise_qualification.address,
+		dept_enterprise_qualification.enterprise_number,
+		dept_enterprise_qualification.website,
+		dept_enterprise_qualification.introduce,
+		dept_enterprise_qualification.qualification_path,
+		dept_enterprise_qualification.status,
+		dept_enterprise_qualification.create_user,
+		dept_enterprise_qualification.create_time,
+		dept_enterprise_qualification.update_user,
+		dept_enterprise_qualification.update_time
+	</sql>
+	
+	<!-- 插入字段的值 -->
+	<sql id="columnValues">
+		#{pName},
+		#{uid},
+		#{enterpriseName},
+		#{economicType},
+		#{industryType},
+		#{address},
+		#{enterpriseNumber},
+		#{website},
+		#{introduce},
+		#{qualificationPath},
+		#{status},
+		#{createUser},
+		#{createTime},
+		#{updateUser},
+		#{updateTime}
+	</sql>
+	
+	<!--更新sql,设置的值 -->
+	<sql id="columnSets">
+		dept_enterprise_qualification.p_name=#{pName},
+		dept_enterprise_qualification.enterprise_name=#{enterpriseName},
+		dept_enterprise_qualification.economic_type=#{economicType},
+		dept_enterprise_qualification.industry_type=#{industryType},
+		dept_enterprise_qualification.address=#{address},
+		dept_enterprise_qualification.enterprise_number=#{enterpriseNumber},
+		dept_enterprise_qualification.website=#{website},
+		dept_enterprise_qualification.introduce=#{introduce},
+		dept_enterprise_qualification.qualification_path=#{qualificationPath},
+		dept_enterprise_qualification.status=#{status},
+		dept_enterprise_qualification.update_user=#{updateUser},
+		dept_enterprise_qualification.update_time=#{updateTime}
+	</sql>
+	
+	<!--更新审核状态sql时用到 ：设置审核状态、更新用户、更新时间字段的值 -->
+	<sql id="columnStatusSet">
+		dept_enterprise_qualification.status=#{status},
+		dept_enterprise_qualification.update_user=#{updateUser},
+		dept_enterprise_qualification.update_time=#{updateTime}
+	</sql>
+
+	<!-- 插入一条数据 -->
+	<insert id="insert" parameterType="com.gobestsoft.common.modular.dao.model.QualificationPojo" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO dept_enterprise_qualification (<include refid="columns"></include>)
+		VALUES (<include refid="columnValues"></include>)
+	</insert>
+	
+	<!-- 传入对象,更新一条数据 -->
+   	<update id="updateById" >
+   		UPDATE dept_enterprise_qualification
+		<set>
+			<include refid="columnSets"></include>
+		</set>
+	 	where ID = #{id}
+   	</update>
+   	
+   	<!-- 根据当前用户user_id,查询出一条企业资质的基本信息 -->
+	<select id="selectByUid" resultMap="BaseResultMap">
+		SELECT dept_enterprise_qualification.id,
+			<include refid="columns"></include>
+		FROM dept_enterprise_qualification
+		where uid = #{uid}
+	</select>
+	
+	<!-- 根据id,查询一条Qualification格式的记录 -->
+	<select id="selectById" resultMap="BaseResultMap">
+		SELECT dept_enterprise_qualification.id,
+			<include refid="columns"></include>
+		FROM dept_enterprise_qualification
+		where id = #{id}
+	</select>
+	
+	<!-- 只更新一条数据的审核状态字段 -->
+   	<update id="updateStatus" >
+   		UPDATE dept_enterprise_qualification
+		<set>
+			<include refid="columnStatusSet"></include>
+		</set>
+	 	where ID = #{id}
+   	</update>
+</mapper>

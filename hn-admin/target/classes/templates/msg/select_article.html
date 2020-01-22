@@ -1,0 +1,96 @@
+@layout("/common/_container.html"){
+<!-- 资讯列表 -->
+<div class="form-horizontal tab-pane" id="articleList">
+        <div class="row">
+            <div class="col-sm-6">
+                <#NameCon id="keyword" name="资讯标题" />
+            </div>
+            <div class="col-sm-6">
+                <#SelectCon id="categoryId" name="类型" options="${categoryDictList}"></#SelectCon>
+            </div>
+        </div>
+    <div class="row text-center" style="margin-top: 20px;">
+        <#button name="搜索" icon="fa-search" clickFun="ObjArticle.search()"/>
+    </div>
+    <div class="hidden-xs" id="ArticleObjTableToolbar" role="group"></div>
+    <#table id="ArticleObjTable"/>
+</div>
+
+<script>
+
+    /**
+     * Tab2
+     * 初始化选中资讯列表
+     */
+    var ObjArticle = {
+        id: "ArticleObjTable",  //表格id
+        seItem: null,       //选中的条目
+        table: null,
+        layerIndex: -1
+    };
+
+    /**
+     * 初始化资讯列表的列
+     */
+    ObjArticle.initColumn = function () {
+        return [
+            {
+                title: '', align: 'center', valign: 'middle', field: 'selectItem', checkbox: false,
+                formatter: function (value, row, index) {
+                    return '<a href="#" onclick="ObjArticle.chooseArticle(\'' + row.id + '\',\''+row.title+'\')"><i class="fa fa-external-link"></i> 选择</a>';
+                }
+            },
+            {
+                title: '编号', field: 'id', visible: true, align: 'center', valign: 'middle', sortable: false
+            },
+            {
+                title: '标题', field: 'title', align: 'center', valign: 'middle'
+            }
+        ];
+    };
+
+    /**
+     * 列表查询响应
+     */
+    ObjArticle.search = function () {
+        ObjArticle.table.refresh({query: ObjArticle.formParams()});
+    }
+
+    /**
+     * 查询表单提交参数对象
+     */
+    ObjArticle.formParams = function () {
+        var queryData = {};
+        queryData['keyword'] = $("#keyword").val();
+        queryData['categoryId'] = $("#categoryId").val();
+        return queryData;
+    }
+
+    ObjArticle.chooseArticle = function (id,articleTitle) {
+        parent.selectArticle(id,articleTitle);
+        back();
+    }
+
+    /**
+     * 返回
+     */
+    function back(){
+        var index = parent.layer.getFrameIndex(window.name);
+        parent.layer.close(index); //再执行关闭
+    }
+    /**
+     * 画面初期处理
+     */
+    $(function () {
+        // 资讯初始化查询
+        var defaultColumn = ObjArticle.initColumn();
+        var table = new BSTable(ObjArticle.id, "/msg/articleList", defaultColumn);
+        table.setPaginationType("server");
+        table.setQueryParams(ObjArticle.formParams());
+        ObjArticle.table = table.init();
+
+    });
+
+</script>
+
+@}

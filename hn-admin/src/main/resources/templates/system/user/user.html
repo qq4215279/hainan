@@ -1,0 +1,73 @@
+<css >
+    <div  th:include="fragment/fargment :: treeCss"></div>
+    <div  th:include="fragment/fargment :: bootstrapTableCss"></div>
+</css>
+<body>
+<div class="row">
+    <div class="col-sm-3">
+        <div class="panel panel-default">
+            <div class="panel-heading">组织机构</div>
+            <div class="panel-body dept-tree">
+                <ul id="deptTree" class="ztree"></ul>
+            </div>
+        </div>
+        <div id="rMenu" style="position: absolute; visibility: hidden; z-index: 1;">
+            <ul class="menu">
+                <li id="m_add" onclick="addTreeNode(0);" class="line1">添加下级工会</li>
+                <li id="m_addNew" onclick="addTreeNode(1);" class="line1">添加本级部门</li>
+                <li id="m_edit" onclick="edit();" class="line1">修改信息</li>
+                <li id="m_remove" onclick="removeTreeNode();">删除</li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-sm-9">
+        <div class="row">
+            <div class="col-sm-10">
+                <input type="hidden" id="loginDeptId">
+                <div class="col-sm-4">
+                    <search:input label="用户名称" name="name" value=""
+                                  placeholder="帐号/姓名/手机号" type="text"></search:input>
+                </div>
+                <div class="col-sm-4">
+                    <search:datetime label="注册开始日期" name="beginTime" isTime="false"
+                                     format="yyyy-MM-dd"></search:datetime>
+                </div>
+                <div class="col-sm-4">
+                    <search:datetime label="注册结束日期" name="endTime" isTime="false"
+                                     format="yyyy-MM-dd"></search:datetime>
+                </div>
+            </div>
+            <div class="col-sm-2">
+                <qx:btn class="btn btn-primary" fa="fa fa-search" label="搜索"
+                        onclick="MgrUser.search()"></qx:btn>
+            </div>
+        </div>
+        <div class="hidden-xs" id="managerTableToolbar" role="group">
+            <qx:btn class="btn btn-primary" fa="fa fa-plus" label="添加" onclick="MgrUser.openAddMgr()"
+                    permission="/mgr/add"></qx:btn>
+            <qx:btn class="btn btn-primary" fa="fa fa-edit" label="修改" onclick="MgrUser.openChangeUser()"
+                    permission="/mgr/edit"></qx:btn>
+            <qx:btn class="btn btn-primary" fa="fa fa-remove" label="删除" onclick="MgrUser.delMgrUser()"
+                    permission="/mgr/delete"></qx:btn>
+            <qx:btn class="btn btn-primary" fa="fa fa-remove" label="重置密码" onclick="MgrUser.resetPwd()"
+                    permission="/mgr/reset"></qx:btn>
+            <qx:btn class="btn btn-primary" fa="fa fa-warning" label="冻结" onclick="MgrUser.freezeAccount()"
+                    permission="/mgr/freeze"></qx:btn>
+            <qx:btn class="btn btn-primary" fa="fa fa-check-circle" label="解除冻结" onclick="MgrUser.unfreeze()"
+                    permission="/mgr/unfreeze"></qx:btn>
+            <qx:btn class="btn btn-primary" fa="fa fa-user-secret" label="角色分配" onclick="MgrUser.roleAssign()"
+                    permission="/mgr/setRole"></qx:btn>
+        </div>
+        <table id="managerTable" data-mobile-responsive="true" data-click-to-select="true">
+
+        </table>
+    </div>
+</div>
+
+</body>
+
+<js>
+    <div th:include="fragment/fargment :: treeJs"></div>
+    <div th:include="fragment/fargment :: bootstrapTableJs"></div>
+    <script th:src="@{/static/modular/system/user/user.js}"></script>
+</js>

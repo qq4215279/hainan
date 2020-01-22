@@ -1,0 +1,133 @@
+.pointer{
+	cursor: pointer;
+}
+.option-add{
+	position: absolute;
+	left: 45%;
+}
+.question-add,
+.question-del{
+	display: inline-block;
+}
+.question-add{
+	margin-right: 15px;
+}
+
+
+.survey-row{
+	padding: 1% 10%;
+	background-color: aliceblue;
+}
+
+.survey-row .line{
+	border-bottom: 1px solid lightgray;
+	margin: 2% 0;
+}
+.survey-row .block{
+	width: 10px;
+	display: inline-block;
+}
+
+/*详情*/
+.survey-row .head{
+	font-weight: bold;
+	color: #0ab0cd;
+}
+
+.survey-row .description{
+	font-size: 18px;
+	font-style: italic;
+}
+
+
+.survey-row .question-all .description{
+	position: absolute;
+	right: 10%;
+	top: 90%;
+	font-size: 14px;
+	font-style: italic;
+}
+
+.survey-row .question-all{
+	margin: 2% 0;
+	position: relative;
+}
+
+.survey-row .question-all .question{
+	display: flex;
+	font-weight: bold;
+	font-size: 16px;
+	margin: 1% 0;
+	position: relative;
+}
+
+.survey-row .correct-answer{
+	color: darkseagreen;
+	font-size: 14px;
+	position: absolute;
+	right: 0;
+}
+
+.survey-row .question-all .question .info .is-must{
+	color: red;
+	font-weight: bold;
+}
+
+.survey-row .question-all .question .info .position{
+	width: 8px;
+}
+
+.survey-row .question-all .option{
+	display: flex;
+	width: 100%;
+	flex-wrap: wrap;
+	min-height: 150px;
+	position: relative;
+	flex-direction: column;
+	margin-bottom: 1%;
+}
+
+.question-all .option .option-item{
+	width: 25%;
+	display: flex;
+	position: relative;
+}
+
+.question-all .option .option-item label{
+	display: flex;
+	align-items: center;
+	margin-left: 15%;
+}
+
+.question-all .option .option-item .option-item-key{
+	min-width: 20px;
+}
+
+.question-all .option .option-item .option-item-text{
+	font-weight: normal;
+	min-width: 100px;
+}
+
+/*编辑*/
+
+.survey-row input[type=text].border-hide{
+	border: none;
+	background: none;
+	cursor: pointer;
+}
+.survey-row input[type=text]:not(.border-hide){
+	border: none;
+	background: none;
+	cursor: pointer;
+	border-bottom: 1px solid;
+}
+
+.survey-row input[type=text]:hover{
+	border-bottom: 1px solid;
+}
+
+.survey-row .survey-head input[type=text]{
+	font-size: 30px;
+	font-weight: 100;
+}
+

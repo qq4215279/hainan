@@ -1,0 +1,292 @@
+<body>
+<div class="container">
+    <div  class="row form-horizontal"  id="ChangeForm">
+        <input id="id" type="hidden" th:value="${deptLegalApply.id}"/>
+        <input id="zhangd" type="hidden" th:value="${deptLegalApply.createunionTime}"/>
+        <div class="row">
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <form:text id="a" label="原基层工会名称" name="a" value="${history.deptName}"
+                               readonly="true"></form:text>
+                </div>
+                <div class="col-sm-4">
+                    <form:text id="deptName" label="变更基层工会名称" name="deptName"  must="true" value="${deptLegalApply.deptName}"></form:text>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <form:text id="b" label="原工会地址" name="b" value="${history.unitAddress}"
+                               disabled="true"></form:text>
+                </div>
+                <div class="col-sm-4">
+                    <form:text id="unitAddress" label="变更工会地址" name="unitAddress" must="true" value="${deptLegalApply.unitAddress}"></form:text>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <form:text id="c" label="原工会邮编" name="c" value="${history.unitZipCode}"
+                               disabled="true"></form:text>
+                </div>
+                <div class="col-sm-4">
+                    <form:text id="unitZipCode" label="变更工会邮编" name="unitZipCode" must="true" value="${deptLegalApply.unitZipCode}"></form:text>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <form:text id="d" label="原法定代表人" name="d" value="${history.name}"
+                               disabled="true" ></form:text>
+                </div>
+                <div class="col-sm-4">
+                    <form:text id="name" label="变更法定代表人" name="name" must="true" value="${deptLegalApply.name}"></form:text>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <form:text id="BpName" label="原隶属工会名称" name="BpName" value="${pName}" disabled="true"></form:text>
+                </div>
+                <div class="col-sm-4">
+                    <form:text id="pDeptFullname" label="变更隶属工会名称" name="pDeptFullname" value="${deptLegalApply.pDeptFullname}" ></form:text>
+                </div>
+            </div>
+
+
+        </div>
+
+
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <form:datetime id="electionDate" label="本届选举日期" istime="false" format="yyyy-MM-dd"
+                                   name="electionDate" value="${deptLegalApply.electionDate}"></form:datetime>
+                </div>
+
+                <div class="col-sm-4">
+                    <form:figure id="officeTerm" label="任期年限"  name="officeTerm"
+                                 value="${deptLegalApply.officeTerm}" max="100" min="0"></form:figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <form:figure id="unitNumber" label="职工人数" name="unitNumber"  min="0"
+                                 value="${deptLegalApply.unitNumber}" ></form:figure>
+                </div>
+                <div class="col-sm-4">
+                    <form:figure id="membership" label="会员人数" name="membership" min="0"
+                                 value="${deptLegalApply.membership}" ></form:figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <form:text id="approveNo" label="申请变更文号" name="approveNo" value="${deptLegalApply.approveNo}"
+                             ></form:text>
+                </div>
+                <div class="col-sm-4">
+                    <form:text id="cacellationBasis" label="上级工会批准工号" name="cacellationBasis"
+                               value="${deptLegalApply.cacellationBasis}" ></form:text>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <form:text id="incomeAccumulativeLastYear" label="上年结余累计收入（万元）" name="incomeAccumulativeLastYear"
+                                 value="${deptLegalApply.incomeAccumulativeLastYear}"
+                               ></form:text>
+                </div>
+                <div class="col-sm-4">
+                    <form:text id="incomeAnnualDues" label="年会员缴纳会费收入（万元）" name="incomeAnnualDues"
+                                 value="${deptLegalApply.incomeAnnualDues}"
+                                 ></form:text>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <form:text id="incomeTradeUnionFunds" label="年2%拨交工会经费本级留成收入（万元）" name="incomeTradeUnionFunds"
+
+                                 value="${deptLegalApply.incomeTradeUnionFunds}" ></form:text>
+                </div>
+                <div class="col-sm-4">
+                    <form:text id="incomeOther" label="其他收入（万元）" name="incomeOther"
+                                 value="${deptLegalApply.incomeOther}"
+                                 ></form:text>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <form:text id="capitalTotal" label="合计资金（万元）" name="capitalTotal"
+                                 value="${deptLegalApply.capitalTotal}"
+                                 ></form:text>
+                </div>
+                <div class="col-sm-4">
+                    <form:text id="capitalFixedFunds" label="固定资金（万元）" name="capitalFixedFunds"
+                                 value="${deptLegalApply.capitalFixedFunds}"
+                               ></form:text>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <form:text id="capitalWorking" label="流动资金（万元）" name="capitalWorking"
+                                 value="${deptLegalApply.capitalWorking}"
+                            ></form:text>
+                </div>
+
+                <div class="col-sm-4">
+                    <form:text id="capitalOther" label="其他资金（万元）" value="${deptLegalApply.capitalOther}"
+                                 name="capitalOther"></form:text>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <form:text id="placeTotal" label="合计场所（平方米）m^2" value="${deptLegalApply.placeTotal}"
+                                 name="placeTotal" ></form:text>
+                    <form:text id="placeActivity" label="活动场所（平方米）m^2" value="${deptLegalApply.placeActivity}"
+                                 name="placeActivity" ></form:text>
+                </div>
+
+                <div class="col-sm-4">
+                    <form:text id="placeOfficeArea" label="办公场所（平方米）m^2" value="${deptLegalApply.placeOfficeArea}"
+                                 name="placeOfficeArea"></form:text>
+                    <form:text id="placeOther" label="其他场所（平方米）m^2" value="${deptLegalApply.placeOther}"
+                                 name="placeOther" ></form:text>
+                </div>
+            </div>
+        <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-4">
+                <form:text id="certificateNumber" label="工会组织机构代码证书号码" value="${deptLegalApply.certificateNumber}"
+                           name="certificateNumber"></form:text>
+            </div>
+            <div class="col-sm-4">
+                <form:text id="personCertificateNumber" label="工会法人资格证书号码 例（工法证字第xxx号）"
+                           value="${deptLegalApply.personCertificateNumber}" name="personCertificateNumber"></form:text>
+            </div>
+        </div>
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <form:text id="name" label="姓名" value="${deptLegalApply.name}" name="name"
+                               ></form:text>
+                    <form:select id="nation" label="民族" name="nation" value="${deptLegalApply.nation}"
+                                 code="lib_ethnic_group" ></form:select>
+                    <form:select id="education" label="文化程度" value="${deptLegalApply.education}" name="education"
+                                 code="lib_education_code"></form:select>
+                    <form:text id="nativePlace" label="籍贯" value="${deptLegalApply.nativePlace}" name="nativePlace"
+                              ></form:text>
+                </div>
+
+                <div class="col-sm-4">
+                    <form:select id="sex" label="性别" value="${deptLegalApply.sex}" name="sex" code="lib_sex"
+                              ></form:select>
+                    <form:datetime id="birthday" label="出生年月" value="${deptLegalApply.birthday}" istime="false"
+                                 format="yyyy-MM-dd" name="birthday"></form:datetime>
+                    <form:select id="politicalOutlook" label="政治面貌" value="${deptLegalApply.politicalOutlook}"
+                                 name="politicalOutlook" code="lib_political_status"></form:select>
+                    <form:text id="workPosition" label="现任工会职务" value="${deptLegalApply.workPosition}"
+                               name="workPosition" ></form:text>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <form:datetime id="tnureStartDate" label="本届任职起始时间" value="${deptLegalApply.tnureStartDate}"
+                                   istime="false"  format="yyyy-MM-dd" name="tnureStartDate"></form:datetime>
+                </div>
+                <div class="col-sm-4">
+                    <form:text id="certificateNo" label="身份证号码" value="${deptLegalApply.certificateNo}"
+                               name="certificateNo" ></form:text>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <form:select id="partTimeJob" value="${deptLegalApply.partTimeJob}" label="属专职/兼职"
+                                 name="partTimeJob" code="lib_job_nature"></form:select>
+                </div>
+
+                <div class="col-sm-4">
+                    <form:datetime id="joinTime" label="何时加入工会组织" value="${deptLegalApply.joinTime}" istime="false"
+                                 format="yyyy-MM-dd" name="joinTime"></form:datetime>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <form:text id="otherPosition" label="现任其他职务" value="${deptLegalApply.otherPosition}"
+                               name="otherPosition" ></form:text>
+                </div>
+                <div class="col-sm-4">
+                    <form:text id="legalMobile" label="手机号码" value="${deptLegalApply.legalMobile}" name="legalMobile"
+                             ></form:text>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-4">
+                    <form:datetime id="cerTime" label="证书有效期" value="${deptLegalApply.cerTime}" istime="false"
+                                   format="yyyy-MM-dd" name="cerTime"></form:datetime>
+                </div>
+
+                <div class="col-sm-4">
+                    <form:text id="cerNo" label="证书编号" value="${deptLegalApply.cerNo}" name="cerNo"
+                             ></form:text>
+                </div>
+            </div>
+        <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-8">
+                <form:area id="changeReason" label="申请变更原因" value="${deptLegalApply.changeReason}" name="changeReason" must="true"
+                ></form:area>
+            </div>
+
+        </div>
+
+        <div class="row text-center">
+            <qx:btn id="save" class="btn btn-success" onclick="ChangeDlg.addSubmit(1)"
+            fa="fa fa-eraser" label="保存"></qx:btn>
+            <qx:btn id="submit" class="btn btn-primary" onclick="ChangeDlg.addSubmit(2)"
+                    fa="fa fa-eraser" label="提交"></qx:btn>
+            <qx:btn id="close" class="btn btn-danger" onclick="ChangeDlg.close()"
+                    fa="fa fa-eraser" label="取消"></qx:btn>
+        </div>
+        <br/>
+    </div>
+</div>
+</body>
+<js>
+    <script th:src="@{/static/modular/legal/change/change_edit.js}"></script>
+</js>
+
+<!--<form class="form-horizontal">-->
+<!--<div class="row">-->
+<!--<div class="col-sm-6">-->
+<!--<form:figure id="two" label="数字输入框" name="two" max="100" min="10" value=""></form:figure>-->
+<!--<form:text id="one" label="文本输入框" name="one"></form:text>-->
+<!--<form:datetime id="three" label="日期输入" istime="false" must="true" format="yyyy-MM-dd" name="three"></form:datetime>-->
+<!--</div>-->
+<!--<div class="col-sm-6">-->
+<!--<form:datetime id="four" label="日期时间输入" istime="true" format="yyyy-MM-dd HH:mm:ss" name="four"></form:datetime>-->
+<!--<form:select id="account" label="性别" name="account"  code="lib_sex" must="true"></form:select>-->
+<!--<form:check id="five" label="check选择" name="five"></form:check>-->
+<!--</div>-->
+<!--</div>-->
+<!--<div class="row text-center">-->
+<!--<qx:btn id="sure" class="btn btn-default" fa="fa fa-address-book" label="确认"></qx:btn>-->
+<!--<qx:btn id="back" class="btn btn-primary" fa="fa fa-address-book" label="返回"></qx:btn>-->
+<!--</div>-->
+<!--</form>-->
+<!--</div>-->

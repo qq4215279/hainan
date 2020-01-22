@@ -1,0 +1,77 @@
+<css>
+    <div th:include="fragment/fargment :: treeCss"></div>
+    <link th:href="@{/static/css/_fstyle.css}" rel="stylesheet">
+</css>
+<body>
+<!-- 配置grid -->
+<div class="container">
+
+    <h5 th:text="${roleName}"></h5>
+</div>
+<div class="ibox-content">
+    <ul id="zTree" class="ztree"></ul>
+</div>
+
+<div class="row text-center">
+    <qx:btn id="btn_save" class="btn btn-primary" fa="fa fa-check" label="保存"></qx:btn>
+    <qx:btn id="btn_close" class="btn btn-danger" fa="fa fa-close" label="关闭"></qx:btn>
+</div>
+</body>
+
+<js>
+    <script th:src="@{/static/plugin/webuploader/webuploader.min.js}"></script>
+    <script th:src="@{/static/js/web-upload-object.js}"></script>
+    <div th:include="fragment/fargment :: treeJs"></div>
+    <script th:inline="javascript">
+        var roleId = [[${roleId}]];
+    </script>
+    <script type="text/javascript">
+        $(function () {
+
+
+            $("#btn_close").bind("click", function () {
+                parent.layer.close(index);
+            });
+
+            $("#btn_save").bind("click", function () {
+                var ids = App.zTreeCheckedNodes("zTree");
+                App.loadingAjax({
+                    url: App.ctxPath + "role/setAuthority",
+                    data: {
+                        roleId: roleId,
+                        ids: ids
+                    },
+                    type: "POST",
+                    success: function (result) {
+                        App.success("分配角色成功!");
+                        window.parent.Role.table.refresh();
+                        var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                        parent.layer.close(index);
+                    }
+                });
+
+            });
+
+            initZtree();
+        });
+
+        function initZtree() {
+            var setting = {
+                check: {
+                    enable: true,
+                    chkboxType: {"Y": "p", "N": "s"}
+                },
+                data: {
+                    simpleData: {
+                        enable: true
+                    }
+                }
+            };
+
+            var ztree = new $ZTree("zTree", "menu/menuTreeListByRoleId/" + roleId);
+            ztree.setSettings(setting);
+            ztree.init();
+        }
+    </script>
+
+</js>
